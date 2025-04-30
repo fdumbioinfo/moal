@@ -14,3 +14,6 @@ https://doi.org/10.1101/2023.10.17.562686
 
 Zenodo repository:
 https://zenodo.org/records/15309968
+
+R-open-science-universe:
+https://fdumbioinfo.r-universe.dev/moal
