@@ -21,4 +21,4 @@ https://fdumbioinfo.r-universe.dev/moal
 
 R install:
 
-install.packages('moal',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org','https://bioc.r-universe.dev'))
+install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
