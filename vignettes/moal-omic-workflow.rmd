@@ -1,0 +1,16 @@
+---
+title: "moal-omic-workflow"
+output: rmarkdown::html_document
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{moal-omic-workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+![](moal-omic-workflow-1.jpg)
+
+
+
+

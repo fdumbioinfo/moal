@@ -1,0 +1,16 @@
+---
+title: "omic-workflow-example"
+output: rmarkdown::html_document
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{omic-workflow-example}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+![](omic-workflow-example.jpg)
+
+
+
+
