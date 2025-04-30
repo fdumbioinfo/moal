@@ -9,7 +9,8 @@ Workflow summary:
  - Graph generation for selected feature: volcanoplots, heatmaps, lineplots, boxplots, PCA
  - Functional analysis: MSigDB enrichment analysis and STRINGDB interaction network
 
+bioRxiv preprint:
+https://doi.org/10.1101/2023.10.17.562686
 
-https://www.biorxiv.org/content/10.1101/2023.10.17.562686v1?__cf_chl_tk=K2mUxIyIzNBFOuV4UsXgwfB4TvGaERlio5iagYp2nJM-1746045399-1.0.1.1-lM6dJMhr6f_O1yxHiXgzrhzBb_k_PfwROH5GZ6eLsB8
-
+Zenodo repository:
 https://zenodo.org/records/15309968
