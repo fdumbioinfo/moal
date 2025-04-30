@@ -1,2 +1,9 @@
 MOAL: Multi-Omic Analysis at Lab.
-A simplified methodology workflow to make reproducible omic bioanalysis.
+A simplified function to make reproducible omic bioanalysis.
+Workflow summary:
+ - Quality controls and unsupervised analysis: histogram, box plot, PCA and sample clustering.
+ - Supervised analysis: analysis of variance (ANOVA) and filter application.
+ - Unsupervised analysis for selected features: row clustering, PCA and pattern search across factor levels.
+ - Graph generation for selected feature: volcanoplots, heatmaps, lineplots, boxplots, PCA
+ - Functional analysis: MSigDB enrichment analysis and STRINGDB interaction network
+
