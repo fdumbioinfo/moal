@@ -19,6 +19,6 @@ https://zenodo.org/records/15309968
 RopenSci r-universe:
 https://fdumbioinfo.r-universe.dev/moal
 
-Install:
+R install:
 
 install.packages('moal',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org','https://bioc.r-universe.dev'))
