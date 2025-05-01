@@ -1,6 +1,9 @@
-MOAL: Multi-Omic Analysis at Lab.
+MOAL: Multi-Omic Analysis at Lab. A simplified workflow function to make reproducible omic bioanalysis.
 
-A simplified function to make reproducible omic bioanalysis.
+R packages install:
+
+install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
+
 
 Workflow summary:
  - Quality controls and unsupervised classification: histogram, box plot, PCA and sample clustering.
@@ -9,12 +12,13 @@ Workflow summary:
  - Graph generation for selected feature: volcanoplots, heatmaps, lineplots, boxplots, PCA
  - Functional analysis: MSigDB enrichment analysis and STRINGDB interaction network
 
-R packages install:
-
-install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
 
 RopenSci r-universe:
 https://fdumbioinfo.r-universe.dev/moal
+
+
+
+
 
 
 
