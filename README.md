@@ -16,7 +16,7 @@ install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cl
 RopenSci r-universe:
 https://fdumbioinfo.r-universe.dev/moal
 
-------
+
 
 bioRxiv preprint:
 https://doi.org/10.1101/2023.10.17.562686
