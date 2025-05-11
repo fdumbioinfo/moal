@@ -21,5 +21,19 @@ https://doi.org/10.1101/2023.10.17.562686
 Zenodo repository:
 https://zenodo.org/records/15309968
 
+Release updates:
 
+1.2.1
+
+
+1.2.0
+Display improvements on graphics.
+Improve omic() function workflow time computing.
+Improve output results browsing and volume.
+Enrichment function gsneain():
+- GSEA enrichment analysis applied to ANOVA results
+- Create heatmaps and interaction networks for significative gene sets
+- Heatmap created with gene set GMT files provided
+Biological databases: NCBI gene, NCBI orthologs, Ensemble gene, Ensemble transcript, Ensemble
+proteins, MSigDB gene sets collections and StringDB interactions.
 
