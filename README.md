@@ -25,8 +25,11 @@ Release updates:
 
 1.2.1
 
+Fix bug for unbalanced design case using anova model with interaction.
+
 
 1.2.0
+
 Display improvements on graphics.
 Improve omic() function workflow time computing.
 Improve output results browsing and volume.
