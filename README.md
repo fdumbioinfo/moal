@@ -9,7 +9,7 @@ Workflow summary:
  - Supervised analysis: analysis of variance (ANOVA) and filter application.
  - Unsupervised analysis for selected features: row clustering, PCA and pattern search across factor levels.
  - Graph generation for selected feature: volcanoplots, heatmaps, lineplots, boxplots, PCA
- - Functional analysis: MSigDB enrichment analysis and STRINGDB interaction network
+ - Functional analysis: MSigDB enrichment analysis and StringDB interaction network
 
 
 RopenSci r-universe:
@@ -40,5 +40,5 @@ Enrichment function gsneain():
 - GSEA enrichment analysis applied to ANOVA results
 - Create heatmaps and interaction networks for significative gene sets
 - Heatmap created with gene set GMT files provided
-- Biological databases updates: NCBI gene, NCBI orthologs, Ensemble gene, Ensemble transcript, Ensemble proteins, MSigDB gene sets collections and StringDB interactions.
+- Biological databases updates: NCBI gene, NCBI orthologs, Ensemble gene, Ensemble transcript, Ensemble proteins, MSigDB gene set collections and StringDB interactions.
 
