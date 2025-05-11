@@ -34,7 +34,7 @@ Display improvements on graphics.
 
 Improve omic() function workflow time computing.
 
-Improve output results browsing and volume.
+Improve omic() output directory browsing and volume.
 
 Enrichment function gsneain():
 - GSEA enrichment analysis applied to ANOVA results
