@@ -31,12 +31,14 @@ Fix bug for unbalanced design case using anova model with interaction.
 1.2.0
 
 Display improvements on graphics.
+
 Improve omic() function workflow time computing.
+
 Improve output results browsing and volume.
+
 Enrichment function gsneain():
 - GSEA enrichment analysis applied to ANOVA results
 - Create heatmaps and interaction networks for significative gene sets
 - Heatmap created with gene set GMT files provided
-Biological databases: NCBI gene, NCBI orthologs, Ensemble gene, Ensemble transcript, Ensemble
-proteins, MSigDB gene sets collections and StringDB interactions.
+- Biological databases updates: NCBI gene, NCBI orthologs, Ensemble gene, Ensemble transcript, Ensemble proteins, MSigDB gene sets collections and StringDB interactions.
 
