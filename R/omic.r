@@ -25,7 +25,7 @@
 #' @param nested character factor for nested design
 #' @param batch character factor for batch effect design
 #' @param addfactor character additionnal factors
-#' @param threshold numeric vector from 1 to 160 (see details)
+#' @param threshold numeric vector from 1 to 24 (see details)
 #' @param dopattern logical search relevant pattern across levels factor
 #' @param dovenn logical venn diagram
 #' @param docluster logical row hierarchical clustering using pearson correlation
@@ -93,8 +93,6 @@
 #' 
 #' For paired, batch and nested design, remove batch effect from limma package are used to calculate fold-change
 #'  
-#' Incomplete block not accepted for interaction design.
-#'   
 #' Use dopar = 2 to decrease computing resources.
 #'  
 #' Use sample for random subset analysis.
@@ -256,6 +254,7 @@ omic <- function(
     ModelFactors -> CompFactors
     # interaction factor
     INTERACTION <- F
+    UNBALANCED <- F
     if(any(grepl("\\*",ModelFactors)))
     {
       # remove interaction in AnovaFactors
@@ -422,7 +421,7 @@ omic <- function(
       AllRbe %>% colnames %>% grep("^fc_",.) -> selRbe
       All[,selRbe] <- AllRbe[,selRbe] 
     }
-    # remove comp for batch Interaction factor 
+    # remove cross comparisons for interaction factor 
     if(INTERACTION & !crosscompint)
     {
       sif %>% colnames %>% grep(IntFactorName,.) %>% sif[,.] -> Comp0
@@ -433,6 +432,16 @@ omic <- function(
       Comp3 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
       All %>% colnames %>% sub(".*_(.*)","\\1",.) %>% grep(grep,.,value=F) -> sel
       All %>% as.data.frame %>% dplyr::select( -all_of(sel) ) -> All
+    }
+    # remove comparison when for unbalanced design
+    if(INTERACTION)
+    {
+      if(IntFactor3 %>% levels %>% length %>% ">"(IntFactor3 %>% as.character %>% table %>% length))
+      {
+        All %>% lapply(is.na) %>% lapply(all) %>% unlist %>% which -> sel
+        All %>% as.data.frame %>% dplyr::select( -all_of(sel) ) -> All
+        UNBALANCED <- T
+      }
     }
     # remove comp for batch factor
     if(!is.null(batch))
@@ -682,7 +691,7 @@ omic <- function(
     # check if more than 2 levels in factors
     FactorVenn1 %>% lapply(levels) %>% lapply(length) %>% ">"(.,2) %>% which -> sel
     if(length(sel) > 0){ FactorVenn1[sel] -> FactorVenn2 ; dovenn <- T }else{ dovenn <- F }
-    # if(INTERACTION){ dovenn <- F }
+    if(UNBALANCED){ dovenn <- F }
     paste( "Venn preprocessing done.\n", sep="" ) %>% cat
   }
   # venn processing
@@ -1031,7 +1040,7 @@ omic <- function(
       if(length(sel) > 0){ statList1[sel] -> statList1 }
       if(length(statList1) < 1){ docluster <- FALSE ; paste("Not enough rows to make cluster analysis \n") %>% cat }
     }else{docluster <- FALSE ; paste("Not enough rows to make cluster analysis \n") %>% cat}
-      }
+  }
   # cluster processing
   if(docluster)
   {
@@ -1210,6 +1219,8 @@ omic <- function(
   # ----
   # 10 - lineplot
   # ----
+  # if(INTERACTON){ if() }
+  if(UNBALANCED){ dolineplot <- FALSE }
   if(dolineplot)
   {
     paste( "Line plot processing...\n" , sep = "" ) %>% cat
@@ -1219,7 +1230,7 @@ omic <- function(
     l0 %>% basename %>% grep("^List_.*.tsv" , . , value = F ) %>% l0[.] -> l1
     l1 %>% basename %>% sub( "List_.*_(.*).tsv" , "\\1" , .  ) %>%
       as.numeric %>% ">"(.,0) %>% which %>% l1[.] -> l2
-    if( length(l2)==0 ){ lineplot <- FALSE ; paste("No significant feature for lineplot done.\n",sep="") %>% cat }
+    if( length(l2)==0 ){ dolineplot <- FALSE ; paste("No significant feature for lineplot done.\n",sep="") %>% cat }
     if(dolineplot)
     {
       ll1 <- foreach( i=1:length(l2), .packages=c("magrittr","dplyr") ) %dopar%

@@ -1,5 +1,5 @@
-#' @title Functional enrichment analysis and interaction network
-#' @description MSigDB enrichment analysis
+#' @title Gene set enrichment analysis and interaction network
+#' @description Gene set enrichment analysis and interaction network
 #' @param omicdata character data.frame see details
 #' @param keywords data.frame keywords list for geneset selection
 #' @param species character hs mm rn dr ss
