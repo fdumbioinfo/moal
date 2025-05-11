@@ -2,7 +2,7 @@
 % Please edit documentation in R/gsenain.r
 \name{gsenain}
 \alias{gsenain}
-\title{Functional enrichment analysis and interaction network}
+\title{Gene set enrichment analysis and interaction network}
 \usage{
 gsenain(
   omicdata = NULL,
@@ -90,7 +90,7 @@ gsenain(
 file with enrichment analysis results
 }
 \description{
-MSigDB enrichment analysis
+Gene set enrichment analysis and interaction network
 }
 \details{
 omicdata needs a data.frame with at list 4 column: rowID, (p-values,fold-change) x N and Symbol annotation.

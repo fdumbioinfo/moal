@@ -73,7 +73,7 @@ omic(
 
 \item{doqc}{logical quality controls}
 
-\item{threshold}{numeric vector from 1 to 160 (see details)}
+\item{threshold}{numeric vector from 1 to 24 (see details)}
 
 \item{padj}{character fdr by defaut for Benjamini-Hochberg false discovery correction}
 
@@ -183,8 +183,6 @@ Experimental design examples for model parameters:
 }
 
 For paired, batch and nested design, remove batch effect from limma package are used to calculate fold-change
-
-Incomplete block not accepted for interaction design.
 
 Use dopar = 2 to decrease computing resources.
 
