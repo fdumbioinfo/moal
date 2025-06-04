@@ -21,6 +21,9 @@ https://doi.org/10.1101/2023.10.17.562686
 Zenodo repository:
 https://zenodo.org/records/15309968
 
+github:
+https://github.com/fdumbioinfo/moal
+
 Release updates:
 
 1.2.1
