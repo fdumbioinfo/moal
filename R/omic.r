@@ -145,8 +145,8 @@ omic <- function(
   dolineplot = TRUE, doboxplotrow = TRUE,
   doena = TRUE, doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2,
-  dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = TRUE,
-  dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
+  dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
+  dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = FALSE,
   crosscompint = FALSE, sample = NULL , seed = 123679, dopar = NULL,
   path = ".", dirname = NULL, zip = FALSE, remove = FALSE )
 {
@@ -188,6 +188,7 @@ omic <- function(
   }
   if(!is.null(annot) & all(colnames(annot)!="Symbol"))
   {
+    colnames(annot)[1] <- "rowID" ; mode(annot[,1]) <- "character"
     annot %>% cbind( "Symbol"=dat[,1] %>% as.character ) -> Annot0
     doena <- FALSE ; doenaora <- FALSE 
   }
@@ -1318,7 +1319,8 @@ omic <- function(
     paste("GSEA Functional analysis :\n") %>% cat
     paste("ena preprocessing...\n") %>% cat
     #
-    threshold %>% min -> thresholdEna0
+    # threshold %>% min -> thresholdEna0
+    if(!is.null(threshold)){ threshold %>% min -> thresholdEna0  }else{ 1 -> thresholdEna0 }
     #
     foreach(i=1:length(CompFactors)) %do%
       {
