@@ -513,7 +513,7 @@ omic <- function(
   if(is.null(threshold))
   {
     dovenn <- F ; docluster <- F ; doheatmap <- F ;
-    dolineplot <- F ; dovolcanoplot <- F ; doenaora <- FALSE 
+    dolineplot <- F ;  doboxplotrow <- F ; dovolcanoplot <- F ; doenaora <- FALSE 
   }
   if(!is.null(threshold))
   {
@@ -1033,9 +1033,10 @@ omic <- function(
   if(docluster)
   {
     # statList1 %>% sapply("[[",3) %>% ">"(.,15) %>% which %>% statList1[.] -> statList1
-    if(statList1 %>% sapply("[[",3) %>% ">"(.,15) %>% which %>% any)
+    nc %>% max -> MaxNc
+    if(statList1 %>% sapply("[[",3) %>% ">"(.,MaxNc) %>% which %>% any)
     {
-      statList1 %>% sapply("[[",3) %>% ">"(.,15) %>% which -> sel
+      statList1 %>% sapply("[[",3) %>% ">"(.,MaxNc) %>% which -> sel
       if(length(sel) > 0){ statList1[sel] -> statList1 }
       statList1 %>% sapply("[[",3) %>% "<"(.,maxclusterheatmap) %>% which -> sel
       if(length(sel) > 0){ statList1[sel] -> statList1 }

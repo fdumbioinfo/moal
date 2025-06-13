@@ -322,8 +322,12 @@ gsenain <- function(
           Omicdataf1[sel,selCol] <- 25
         }
         # twotailena = T
+        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% sign -> SignFC0
+        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0
         Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% sign -> SignFC0
-        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "*"(SignFC0) -> Signlog10pval0
+        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "*"(SignFC0) -> Signlog10pval0
+        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>%
+          "*"(-1) %>% "*"(SignFC0) %>% "*"(ValueFC0) -> Signlog10pval0
         Omicdataf1 %>% data.frame(Signlog10pval0) %>% dplyr::arrange(Signlog10pval0) -> Omicdataf2
         Omicdataf2$Signlog10pval0 -> stats
         names(stats) <- Omicdataf2$GeneID
