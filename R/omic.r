@@ -256,7 +256,8 @@ omic <- function(
     # interaction factor
     INTERACTION <- F
     UNBALANCED <- F
-    if(any(grepl("\\*",ModelFactors)))
+    # two factor interaction
+    if(any(grepl("^[^\\*]*\\*[^\\*]*$",ModelFactors)))
     {
       # remove interaction in AnovaFactors
       AnovaFactors %>% grep("\\*",.,invert=T) %>% AnovaFactors[.] -> AnovaFactors
@@ -276,6 +277,31 @@ omic <- function(
       # change interaction name in CompFactors
       CompFactors[ grep("\\*" , CompFactors , invert = F ) ] <- IntFactorName
       INTERACTION <- T
+      # dovenn <- F
+    }
+    # three factor interaction
+    if(any(grepl("^[^\\*]*\\*[^\\*]*\\*[^\\*]*$",ModelFactors)))
+    {
+      # remove interaction in AnovaFactors
+      AnovaFactors %>% grep("\\*",.,invert=T) %>% AnovaFactors[.] -> AnovaFactors
+      RbeFactors %>% grep("\\*",.,invert=T) %>% RbeFactors[.] -> RbeFactors
+      # create interaction factor
+      ModelFactors %>% grep("\\*",.,invert=F) %>% ModelFactors[.] -> IntFactor0
+      IntFactor0 %>% strsplit("\\*") %>% unlist -> IntFactor1
+      IntFactor1 %>% paste0( collapse = "x" ) -> IntFactorName
+      IntFactor1[1] %>% paste("^",.,"$",sep="") %>% grep(sif %>% colnames) %>% sif[,.] -> F1
+      IntFactor1[2] %>% paste("^",.,"$",sep="") %>% grep(sif %>% colnames) %>% sif[,.] -> F2
+      IntFactor1[3] %>% paste("^",.,"$",sep="") %>% grep(sif %>% colnames) %>% sif[,.] -> F3
+      expand.grid(F1 %>% levels,F2 %>% levels,F3 %>% levels) -> LevelsIntFactor0
+      paste(LevelsIntFactor0[,1],LevelsIntFactor0[,2],LevelsIntFactor0[,3],sep="-") -> LevelsIntFactor1
+      paste(F1,F2,F3,sep="-") -> IntFactor2
+      IntFactor2 %>% ordered( LevelsIntFactor1 ) -> IntFactor3
+      sif %>% cbind( IntFactor3 ) -> sif
+      colnames( sif )[ ncol(sif)  ] <- IntFactorName
+      # change interaction name in CompFactors
+      CompFactors[ grep("\\*" , CompFactors , invert = F ) ] <- IntFactorName
+      INTERACTION <- T
+      threshold <- NULL
       # dovenn <- F
     }
     # nested factor

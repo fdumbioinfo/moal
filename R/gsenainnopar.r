@@ -322,12 +322,12 @@ gsenainnopar <- function(
           Omicdataf1[sel,selCol] <- 25
         }
         # twotailena = T
-        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% sign -> SignFC0
-        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0
         Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% sign -> SignFC0
-        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "*"(SignFC0) -> Signlog10pval0
-        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>%
-          "*"(-1) %>% "*"(SignFC0) %>% "*"(ValueFC0) -> Signlog10pval0
+        1 -> ValueFC0
+        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs -> ValueFC0
+        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0
+        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 -> ValueFC0
+        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "*"(SignFC0) %>% "*"(ValueFC0) -> Signlog10pval0
         Omicdataf1 %>% data.frame(Signlog10pval0) %>% dplyr::arrange(Signlog10pval0) -> Omicdataf2
         Omicdataf2$Signlog10pval0 -> stats
         names(stats) <- Omicdataf2$GeneID
@@ -354,7 +354,6 @@ gsenainnopar <- function(
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %do%
       {
-        gseastats2[[i]][[2]] %>% class
         fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=15,maxSize=500,scoreType="std",nproc=1)
         if(nrow(fgsea0)>0)
         {
@@ -394,7 +393,6 @@ gsenainnopar <- function(
               fgseapval1plot2$Name[selNchar] %>% substr(1,45) -> Head0
               fgseapval1plot2$Name[selNchar] %>% substr(Nchar0-10,Nchar0)-> Tail0
               fgseapval1plot2$Name %>% as.character -> NameNchar0
-              NameNchar0
               fgseapval1plot2$Name[selNchar] <- paste(Head0,Tail0,sep="...")
             }
             fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,Log10Pval)) -> fgseapval1plot3
@@ -408,6 +406,7 @@ gsenainnopar <- function(
             p + ggtitle(DirName1,subtitle=gseastats2[[i]][[1]]) -> p
             p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12),
                       plot.title = element_text(size = 8,hjust = 0.5),plot.subtitle = element_text(size = 8,hjust = 0.5)) -> p
+            p + geom_vline(xintercept=-log10(0.05),color="orange",size=0.3) -> p
             # output plot
             paste(DirName1,"_ena_",gseastats2[[i]][[1]],"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
             ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
@@ -572,6 +571,7 @@ gsenainnopar <- function(
                 p + labs(x="log10(p-value)",y="Genesets") -> p
                 p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12))
                 p + ggtitle(DirName1) -> p
+                p + geom_vline(xintercept=-log10(0.05),color="orange",size=0.3) -> p
                 p
                 # output plot
                 paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
