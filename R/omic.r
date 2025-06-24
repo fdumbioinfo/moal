@@ -1277,7 +1277,7 @@ omic <- function(
           foreach( j=1:nrow(Dat2), .packages = c("moal","magrittr","dplyr","broom","ggplot2") ) %dopar%
             {
               # r1$Symbol[j] %>% gsub("/"," ",.) %>% gsub("\'","",.) %>% gsub("-","",.) -> Symbol
-              r1$Symbol[j] %>% gsub("/","",.) %>% gsub("\'","",.) %>% gsub("-","",.) %>% gsub(":","",.) -> Symbol
+              r1$Symbol[j] %>% gsub("/","",.) %>% gsub("\'","",.) %>% gsub("-","",.) %>% gsub(":","",.) %>% gsub("\\*","",.) -> Symbol
               paste("lineplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileName
               Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
               CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
@@ -1320,7 +1320,7 @@ omic <- function(
           # if( CompFactors[i] %>% grepl("x",.) ){ IntFactor1 -> CompFactors0 }
           foreach( j=1:nrow(Dat2), .packages = c("moal","magrittr","dplyr","broom","ggplot2","ggpubr") ) %dopar%
             {
-              r1$Symbol[j] %>% gsub("/"," ",.) %>% gsub("\'","",.) %>% gsub("-","",.) -> Symbol
+              r1$Symbol[j] %>% gsub("/"," ",.) %>% gsub("\'","",.) %>% gsub("-","",.) %>% gsub("\\*","",.) -> Symbol
               paste("boxplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileName
               Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
               CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
