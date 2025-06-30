@@ -305,7 +305,7 @@ gsenain <- function(
   {
     file.path(Path0,"ena") %>% dir.create
     moalannotgene::genesetdb -> t
-    t %>% names
+    # t %>% names
     #
     # preprocessing
     gseastats0 <- foreach(j=1:length(t6)) %do%
@@ -327,7 +327,21 @@ gsenain <- function(
         # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs -> ValueFC0
         # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0
         # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 -> ValueFC0
+        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 %>% "+"(1)  -> ValueFC0
+        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% "+"(1) %>% log2 -> ValueFC0
+        #
         Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "*"(SignFC0) %>% "*"(ValueFC0) -> Signlog10pval0
+        # decrease fold-change outliers ponderation
+        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% "<"(0.9) %>% which -> sel01
+        if(length(sel01) > 0)
+        {
+          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs -> ValueFC0
+          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0
+          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 -> ValueFC0
+          Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 %>% "+"(1)  -> ValueFC0
+          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% "+"(1) %>% log2 -> ValueFC0
+          Signlog10pval0[sel01] %>% "*"(ValueFC0[sel01]) -> Signlog10pval0[sel01]
+        }
         Omicdataf1 %>% data.frame(Signlog10pval0) %>% dplyr::arrange(Signlog10pval0) -> Omicdataf2
         Omicdataf2$Signlog10pval0 -> stats
         names(stats) <- Omicdataf2$GeneID
@@ -354,6 +368,7 @@ gsenain <- function(
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %dopar%
       {
+        set.seed(123679)
         fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=15,maxSize=500,scoreType="std",nproc=1)
         if(nrow(fgsea0)>0)
         {
@@ -398,15 +413,20 @@ gsenain <- function(
             fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,Log10Pval)) -> fgseapval1plot3
             # barplot 
             fgseapval1plot3 %>% ggplot( aes(x=Log10Pval,y=.data$Name,fill=.data$NES)) -> p
-            p + geom_bar(stat="identity") -> p
+            p + geom_bar(stat="identity",width = 0.95) -> p
             p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
+            # p + theme_minimal() -> p
+            # p + theme_light() -> p
+            # p + theme_linedraw() -> p
+            p + theme_bw() -> p
             p + theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1,size = 5),
-                      axis.text.y = element_text(angle = 0, vjust = 1, hjust=1,size = 6)) -> p
+                      axis.text.y = element_text(angle = 0, vjust = 0.4, hjust=1,size = 6)) -> p
             p + labs(x="log10(p-value)",y="Genesets") -> p
             p + ggtitle(DirName1,subtitle=gseastats2[[i]][[1]]) -> p
-            p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12),
-                      plot.title = element_text(size = 8,hjust = 0.5),plot.subtitle = element_text(size = 8,hjust = 0.5)) -> p
-            p + geom_vline(xintercept=-log10(0.05),color="orange",size=0.3) -> p
+            p + theme(axis.title.x=element_text(size=12,face="bold"),
+                      axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
+                      plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
+            p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.2,linetype="dashed") -> p
             # output plot
             paste(DirName1,"_ena_",gseastats2[[i]][[1]],"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
             ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))

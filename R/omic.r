@@ -1357,11 +1357,8 @@ omic <- function(
         sif %>% dplyr::select(all_of(selFactorEna)) %>% unlist -> FactorEna1
         FactorEna0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
         sif %>% colnames %>% grep(grep,.) %>% sif[,.] -> Comp0
-        Comp0 %>% levels %>% rev %>% as.character %>% combn(2,simplify=F) %>%
-          lapply(paste0,collapse="vs") %>% unlist %>% paste("p_",.,sep="") %>%
-          paste("^",.,"$",sep="") %>%
-          # sub(".*_(.*)","\\1",.)
-          paste0(collapse="|") %>% paste(.,sep="") -> grepval
+        Comp0 %>% levels %>% rev %>% as.character %>% combn(2,simplify=F) %>% lapply(paste0,collapse="vs") %>% unlist %>% paste("p_",.,sep="") %>%
+          paste("^",.,"$",sep="") %>% paste0(collapse="|") %>% paste(.,sep="") -> grepval
         r0 %>% colnames %>% grep(grepval,.) -> selCol
         c(selCol,selCol+1) %>% sort -> selCol 
         # r0 %>% colnames %>% grep("^p_.*vs|^fc_.*vs",.,value=T) %>% sub(".*_(.*)","\\1",.) %>% grep(grepval,.) -> selCol
