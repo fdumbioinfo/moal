@@ -2,7 +2,19 @@ MOAL: Multi-Omic Analysis at Lab. A simplified workflow function to make reprodu
 
 R packages install: version 1.2.1
 
-install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
+install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))
+
+annotation depends packages:
+
+install.packages('moalannotgene',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalannotensg',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalannotenst',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalannotensp',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalstringdbhs',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalstringdbmm',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalstringdbrn',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalstringdbdr',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+install.packages('moalstringdbss',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
 
 Workflow summary:
  - Quality controls and unsupervised classification: histogram, box plot, PCA and sample clustering.
@@ -29,6 +41,8 @@ Release updates:
 1.2.1
 
 Fix bug for unbalanced design case using anova model with interaction.
+choose gsea rank
+Add three factors interaction design
 
 
 1.2.0
