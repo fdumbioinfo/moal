@@ -32,6 +32,7 @@
 #' @param nc numeric number of clusters to cut in dendrogramm
 #' @param maxclusterheatmap numeric max row for cluster analysis
 #' @param padj character fdr by defaut for Benjamini-Hochberg false discovery correction
+#' @param logratio logical change fc (by default) in log2ratio
 #' @param doheatmap logical do heatmaps for all lists
 #' @param heatmapcluster character row clustering only by default both accepted 
 #' @param maxheatmap numeric max rows for heatmap
@@ -41,6 +42,7 @@
 #' @param dolineplot logical do lineplot for significant features
 #' @param doboxplotrow logical do boxplot for significant features with Kruskal
 #' @param doena logical msigdb enrichement analysis using gsea method without filtering
+#' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt 
 #' @param doenaora logical msigdb enrichement analysis using ora method for diff list
 #' @param keywords data.frame keywords list for geneset selection
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
@@ -138,12 +140,12 @@
 omic <- function(
   dat = NULL, sif = NULL, annot = NULL, species = "hs",
   model = NULL, paired = NULL, nested = NULL, batch = NULL , addfactor = NULL,
-  doqc = TRUE, threshold = c(2,3,4,10,11,12) , padj = "none",
+  doqc = TRUE, threshold = c(2,3,4,10,11,12) , padj = "none", logratio = FALSE,
   dopattern = TRUE, dovenn = TRUE, docluster = TRUE, nc = c(2,3,6,12), maxclusterheatmap = 5000,
   doheatmap = TRUE, heatmapcluster = "row", maxheatmap = 2000, minheatmap = 3,
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
-  doena = TRUE, doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
+  doena = TRUE, gsearank = "fc", doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = FALSE,
@@ -429,7 +431,7 @@ omic <- function(
     parallel::makeCluster(NbCore) -> cl ; doParallel::registerDoParallel(cl)
     ### anova
     All0 <- foreach(i=1:nrow(dat),.packages=c("moal","magrittr","dplyr","broom"),.combine=rbind) %dopar%
-      { anova( dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=dat[i,-1] %>% as.numeric,.), model=model ) %>% unlist }
+      { anova( dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=dat[i,-1] %>% as.numeric,.), model=model,logratio=logratio ) %>% unlist }
     # anovastat data
     All0 %>% colnames %>% grep("(Sumsq_|Meansq_|Fratio)",.,value=F ) -> sel
     All0 %>% as.data.frame %>% dplyr::select(all_of(sel)) %>%
@@ -439,7 +441,7 @@ omic <- function(
     if(RBE)
     {
       AllRbe <- foreach(i=1:nrow(DatRbe),.packages=c("moal","magrittr","dplyr","broom"),.combine=rbind) %dopar%
-        { anova( dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=DatRbe[i,-1] %>% as.numeric,.), model=model ) %>% unlist }
+        { anova( dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=DatRbe[i,-1] %>% as.numeric,.), model=model,logratio=logratio ) %>% unlist }
       # anovastat data RBE
       AllRbe %>% colnames %>% grep("(Sumsq_|Meansq_|Fratio)",.,value=F ) -> sel
       # AllRbe %>% as.data.frame %>% dplyr::select(all_of(sel)) %>%
@@ -1283,7 +1285,7 @@ omic <- function(
               CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
               sif %>% colnames %>% grep(grep, ., value=FALSE) %>% sif[,.] -> Sif0
               Sif0 %>% data.frame( y=Dat2[j,-1] %>% as.numeric, . ) -> Sif1
-              dplot( dat=Sif1, title=r1$Symbol[j],log = F ) -> p0
+              dplot( dat=Sif1, title=r1$Symbol[j],log = T ) -> p0
               ggsave( plot=p0, filename=FileName )
             }
         }
@@ -1370,11 +1372,12 @@ omic <- function(
         gsenain(
           omicdata=omicdata,keywords=keywords,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
-          doena=doena,layout=layout,bg=bg,
+          doena=doena,gsearank=gsearank,layout=layout,bg=bg,
           dotopgenesetnetwork=dotopgenesetnetwork,dotopgenesetheatmap=dotopgenesetheatmap,
           dogmtgenesetnetwork=dogmtgenesetnetwork,dogmtgenesetheatmap=dogmtgenesetheatmap,
           dat=dat,factor=FactorEna1,path=Path,dirname=FactorEna0,dopar=F)
       }
+  paste("gsea enrichment analysis done.\n",sep="") %>% cat
   }
   #
   # ORA
@@ -1382,7 +1385,7 @@ omic <- function(
   if(doena & doenaora)
   {
     paste("#\n") %>% cat
-    paste("Functional analysis :\n") %>% cat
+    paste("ORA Functional analysis :\n") %>% cat
     paste("ena preprocessing...\n") %>% cat
     #
     Path %>% list.dirs(recursive = F) -> d0
@@ -1426,8 +1429,8 @@ omic <- function(
             dogmtgenesetnetwork=F,dogmtgenesetheatmap=F,
             dat=dat,factor=FactorEna1,path=PathEna,dirname=DirNameDiff,dopar=F)
         }
-      
     }
+    paste("gsea enrichment analysis done.\n",sep="") %>% cat
   }
   #
   parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()
@@ -1466,6 +1469,7 @@ omic <- function(
     paste("Enrichment analysis done.",sep="") %>% c(LogOutput,.) -> LogOutput
     paste("species : ",species,sep="") %>% c(LogOutput,.) -> LogOutput
     paste("Background used : ",bg,sep="") %>% c(LogOutput,.) -> LogOutput
+    paste("gsea rank : ",gsearank,sep="") %>% c(LogOutput,.) -> LogOutput
     paste("Filter geneset : ",filtergeneset,sep="") %>% c(LogOutput,.) -> LogOutput
   }
   paste("Date : ",format(Sys.time(), "%a %b %d %X %Y"),sep = "") %>% c(LogOutput,.) -> LogOutput
@@ -1483,7 +1487,7 @@ omic <- function(
     paste("zip done.\n") %>% cat
   }
   if(zip & remove){ base::unlink( Path, recursive=T ) ; paste( "remove done.\n" ) %>% cat }
-  paste( "###########################\nOmic analysis done \n###########################\n",sep="") %>% cat
+  paste( "##################\nOmic analysis done \n##################\n",sep="") %>% cat
   # Rplots.pdf
   if(file.exists(file.path(path,"Rplots.pdf"))){ file.remove(file.path(path,"Rplots.pdf")) }
   # ----

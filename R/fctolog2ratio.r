@@ -11,7 +11,7 @@
 #' @noRd
 fctolog2ratio <- function( fc )
 {
-  fc %>% as.numeric %>% "<"( . , 0 ) %>% which -> sel
-  fc[sel] %>% invratio %>% "*"( . , -1 ) -> fc[sel]
+  fc %>% as.numeric %>% "<"(.,0) %>% which -> sel
+  if(length(sel)>0){ fc[sel] %>% invratio %>% "*"(.,-1) -> fc[sel] }
   fc %>% log2 %>% return()
 }

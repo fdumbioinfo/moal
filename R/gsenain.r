@@ -16,6 +16,7 @@
 #' @param intmaxdh numeric maximum number of interaction to use for Davidson and Harel algorithm layout
 #' @param nodesize numeric change Symbol size
 #' @param doena logical do MSigDB enrichment analysis
+#' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt 
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
 #' @param dotopnetwork logical do top networks
 #' @param dotopheatmap logical do top heatmap
@@ -66,7 +67,7 @@ gsenain <- function(
     omicdata = NULL, keywords = NULL, species = "hs", dat = NULL, factor = NULL,
     filtergeneset = NULL, threshold = 1 , topdeg = 80, rangedeg = NULL, topena = 80, twotailena = TRUE, 
     topgeneset = 80, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
-    doena = TRUE, layout = 1,
+    doena = TRUE, gsearank = "fc", layout = 1,
     dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = TRUE,
     dotopheatmap = TRUE, dotopgenesetheatmap = FALSE, dogmtgenesetheatmap = TRUE,
     path = NULL, dirname = NULL, dopar = TRUE)
@@ -324,22 +325,16 @@ gsenain <- function(
         # twotailena = T
         Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% sign -> SignFC0
         1 -> ValueFC0
-        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs -> ValueFC0
-        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0
-        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 -> ValueFC0
-        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 %>% "+"(1)  -> ValueFC0
-        # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% "+"(1) %>% log2 -> ValueFC0
-        #
         Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "*"(SignFC0) %>% "*"(ValueFC0) -> Signlog10pval0
         # decrease fold-change outliers ponderation
         Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[2]]]) %>% unlist %>% "<"(0.9) %>% which -> sel01
         if(length(sel01) > 0)
         {
-          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs -> ValueFC0
-          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0
-          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 -> ValueFC0
-          Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% log2 %>% "+"(1)  -> ValueFC0
-          # Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% "+"(1) %>% log2 -> ValueFC0
+          if(gsearank == "fc"){ Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs -> ValueFC0 }
+          if(gsearank == "logratio"){ Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% fctolog2ratio %>% abs -> ValueFC0 }
+          if(gsearank == "logfc"){ Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% "+"(1) %>% log2 -> ValueFC0 }
+          if(gsearank == "sqrt"){ Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf1)[3]]]) %>% unlist %>% abs %>% sqrt -> ValueFC0 }
+          # 
           Signlog10pval0[sel01] %>% "*"(ValueFC0[sel01]) -> Signlog10pval0[sel01]
         }
         Omicdataf1 %>% data.frame(Signlog10pval0) %>% dplyr::arrange(Signlog10pval0) -> Omicdataf2
@@ -351,7 +346,6 @@ gsenain <- function(
     # fsgsea
     gseastats1 <- foreach(i=1:length(t)) %do%
       {
-        gseastats0
         t[[i]] %>% lapply("[",2) 
         t[[i]] %>% lapply("[",1) %>% unlist -> GeneSetName0
         t[[i]] %>% lapply("[",4) %>% unlist(recursive = F) -> GeneSetNameList0
@@ -1081,5 +1075,5 @@ gsenain <- function(
     if(dopar){parallel::stopCluster(cl); doParallel::stopImplicitCluster()}
     #
   }
-  paste("###########################\n Functional analysis done \n###########################\n",sep="") %>% cat
+  # paste("\n ena done\n",sep="") %>% cat
 }

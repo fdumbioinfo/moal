@@ -1,6 +1,7 @@
 #' @title analysis of variance
 #' @param dat numeric
 #' @param model character
+#' @param logratio logical change fc (by default) in log2ratio
 #' @details directory with anova plot and results
 #' @return data.frame
 #' @examples
@@ -19,7 +20,7 @@
 #' @importFrom utils capture.output
 #' @importFrom broom tidy
 #' @noRd
-anova <- function( dat, model )
+anova <- function( dat, model, logratio = FALSE )
 {
   dat %>% names -> Names
   names(dat)[1] <- "y"
@@ -35,7 +36,9 @@ anova <- function( dat, model )
   dat %>% lm( formula = paste("y~",model) , data = .) %>% aov %>% TukeyHSD %>% tidy %>% select( .data$contrast, .data$adj.p.value) -> c0
   # fc
   dat %>% lm( formula = paste( "y~" , model ), data = .) %>% aov %>% TukeyHSD %>% tidy %>% select( .data$estimate ) %>% "^"(2 , . ) %>% unlist -> ratio
+  # dat %>% lm( formula = paste( "y~" , model ), data = .) %>% aov %>% TukeyHSD %>% tidy %>% select( .data$estimate ) %>% unlist -> ratio
   replace( ratio, which( ratio < 1 ), -1/ratio[ which( ratio < 1 ) ] ) -> fc
+  if(logratio){ ratio %>% log2 -> fc }
   # return
   r1 %>% select( .data$term ) %>% unlist %>% as.character %>% gsub( "-" ,"vs", . ) %>% gsub( ":" , "x" , . ) %>% paste( "p_" , . , sep = "" ) -> rNames
   c0 %>% select( .data$contrast ) %>% unlist %>% gsub( "-" ,"vs", . ) %>% gsub( ":" , "-" , . ) %>% paste( "p_" , . , sep = "" ) -> cNames
