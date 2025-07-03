@@ -21,6 +21,7 @@ gsenain(
   nodesize = 0.6,
   bg = 25000,
   doena = TRUE,
+  gsearank = "fc",
   layout = 1,
   dotopnetwork = TRUE,
   dotopgenesetnetwork = FALSE,
@@ -65,6 +66,8 @@ gsenain(
 \item{bg}{numeric background used for functional analysis over-representation test}
 
 \item{doena}{logical do MSigDB enrichment analysis}
+
+\item{gsearank}{character to choose gsea rank type among fc (by default) logration logfc sqrt}
 
 \item{layout}{numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere}
 

@@ -17,6 +17,7 @@ omic(
   doqc = TRUE,
   threshold = c(2, 3, 4, 10, 11, 12),
   padj = "none",
+  logratio = FALSE,
   dopattern = TRUE,
   dovenn = TRUE,
   docluster = TRUE,
@@ -31,6 +32,7 @@ omic(
   dolineplot = TRUE,
   doboxplotrow = TRUE,
   doena = TRUE,
+  gsearank = "fc",
   doenaora = FALSE,
   keywords = NULL,
   filtergeneset = NULL,
@@ -77,6 +79,8 @@ omic(
 
 \item{padj}{character fdr by defaut for Benjamini-Hochberg false discovery correction}
 
+\item{logratio}{logical change fc (by default) in log2ratio}
+
 \item{dopattern}{logical search relevant pattern across levels factor}
 
 \item{dovenn}{logical venn diagram}
@@ -104,6 +108,8 @@ omic(
 \item{doboxplotrow}{logical do boxplot for significant features with Kruskal}
 
 \item{doena}{logical msigdb enrichement analysis using gsea method without filtering}
+
+\item{gsearank}{character to choose gsea rank type among fc (by default) logration logfc sqrt}
 
 \item{doenaora}{logical msigdb enrichement analysis using ora method for diff list}
 
