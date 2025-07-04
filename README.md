@@ -7,6 +7,7 @@ install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cl
 annotation depends packages:
 
 install.packages('moalannotgene',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
+
 install.packages('moalannotensg',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
 install.packages('moalannotenst',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
 install.packages('moalannotensp',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
