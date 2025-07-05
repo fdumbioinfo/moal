@@ -33,6 +33,8 @@ omic(
   doboxplotrow = TRUE,
   doena = TRUE,
   gsearank = "fc",
+  topdeg = 80,
+  topena = 80,
   doenaora = FALSE,
   keywords = NULL,
   filtergeneset = NULL,
@@ -110,6 +112,10 @@ omic(
 \item{doena}{logical msigdb enrichement analysis using gsea method without filtering}
 
 \item{gsearank}{character to choose gsea rank type among fc (by default) logration logfc sqrt}
+
+\item{topdeg}{numeric top DEGs number to plot on network}
+
+\item{topena}{numeric top geneset for ena plot}
 
 \item{doenaora}{logical msigdb enrichement analysis using ora method for diff list}
 

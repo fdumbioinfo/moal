@@ -42,7 +42,9 @@
 #' @param dolineplot logical do lineplot for significant features
 #' @param doboxplotrow logical do boxplot for significant features with Kruskal
 #' @param doena logical msigdb enrichement analysis using gsea method without filtering
-#' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt 
+#' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt
+#' @param topdeg numeric top DEGs number to plot on network
+#' @param topena numeric top geneset for ena plot
 #' @param doenaora logical msigdb enrichement analysis using ora method for diff list
 #' @param keywords data.frame keywords list for geneset selection
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
@@ -145,7 +147,7 @@ omic <- function(
   doheatmap = TRUE, heatmapcluster = "row", maxheatmap = 2000, minheatmap = 3,
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
-  doena = TRUE, gsearank = "fc", doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
+  doena = TRUE, gsearank = "fc",topdeg = 80 , topena = 80, doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = FALSE,
@@ -1372,7 +1374,7 @@ omic <- function(
         gsenain(
           omicdata=omicdata,keywords=keywords,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
-          doena=doena,gsearank=gsearank,layout=layout,bg=bg,
+          doena=doena,gsearank=gsearank,topdeg=topdeg,topena=topena,layout=layout,bg=bg,
           dotopgenesetnetwork=dotopgenesetnetwork,dotopgenesetheatmap=dotopgenesetheatmap,
           dogmtgenesetnetwork=dogmtgenesetnetwork,dogmtgenesetheatmap=dogmtgenesetheatmap,
           dat=dat,factor=FactorEna1,path=Path,dirname=FactorEna0,dopar=F)
