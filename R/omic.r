@@ -147,7 +147,7 @@ omic <- function(
   doheatmap = TRUE, heatmapcluster = "row", maxheatmap = 2000, minheatmap = 3,
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
-  doena = TRUE, gsearank = "fc",topdeg = 80 , topena = 80, doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
+  doena = TRUE, gsearank = "logfc",topdeg = 60 , topena = 60, doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = FALSE,

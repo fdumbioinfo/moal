@@ -21,7 +21,7 @@ gsenain(
   nodesize = 0.6,
   bg = 25000,
   doena = TRUE,
-  gsearank = "fc",
+  gsearank = "logfc",
   layout = 1,
   dotopnetwork = TRUE,
   dotopgenesetnetwork = FALSE,

@@ -67,7 +67,7 @@ gsenain <- function(
     omicdata = NULL, keywords = NULL, species = "hs", dat = NULL, factor = NULL,
     filtergeneset = NULL, threshold = 1 , topdeg = 80, rangedeg = NULL, topena = 80, twotailena = TRUE, 
     topgeneset = 80, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
-    doena = TRUE, gsearank = "fc", layout = 1,
+    doena = TRUE, gsearank = "logfc", layout = 1,
     dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = TRUE,
     dotopheatmap = TRUE, dotopgenesetheatmap = FALSE, dogmtgenesetheatmap = TRUE,
     path = NULL, dirname = NULL, dopar = TRUE)
