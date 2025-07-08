@@ -1371,7 +1371,7 @@ omic <- function(
         # r0 %>% dplyr::select(c(1)) %>% data.frame(r1) %>% dplyr::select(Symbol) -> r2
         r0 %>% dplyr::select(c(1,selCol,Symbol)) -> omicdata
         # ena
-        gsenain(
+        ena(
           omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
           doena=doena,gsearank=gsearank,topdeg=topdeg,topena=topena,layout=layout,bg=bg,
@@ -1423,7 +1423,7 @@ omic <- function(
           ll1 %>% dplyr::select(c(1,selCol,Symbol)) -> omicdata
           mode(omicdata$rowID) <- "character"
           # enaora
-          gsenainnopar(
+          enanopar(
             omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
             filtergeneset=filtergeneset,dotopnetwork=T,dotopheatmap=T,
             doena=doena,layout=layout,bg=bg,
