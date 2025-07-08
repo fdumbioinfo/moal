@@ -46,7 +46,7 @@
 #' @param topdeg numeric top DEGs number to plot on network
 #' @param topena numeric top geneset for ena plot
 #' @param doenaora logical msigdb enrichement analysis using ora method for diff list
-#' @param keywords data.frame keywords list for geneset selection
+#' @param gmtfiles character gmt files list path
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
 #' @param dotopnetwork logical do top networks
 #' @param dotopheatmap logical do top heatmap
@@ -147,10 +147,10 @@ omic <- function(
   doheatmap = TRUE, heatmapcluster = "row", maxheatmap = 2000, minheatmap = 3,
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
-  doena = TRUE, gsearank = "logfc",topdeg = 60 , topena = 60, doenaora = FALSE, keywords = NULL, filtergeneset = NULL, bg = 25000,
+  doena = TRUE, gsearank = "logfc",topdeg = 60 , topena = 60, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
-  dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = FALSE,
+  dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE, sample = NULL , seed = 123679, dopar = NULL,
   path = ".", dirname = NULL, zip = FALSE, remove = FALSE )
 {
@@ -1372,7 +1372,7 @@ omic <- function(
         r0 %>% dplyr::select(c(1,selCol,Symbol)) -> omicdata
         # ena
         gsenain(
-          omicdata=omicdata,keywords=keywords,species=species,threshold=thresholdEna0,
+          omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
           doena=doena,gsearank=gsearank,topdeg=topdeg,topena=topena,layout=layout,bg=bg,
           dotopgenesetnetwork=dotopgenesetnetwork,dotopgenesetheatmap=dotopgenesetheatmap,
@@ -1424,7 +1424,7 @@ omic <- function(
           mode(omicdata$rowID) <- "character"
           # enaora
           gsenainnopar(
-            omicdata=omicdata,keywords=keywords,species=species,threshold=thresholdEna0,
+            omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
             filtergeneset=filtergeneset,dotopnetwork=T,dotopheatmap=T,
             doena=doena,layout=layout,bg=bg,
             dotopgenesetnetwork=F,dotopgenesetheatmap=F,

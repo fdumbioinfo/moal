@@ -6,7 +6,7 @@
 \usage{
 gsenain(
   omicdata = NULL,
-  keywords = NULL,
+  gmtfiles = NULL,
   species = "hs",
   dat = NULL,
   factor = NULL,
@@ -25,7 +25,7 @@ gsenain(
   layout = 1,
   dotopnetwork = TRUE,
   dotopgenesetnetwork = FALSE,
-  dogmtgenesetnetwork = TRUE,
+  dogmtgenesetnetwork = FALSE,
   dotopheatmap = TRUE,
   dotopgenesetheatmap = FALSE,
   dogmtgenesetheatmap = TRUE,
@@ -37,7 +37,7 @@ gsenain(
 \arguments{
 \item{omicdata}{character data.frame see details}
 
-\item{keywords}{data.frame keywords list for geneset selection}
+\item{gmtfiles}{character gmt files list path}
 
 \item{species}{character hs mm rn dr ss}
 

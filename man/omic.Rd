@@ -36,7 +36,7 @@ omic(
   topdeg = 60,
   topena = 60,
   doenaora = FALSE,
-  keywords = NULL,
+  gmtfiles = NULL,
   filtergeneset = NULL,
   bg = 25000,
   dotopnetwork = TRUE,
@@ -45,7 +45,7 @@ omic(
   dotopgenesetnetwork = FALSE,
   dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,
-  dogmtgenesetheatmap = FALSE,
+  dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE,
   sample = NULL,
   seed = 123679,
@@ -119,7 +119,7 @@ omic(
 
 \item{doenaora}{logical msigdb enrichement analysis using ora method for diff list}
 
-\item{keywords}{data.frame keywords list for geneset selection}
+\item{gmtfiles}{character gmt files list path}
 
 \item{filtergeneset}{character regular expression to filter collection geneset (e.g. "reactome|tft")}
 

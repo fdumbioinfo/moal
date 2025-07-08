@@ -1,7 +1,7 @@
 #' @title Gene set enrichment analysis and interaction network
 #' @description Gene set enrichment analysis and interaction network
 #' @param omicdata character data.frame see details
-#' @param keywords data.frame keywords list for geneset selection
+#' @param gmtfiles character gmt files list path
 #' @param species character hs mm rn dr ss
 #' @param filtergeneset character list to filter MSigDB geneset collection
 #' @param threshold numeric pval 0.05 fc 1.5 by default see details
@@ -64,11 +64,11 @@
 #' @importFrom doParallel registerDoParallel stopImplicitCluster
 #' @export
 gsenain <- function(
-    omicdata = NULL, keywords = NULL, species = "hs", dat = NULL, factor = NULL,
+    omicdata = NULL, gmtfiles = NULL, species = "hs", dat = NULL, factor = NULL,
     filtergeneset = NULL, threshold = 1 , topdeg = 80, rangedeg = NULL, topena = 80, twotailena = TRUE, 
     topgeneset = 80, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
     doena = TRUE, gsearank = "logfc", layout = 1,
-    dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = TRUE,
+    dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = FALSE,
     dotopheatmap = TRUE, dotopgenesetheatmap = FALSE, dogmtgenesetheatmap = TRUE,
     path = NULL, dirname = NULL, dopar = TRUE)
 {
@@ -229,13 +229,11 @@ gsenain <- function(
       {
         t5[[j]] %>% dplyr::arrange(.data[[colnames(t5[[j]])[2]]]) %>% dplyr::slice(1:topdeg) -> p
         p %>% dplyr::select(1,4) %>% inner_join(dat) -> t
-        t %>% head
         t5[[j]] %>% colnames %>% "["(2) %>% sub("^p_(.*)vs(.*)","\\1",.) -> GrN
         t5[[j]] %>% colnames %>% "["(2) %>% sub("^p_(.*)vs(.*)","\\2",.) -> GrD
         c(GrD,GrN) %>% paste("^",.,"$",sep="") %>% paste0(collapse = "|") -> grep
         factor %>% grep(grep,.) -> sel
         t %>% dplyr::select(c(sel+2)) -> tt
-        tt %>% head
         factor[sel] -> Factor0
         paste("Heatmap_top",nrow(tt),"_",colnames(t5[[j]])[2] %>% gsub("p_","",.),"_",nrow(tt),sep="") -> Title0
         paste("Heatmap_top",nrow(tt),"_",colnames(t5[[j]])[2] %>% gsub("p_","",.),"_",nrow(tt),".pdf",sep="") -> FileName0
@@ -865,15 +863,15 @@ gsenain <- function(
   # ----
   # 8 - GMT network
   # ----
-  if(!is.null(keywords) & dogmtgenesetnetwork)
+  if(!is.null(gmtfiles) & dogmtgenesetnetwork)
   {
     "NetworksGMT" -> DirName1
     file.path(Path0,DirName1) %>% dir.create
-    GenesetLists1 <- foreach(i=1:length(keywords), .combine = "c") %do%
+    GenesetLists1 <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        keywords[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
         file.path(Path0,DirName1,Keyword0) %>% dir.create
-        keywords[i] %>% file("r") -> f 
+        gmtfiles[i] %>% file("r") -> f 
         readLines(f,warn=FALSE) -> rl0
         close(f)
         rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2)) -> GenesetLists0
@@ -909,28 +907,17 @@ gsenain <- function(
   # ----
   # 9 - GMT heatmap
   # ----
-  if(!is.null(keywords) & dogmtgenesetheatmap)
+  if(!is.null(gmtfiles) & dogmtgenesetheatmap)
   {
     "HeatmapGMT" -> DirName1
     file.path(Path0,DirName1) %>% dir.create
     # moal:::thresholdlist[threshold] -> Threshold0
-    keywords %>% basename %>% sub("(.*).gmt","\\1",.) -> DirNameGMT0
+    gmtfiles %>% basename %>% sub("(.*).gmt","\\1",.) -> DirNameGMT0
     file.path(Path0,DirName1,DirNameGMT0) %>% lapply(dir.create)
-    # GenesetLists1 <- foreach(i=1:length(keywords), .combine = "c") %do%
-    #   {
-    #     keywords[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
-    #     keywords[i] %>% file("r") -> f
-    #     readLines(f,warn=FALSE) -> rl0
-    #     close(f)
-    #     rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2)) -> GenesetLists0
-    #     rl0 %>% strsplit("\t") %>% lapply("[",1) %>% unlist -> Names0
-    #     paste(Names0,"|",Keyword0,sep="") -> Names1
-    #     names(GenesetLists0) <- Names1
-    #   }
-    GenesetLists1 <- foreach(i=1:length(keywords), .combine = "c") %do%
+    GenesetLists1 <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        keywords[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
-        keywords[i] %>% file("r") -> f
+        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
         rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2)) -> GenesetLists0
@@ -938,25 +925,19 @@ gsenain <- function(
         paste(Names0,"|",Keyword0,sep="") -> Names1
         names(GenesetLists0) <- Names1
       }
-    GenesetLists1 %>% length
-    GenesetListsSymbol <- foreach(i=1:length(keywords), .combine = "c") %do%
+    GenesetListsSymbol <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        keywords[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
-        keywords[i] %>% file("r") -> f
+        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
         rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2))
       }
-    GenesetListsSymbol %>% head
-    GenesetListsSymbol %>% length
-    GenesetListsSymbol %>% lapply(length)
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %dopar%
       {
         # GenesetLists1[[i]] -> symbollist
         GenesetListsSymbol[[i]] -> symbollist
-        symbollist
-        symbollist %>% length
         # GenesetLists1[[i]] %>% annot(.,idtype = "SYMBOL") -> a0
         symbollist %>% annot(.,idtype = "SYMBOL") -> a0
         a0$Symbol -> nodelist
@@ -972,7 +953,6 @@ gsenain <- function(
           FileNameGeneset[selNchar] %>% substr(1,45) -> Head0
           FileNameGeneset[selNchar] %>% substr(Nchar0-10,Nchar0)-> Tail0
           FileNameGeneset %>% as.character -> NameNchar0
-          NameNchar0
           FileNameGeneset <- paste(Head0,Tail0,sep="...")
         }
         # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
@@ -1004,7 +984,6 @@ gsenain <- function(
               {
                 paste("Heatmap_p",unlist(Threshold0[[1]][3]),"_fc",unlist(Threshold0[[1]][4]),"_",FileNameGeneset,"_",
                       colnames(t6[[j]])[2] %>% gsub("p_","",.),"_",nrow(tt),".pdf",sep="") -> FileName0
-                # paste("Heatmap_",FileNameGeneset,"_",colnames(t6[[j]])[2] %>% gsub("p_","",.),"_",nrow(tt),".pdf",sep="") -> FileName0
                 paste("Heatmap_p",unlist(Threshold0[[1]][3]),"_fc",unlist(Threshold0[[1]][4]),"_",
                       colnames(t6[[j]])[2] %>% gsub("p_","",.),"_",nrow(tt),sep="") -> Title0
               }else
@@ -1034,33 +1013,17 @@ gsenain <- function(
   # ----
   # 10 - GMT heatmap all groups
   # ----
-  if(!is.null(keywords) & dogmtgenesetheatmap & length(levels(factor)) > 2 & length(t6) > 1)
+  if(!is.null(gmtfiles) & dogmtgenesetheatmap & length(levels(factor)) > 2 & length(t6) > 1)
   {
     length(levels(factor)) -> NbLevels0
     paste("HeatmapGMT_",NbLevels0,sep = "") -> DirName1
     file.path(Path0,DirName1) %>% dir.create
-    # moal:::thresholdlist[threshold] -> Threshold0
-    # keywords %>% basename %>% sub("(.*).gmt","\\1",.) -> DirNameGMT0
-    # file.path(Path0,DirName1,DirNameGMT0) %>% lapply(dir.create)
-    # GenesetLists1 <- foreach(i=1:length(keywords), .combine = "c") %do%
-    #   {
-    #     keywords[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
-    #     keywords[i] %>% file("r") -> f
-    #     readLines(f,warn=FALSE) -> rl0
-    #     close(f)
-    #     rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2)) -> GenesetLists0
-    #     rl0 %>% strsplit("\t") %>% lapply("[",1) %>% unlist -> Names0
-    #     paste(Names0,"|",Keyword0,sep="") -> Names1
-    #     names(GenesetLists0) <- Names1
-    #   }
-
-    keywords %>% basename %>% sub("(.*).gmt","\\1",.) -> DirNameGMT0
+    gmtfiles %>% basename %>% sub("(.*).gmt","\\1",.) -> DirNameGMT0
     file.path(Path0,DirName1,DirNameGMT0) %>% lapply(dir.create)
-    
-    GenesetLists1 <- foreach(i=1:length(keywords), .combine = "c") %do%
+    GenesetLists1 <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        keywords[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
-        keywords[i] %>% file("r") -> f
+        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
         rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2)) -> GenesetLists0
@@ -1069,25 +1032,14 @@ gsenain <- function(
         names(GenesetLists0) <- Names1
       }
     GenesetLists1 %>% length
-    GenesetListsSymbol <- foreach(i=1:length(keywords), .combine = "c") %do%
+    GenesetListsSymbol <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        keywords[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
-        keywords[i] %>% file("r") -> f
+        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
         rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2))
       }
-    GenesetListsSymbol %>% head
-    GenesetListsSymbol %>% length
-    GenesetListsSymbol %>% lapply(length)
-    
-    
-    
-    
-    
-    
-    
-        #
     MatHeatmap0 <- foreach(j=1:length(t6), .combine = "rbind") %do%
       {
         # threshold
@@ -1106,20 +1058,12 @@ gsenain <- function(
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %dopar%
       {
-        # GenesetLists1[[i]] -> symbollist
         GenesetListsSymbol[[i]] -> symbollist
         symbollist %>% annot(.,idtype = "SYMBOL") -> a0
         a0$Symbol -> nodelist
-        
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
-        
-        
-        
-        # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
-        # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset
-        # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
         nodelist %>% data.frame(Symbol=.) %>% inner_join(MatHeatmap1) -> tt
         if(nrow(tt) > 2)
         {
