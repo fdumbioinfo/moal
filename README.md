@@ -2,12 +2,11 @@ MOAL: Multi-Omic Analysis at Lab. A simplified workflow function to make reprodu
 
 R packages install: version 1.2.1
 
-install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))
+install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
 
 annotation depends packages:
 
 install.packages('moalannotgene',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
-
 install.packages('moalannotensg',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
 install.packages('moalannotenst',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
 install.packages('moalannotensp',repos=c('https://fdumbioinfo.r-universe.dev','https://cloud.r-project.org'))
