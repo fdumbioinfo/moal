@@ -239,8 +239,9 @@ omic <- function(
   # ----
   if(doqc)
   {
-    paste("QC_all_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirNameQC
-    dat %>% moal::qc(sif=sif,dirname=DirNameQC,path=Path,inputdata=F)
+    # paste("QC_all_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirNameQC
+    "all" -> DirNameQC
+    dat %>% moal::qc(sif=sif,dirname=DirNameQC,path=Path)
     paste("QC all done.\n") %>% cat
   }
   # ----
@@ -373,7 +374,7 @@ omic <- function(
       DatRbe %>% output(FileName)
       # QC RBE
       paste("QC_all_RBE_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
-      DatRbe %>% qc(sif=sif,path=Path,dirname=DirName,inputdata=F)
+      DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)
       # add factor for anova
       AnovaFactors %>% c(batch) -> AnovaFactors
       RBE <- T
@@ -394,7 +395,7 @@ omic <- function(
       DatRbe %>% output(FileName)
       # QC all RBE
       paste( "QC_all_RBE_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
-      DatRbe %>% qc(sif=sif,path=Path,dirname=DirName,inputdata=F)
+      DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)
       AnovaFactors %>% c(paired) -> AnovaFactors
       RBE <- T
     }
@@ -416,7 +417,7 @@ omic <- function(
       DatRbe %>% output(FileName)
       # QC all RBE
       paste("QC_RBE_all_",paired,"_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
-      DatRbe %>% qc(sif=sif,path=Path,dirname=DirName,inputdata=F)
+      DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)
       AnovaFactors %>% c(paired,batch) -> AnovaFactors
       RBE <- T
     }
@@ -701,8 +702,7 @@ omic <- function(
           statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% length -> Nb0
           statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0-1) %>% sub( "(.*)_.*" , "\\1" , . ) %>%
             paste("_",statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0) , sep = "" ) -> DirName
-          Allstat1 %>% qc( sif=sif, inputdata=F, histo=F, boxplot=F, hc=F, acp=T,
-                           path=Path %>% file.path("pca"), dirname=DirName )
+          Allstat1 %>% qc(sif=sif,dohisto=F,doboxplot=F,dohc=F,doacp=T,path=Path %>% file.path("pca"),dirname=DirName)
         }
     }
     paste("pca threshold done.\n") %>% cat

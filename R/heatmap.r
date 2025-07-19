@@ -85,8 +85,8 @@ heatmap <- function(
   {
     c(5,10,20,30,40,50,100,200,300,400,1000) -> NRowheatmap0
     c(1,0.9,0.8,0.7,0.6,0.5,0.35,0.20,0.18,0.15,0.1) -> CexRow0
-    if(nrow(dat) < 2000)
-      {nrow(dat) %>% "<="(NRowheatmap0) %>% which %>% min %>% CexRow0[.] -> CexRow1}else{ CexRow0[10] -> CexRow1 }
+    if(nrow(dat) < 1000)
+      {nrow(dat) %>% "<="(NRowheatmap0) %>% which %>% min %>% CexRow0[.] -> CexRow1}else{ CexRow0[11] -> CexRow1 }
   }else{ cexRow -> CexRow1}
   #
   

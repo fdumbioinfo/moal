@@ -2,7 +2,7 @@
 % Please edit documentation in R/norm.r
 \name{norm}
 \alias{norm}
-\title{Normalization}
+\title{Normalization function}
 \usage{
 norm(dat, method = NULL, log = TRUE)
 }
@@ -17,10 +17,10 @@ norm(dat, method = NULL, log = TRUE)
 data.frame
 }
 \description{
-quantile normalization and log2
+normalization and log2
 }
 \details{
-for .method see limma normalizeBetweenArrays method
+for see limma normalizeBetweenArrays method
 }
 \examples{
 # not run

@@ -7,11 +7,12 @@
 qc(
   dat,
   sif = NULL,
-  inputdata = F,
-  histo = TRUE,
-  boxplot = TRUE,
-  hc = TRUE,
-  acp = TRUE,
+  dooutputinput = FALSE,
+  dohisto = TRUE,
+  doboxplot = TRUE,
+  dohc = TRUE,
+  doacp = TRUE,
+  breaks = 70,
   dirname = NULL,
   path = "."
 )
@@ -19,35 +20,35 @@ qc(
 \arguments{
 \item{dat}{data.frame first column for rowID column}
 
-\item{sif}{data.frame table with factor columns to display groups}
+\item{sif}{data.frame sample information file}
 
-\item{inputdata}{logical to export input data or not}
+\item{dooutputinput}{logical if TRUE (by default) export input data}
 
-\item{histo}{logical do histogram if TRUE by defaut}
+\item{dohisto}{logical if TRUE (by default) do histogram}
 
-\item{boxplot}{logical do boxplot if TRUE by defaut}
+\item{doboxplot}{logical if TRUE (by default) do boxplot}
 
-\item{hc}{logical do hierarchical clustering if TRUE by defaut}
+\item{dohc}{logical if TRUE (by default)do hierarchical clustering}
 
-\item{acp}{logical do principal component analysis if TRUE by defaut}
+\item{doacp}{logical if TRUE (by default) do PCA}
+
+\item{breaks}{numeric break number for histogramm function}
 
 \item{dirname}{character}
 
 \item{path}{character}
 }
 \value{
-data.frame
+directory including analysis pdf plots
 }
 \description{
-To generate descriptive analysis on a numerical matrix:
+Descriptive analysis applied on column:
 \itemize{
-\item histogram, boxplot
-\item hierarchical clustering and ACP for column
+\item histogram, boxplot, hierarchical clustering and PCA for column
 }
 }
 \details{
-return pval for each factor of anova model
-function use doparalle
+dat row must be equal to sif row
 }
 \examples{
 # not run
