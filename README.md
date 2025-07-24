@@ -16,6 +16,13 @@ install.packages('moalstringdbrn',repos=c('https://fdumbioinfo.r-universe.dev'))
 install.packages('moalstringdbdr',repos=c('https://fdumbioinfo.r-universe.dev'))
 install.packages('moalstringdbss',repos=c('https://fdumbioinfo.r-universe.dev'))
 
+other depend packages if necessary :
+
+if (!require("BiocManager", quietly = TRUE)){install.packages("BiocManager")}
+
+BiocManager::install("Rgraphviz")
+
+
 Workflow summary:
  - Quality controls: histogram, boxplot, PCA and sample hierarchical clustering.
  - Supervised analysis: analysis of variance (ANOVA), Fratio barplot and filtering.
