@@ -394,7 +394,8 @@ omic <- function(
         file.path(Path,"inputdata",.) -> FileName
       DatRbe %>% output(FileName)
       # QC all RBE
-      paste( "QC_all_RBE_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
+      # paste( "QC_all_RBE_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
+      "all_RBE" -> DirName
       DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)
       AnovaFactors %>% c(paired) -> AnovaFactors
       RBE <- T

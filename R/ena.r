@@ -580,13 +580,13 @@ ena <- function(
                 fgseapval1plot3 %>% ggplot( aes(x=Log10Pval,y=.data$Name,fill=.data$NES)) -> p
                 p + geom_bar(stat="identity") -> p
                 p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
-                p + theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1,size = 5),
-                          axis.text.y = element_text(angle = 0, vjust = 1, hjust=1,size = 6)) -> p
+                p + theme(axis.title.x=element_text(size=12,face="bold"),
+                          axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
+                          plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
                 p + labs(x="log10(p-value)",y="Genesets") -> p
                 p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12))
                 p + ggtitle(DirName1) -> p
-                p + geom_vline(xintercept=-log10(0.05),color="orange",size=0.3) -> p
-                p
+                p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.2,linetype="dashed") -> p
                 # output plot
                 paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
                 ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
