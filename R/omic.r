@@ -241,7 +241,7 @@ omic <- function(
   {
     # paste("QC_all_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirNameQC
     "all" -> DirNameQC
-    dat %>% moal::qc(sif=sif,dirname=DirNameQC,path=Path)
+    dat %>% qc(sif=sif,dirname=DirNameQC,path=Path)
     paste("QC all done.\n") %>% cat
   }
   # ----
@@ -373,7 +373,8 @@ omic <- function(
       # dat %>% output(FileName)
       DatRbe %>% output(FileName)
       # QC RBE
-      paste("QC_all_RBE_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
+      # paste("QC_all_RBE_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
+      "all_RBE" -> DirName
       DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)
       # add factor for anova
       AnovaFactors %>% c(batch) -> AnovaFactors
@@ -417,7 +418,8 @@ omic <- function(
         file.path(Path,"inputdata",.) -> FileName
       DatRbe %>% output(FileName)
       # QC all RBE
-      paste("QC_RBE_all_",paired,"_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
+      # paste("QC_RBE_all_",paired,"_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
+      "all_RBE" -> DirName
       DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)
       AnovaFactors %>% c(paired,batch) -> AnovaFactors
       RBE <- T
@@ -692,17 +694,17 @@ omic <- function(
     # }
     # acp threshold
     #
-    if( DoAnovastatLists )
+    if(DoAnovastatLists)
     {
       paste("pca threshold processing...\n",sep="") %>% cat
-      file.path( Path , "pca" ) %>% dir.create
-      foreach( i=1:length(statList1), .packages=c("magrittr","moal","dplyr","foreach") ) %dopar%
+      file.path(Path,"pca") %>% dir.create
+      foreach(i=1:length(statList1),.packages=c("magrittr","moal","dplyr","foreach")) %dopar%
         {
-          statList1[[i]][2] %>% unlist %>% as.character %>% data.frame( rowID=., stringsAsFactors=F ) %>%
-            inner_join( dat, by="rowID" ) -> Allstat1
+          statList1[[i]][2] %>% unlist %>% as.character %>% 
+            data.frame(rowID=.,stringsAsFactors=F) %>% inner_join(dat,by="rowID") -> Allstat1
           statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% length -> Nb0
-          statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0-1) %>% sub( "(.*)_.*" , "\\1" , . ) %>%
-            paste("_",statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0) , sep = "" ) -> DirName
+          statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0-1) %>% sub("(.*)_.*","\\1",.) %>%
+            paste("_",statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0),sep="") -> DirName
           Allstat1 %>% qc(sif=sif,dohisto=F,doboxplot=F,dohc=F,doacp=T,path=Path %>% file.path("pca"),dirname=DirName)
         }
     }
