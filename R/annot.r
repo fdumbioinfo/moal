@@ -85,6 +85,8 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
     symbollist0 %>% data.frame( "ENSGID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
     ens1 %>% inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSGID) %>% ens2[.,] -> Annot
+    Annot$Symbol %>% grep("^$",.) -> sell
+    if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
   }
   #
   # Ensembl transcript
@@ -97,6 +99,8 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
     symbollist0 %>% data.frame( "ENSTID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
     ens1 %>% inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSTID) %>% ens2[.,] -> Annot
+    Annot$Symbol %>% grep("^$",.) -> sell
+    if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
   }
   #
   # Ensembl Protein
@@ -109,6 +113,8 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
     symbollist0 %>% data.frame( "ENSPID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
     ens1 %>% inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSPID) %>% ens2[.,] -> Annot
+    Annot$Symbol %>% grep("^$",.) -> sell
+    if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
   }
   #
   # SYMBOL ID

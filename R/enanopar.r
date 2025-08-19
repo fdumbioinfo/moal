@@ -933,14 +933,18 @@ enanopar <- function(
         close(f)
         rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2))
       }
+    GenesetListsSymbol %>% length
+    GenesetListsSymbol %>% head
+    GenesetListsSymbol %>% lapply(length) %>% "<"(3) %>% which -> sel2
+    if(length(sel2)>0){ GenesetListsSymbol[-sel2] -> GenesetListsSymbol ; GenesetLists1[-sel2] -> GenesetLists1 }
+    #
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %do%
       {
-        # GenesetLists1[[i]] -> symbollist
-        GenesetListsSymbol[[i]] -> symbollist
-        # GenesetLists1[[i]] %>% annot(.,idtype = "SYMBOL") -> a0
-        symbollist %>% annot(.,idtype = "SYMBOL") -> a0
-        a0$Symbol -> nodelist
+        # GenesetListsSymbol[[i]] -> symbollist
+        # symbollist %>% annot(.,idtype = "SYMBOL") -> a0
+        # a0$Symbol -> nodelist
+        GenesetListsSymbol[[i]] -> nodelist
         # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset
@@ -1058,9 +1062,10 @@ enanopar <- function(
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %do%
       {
-        GenesetListsSymbol[[i]] -> symbollist
-        symbollist %>% annot(.,idtype = "SYMBOL") -> a0
-        a0$Symbol -> nodelist
+        # GenesetListsSymbol[[i]] -> symbollist
+        # symbollist %>% annot(.,idtype = "SYMBOL") -> a0
+        # a0$Symbol -> nodelist
+        GenesetListsSymbol[[i]] -> nodelist
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0

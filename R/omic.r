@@ -1340,6 +1340,7 @@ omic <- function(
       paste("boxplot done.\n",sep="") %>% cat
     }
   }
+  # parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()
   #
   # ----
   # 12 - Functional analysis :
