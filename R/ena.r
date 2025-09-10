@@ -300,7 +300,9 @@ ena <- function(
   # ----
   # 5 - MSigDB enrichment analysis 
   # ----
-  ### gsea enrichment
+  #
+  # gsea enrichment
+  #
   if(dotopgenesetnetwork | dotopgenesetheatmap){ doena <- T }
   if(doena & nrow(OutPut1) > 2000)
   {
@@ -580,6 +582,7 @@ ena <- function(
                 fgseapval1plot3 %>% ggplot( aes(x=Log10Pval,y=.data$Name,fill=.data$NES)) -> p
                 p + geom_bar(stat="identity") -> p
                 p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
+                p + theme_bw() -> p
                 p + theme(axis.title.x=element_text(size=12,face="bold"),
                           axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
                           plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p

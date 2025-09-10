@@ -35,7 +35,7 @@
 #' @noRd
 networkgena4pval4 <- function(
     nodelist = NULL, foldchange = NULL, pval = NULL, species = NULL, layout = 1, seed = 1234567,
-    intmaxdh = 2500, nodelabelsize = 0.39, nodesize = 0.5, edgeweight = 0.1, edgewidth = 0.2, title = "Network", path = ".", filename = NULL)
+    intmaxdh = 5000, nodelabelsize = 0.39, nodesize = 0.5, edgeweight = 0.1, edgewidth = 0.2, title = "Network", path = ".", filename = NULL)
 {
   i=j=k=m=1
   # moal:::orthoinfo -> orthoinfo
