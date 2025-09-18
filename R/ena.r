@@ -21,6 +21,7 @@
 #' @param mings numeric minimal size of a gene set
 #' @param maxgs numeric maximal size of a gene set
 #' @param overlapmin numeric minimal overlap to keep for gene set analysis
+#' @param addratioena logical if TRUE add overlap and geneset size on enrichment barplot
 #' @param dotopnetwork logical do top networks
 #' @param dotopheatmap logical do top heatmap
 #' @param dotopgenesetnetwork logical do geneset networks
@@ -70,7 +71,7 @@ ena <- function(
     omicdata = NULL, gmtfiles = NULL, species = "hs", dat = NULL, factor = NULL,
     filtergeneset = NULL, threshold = 1 , topdeg = 50, rangedeg = NULL, topena = 50, twotailena = TRUE, 
     topgeneset = 50, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
-    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 500, overlapmin = 2,
+    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 500, overlapmin = 2, addratioena = TRUE,
     dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = FALSE,
     dotopheatmap = TRUE, dotopgenesetheatmap = FALSE, dogmtgenesetheatmap = TRUE,
     path = NULL, dirname = NULL, dopar = TRUE)
@@ -530,7 +531,6 @@ ena <- function(
               Omicdataf1[sel,selCol] <- 25
             }
             #
-            # 1 -> overlapmin
             1.1 -> enascoremin
             # Omicdataf1$GeneID -> GeneidList0
             # Omicdataf1$Symbol -> SymbolList0
@@ -676,11 +676,9 @@ ena <- function(
                 
                 
                 
-                fgseapval1plot3 %>% colnames
                 fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
                   lapply(paste0,collapse="") %>% unlist -> Overlap
                 fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
-                fgseapval1plot3 %>% head
                 fgseapval1plot3 %>% ggplot( aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
                 p + geom_bar(stat="identity") -> p
                 p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
@@ -688,7 +686,7 @@ ena <- function(
                 # p + geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white") -> p
                 # p + geom_text(aes(label = .data$GeneSetSize), stat = "count", vjust = 1.5, colour = "white") -> p
                 # p + geom_text(data = fgseapval1plot3, aes(label = .data$GeneSetSize)) -> p
-                p + geom_text(data = fgseapval1plot3, aes(label = .data$Overlap),hjust=1.1,size = 2) -> p
+                if(addratioena){p + geom_text(data = fgseapval1plot3, aes(label = .data$Overlap),hjust=1.1,size = 2) -> p}
                 p + theme(axis.title.x=element_text(size=12,face="bold"),
                           axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
                           plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
