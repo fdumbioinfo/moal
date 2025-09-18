@@ -18,6 +18,9 @@
 #' @param doena logical do MSigDB enrichment analysis
 #' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt 
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
+#' @param mings numeric minimal size of a gene set
+#' @param maxgs numeric maximal size of a gene set
+#' @param overlapmin numeric minimal overlap to keep for gene set analysis
 #' @param dotopnetwork logical do top networks
 #' @param dotopheatmap logical do top heatmap
 #' @param dotopgenesetnetwork logical do geneset networks
@@ -67,7 +70,7 @@ ena <- function(
     omicdata = NULL, gmtfiles = NULL, species = "hs", dat = NULL, factor = NULL,
     filtergeneset = NULL, threshold = 1 , topdeg = 50, rangedeg = NULL, topena = 50, twotailena = TRUE, 
     topgeneset = 50, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
-    doena = TRUE, gsearank = "logfc", layout = 1,
+    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 500, overlapmin = 2,
     dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = FALSE,
     dotopheatmap = TRUE, dotopgenesetheatmap = FALSE, dogmtgenesetheatmap = TRUE,
     path = NULL, dirname = NULL, dopar = TRUE)
@@ -307,8 +310,15 @@ ena <- function(
   if(doena & nrow(OutPut1) > 2000)
   {
     file.path(Path0,"ena") %>% dir.create
-    moalannotgene::genesetdb -> t
-    # t %>% names
+    moalannotgene::genesetdb -> Genesetdb0
+    # remove min and max geneset
+    Genesetdb1 <- foreach(i=1:length(Genesetdb0)) %do%
+      {
+        Genesetdb0[[i]] %>% lapply("[",4) %>% unlist(recursive = F) %>% lapply(length) %>% unlist -> t
+        (t %>% ">="(.,mings) & t %>% "<="(.,maxgs)) %>% which -> selgs
+        if(length(selgs)>0){ Genesetdb0[[i]][selgs] -> tt }else{ Genesetdb0[[i]] -> tt }
+      }
+    Genesetdb0 %>% names -> names(Genesetdb1)
     #
     # preprocessing
     gseastats0 <- foreach(j=1:length(t6)) %do%
@@ -346,18 +356,18 @@ ena <- function(
         list(colnames(Omicdataf0)[2] %>% sub("p_","",.),stats)
       }
     # fsgsea
-    gseastats1 <- foreach(i=1:length(t)) %do%
+    gseastats1 <- foreach(i=1:length(Genesetdb1)) %do%
       {
-        t[[i]] %>% lapply("[",2) 
-        t[[i]] %>% lapply("[",1) %>% unlist -> GeneSetName0
-        t[[i]] %>% lapply("[",4) %>% unlist(recursive = F) -> GeneSetNameList0
+        Genesetdb1[[i]] %>% lapply("[",2) 
+        Genesetdb1[[i]] %>% lapply("[",1) %>% unlist -> GeneSetName0
+        Genesetdb1[[i]] %>% lapply("[",4) %>% unlist(recursive = F) -> GeneSetNameList0
         names(GeneSetNameList0) <- GeneSetName0
         foreach(j=1:length(gseastats0)) %do%
           {
             GeneSetNameList0
             gseastats0[[j]][2] %>% unlist
             list(gseastats0[[j]][1] %>% as.character,gseastats0[[j]][2] %>% unlist,
-                 GeneSetNameList0,t %>% names %>% "["(i))
+                 GeneSetNameList0,Genesetdb1 %>% names %>% "["(i))
           }
       }
     gseastats1 %>% unlist(recursive = F) -> gseastats2
@@ -365,7 +375,8 @@ ena <- function(
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %dopar%
       {
         set.seed(123679)
-        fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=15,maxSize=500,scoreType="std",nproc=1)
+        # fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=15,maxSize=500,scoreType="std",nproc=1)
+        fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=mings,maxSize=maxgs,scoreType="std",nproc=1)
         if(nrow(fgsea0)>0)
         {
           fgsea0 -> fgsea1
@@ -433,7 +444,6 @@ ena <- function(
     # 
     Path0 %>% file.path("ena") %>% list.files(full.names = T) -> l0
     l0
-    t %>% names
     if(length(l0) > 0)
     {
       Path0 %>% file.path("ena") %>% list.files(full.names = T) -> l0
@@ -489,14 +499,21 @@ ena <- function(
   {
     file.path(Path0,"ena") %>% dir.create
     moalannotgene::genesetdb -> Genesetdb0
-    Genesetdb0 %>% names
+    # remove min and max geneset
+    Genesetdb1 <- foreach(i=1:length(Genesetdb0)) %do%
+      {
+        Genesetdb0[[i]] %>% lapply("[",4) %>% unlist(recursive = F) %>% lapply(length) %>% unlist -> t
+        (t %>% ">"(mings) & t %>% "<="(.,maxgs)) %>% which -> selgs
+        if(length(selgs)>0){ Genesetdb0[[i]][selgs] -> tt }else{ Genesetdb0[[i]] -> tt }
+      }
+    Genesetdb0 %>% names -> names(Genesetdb1)
     #
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
-    foreach(i=1:length(Genesetdb0),.packages=c("magrittr","dplyr","moal","foreach","stringr","ggplot2")) %dopar%
+    foreach(i=1:length(Genesetdb1),.packages=c("magrittr","dplyr","moal","foreach","stringr","ggplot2")) %dopar%
       {
         # gene set
-        Genesetdb0[[i]] %>% lapply("[",1) %>% unlist -> GeneSetName0
-        Genesetdb0[[i]] %>% lapply("[",4) %>% unlist(recursive = F) -> GeneSetNameList0
+        Genesetdb1[[i]] %>% lapply("[",1) %>% unlist -> GeneSetName0
+        Genesetdb1[[i]] %>% lapply("[",4) %>% unlist(recursive = F) -> GeneSetNameList0
         names(GeneSetNameList0) <- GeneSetName0
         # 
         foreach(j=1:length(t6)) %do%
@@ -513,21 +530,55 @@ ena <- function(
               Omicdataf1[sel,selCol] <- 25
             }
             #
-            1 -> overlapmin
+            # 1 -> overlapmin
             1.1 -> enascoremin
-            Omicdataf1$GeneID -> GeneidList0
-            Omicdataf1$Symbol -> SymbolList0
-            Ena0 <- foreach(k=1:length(Genesetdb0[[i]]),.combine="rbind") %do%
+            # Omicdataf1$GeneID -> GeneidList0
+            # Omicdataf1$Symbol -> SymbolList0
+            # NULL -> Ena0
+            Ena0 <- foreach(k=1:length(Genesetdb1[[i]]),.combine="rbind") %do%
               {
-                Genesetdb0[[i]][[k]][[1]] -> GenesetName
-                GeneidList0 %in% Genesetdb0[[i]][[k]][[4]] %>% which %>% GeneidList0[.] -> OverlapGeneIDList0
-                GeneidList0 %in% Genesetdb0[[i]][[k]][[4]] %>% which %>% SymbolList0[.] -> OverlapSymbolList0
-                Omicdataf1$Symbol %>% length -> ListSize0
-                OverlapSymbolList0 %>% length -> OverlapSize0
-                Genesetdb0[[i]][[k]][[4]] %>% length -> GenesetSize0
+                Genesetdb1[[i]][[k]][[1]] -> GenesetName
+                # GeneidList0 %in% Genesetdb0[[i]][[k]][[4]] %>% which %>% GeneidList0[.] -> OverlapGeneIDList0
+                # GeneidList0 %in% Genesetdb0[[i]][[k]][[4]] %>% which %>% SymbolList0[.] -> OverlapSymbolList0
+                Omicdataf1$GeneID %in% Genesetdb1[[i]][[k]][[4]] %>% which -> selo
+                Omicdataf1[selo,]  -> Omicdataf2
+                Omicdataf2$GeneID -> OverlapGeneIDList0
+                Omicdataf2$Symbol -> OverlapSymbolList0
+                # Omicdataf1$Symbol %>% length -> ListSize0
+                Omicdataf1 %>% nrow -> ListSize0
+                # OverlapSymbolList0 %>% length -> OverlapSize0
+                Omicdataf2 %>% nrow -> OverlapSize0
+                Genesetdb1[[i]][[k]][[4]] %>% length -> GenesetSize0
                 ( OverlapSize0 / GenesetSize0 ) %>% round(2) -> OverlapRatio0
+                # enaScore0
                 ( ( OverlapSize0 / ListSize0 ) / (  GenesetSize0 / bg ) ) %>% round(2) -> EnaScore0
-                if(  OverlapSize0 >= overlapmin & EnaScore0 > enascoremin )
+                Omicdataf2 %>% dplyr::select(.data[[colnames(Omicdataf0)[3]]]) %>% unlist %>% ">="(1) %>% which -> selfcu
+                Omicdataf2 %>% dplyr::select(.data[[colnames(Omicdataf0)[3]]]) %>% unlist %>% "<="(-1) %>% which -> selfcd
+                if(length(selfcu) %>% ">"(0))
+                {
+                  Omicdataf2 %>% dplyr::slice(selfcu) %>% dplyr::select(.data[[colnames(Omicdataf0)[3]]]) %>% unlist %>% abs %>%
+                    "*"(Omicdataf2 %>% dplyr::slice(selfcu) %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "+"(1)) %>%
+                    mean %>% "*"(length(selfcu)) %>% log2 -> enafcu
+                }else{ 1 -> enafcu }
+                if(length(selfcd) %>% ">"(0))
+                {
+                  Omicdataf2 %>% dplyr::slice(selfcd) %>% dplyr::select(.data[[colnames(Omicdataf0)[3]]]) %>% unlist %>% abs %>%
+                    "*"(Omicdataf2 %>% dplyr::slice(selfcd) %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "+"(1)) %>%
+                    mean %>% "*"(length(selfcd)) %>% log2 -> enafcd
+                }else{ 1 -> enafcd }
+                # if(enafcu %>% "-"(enafcd) %>% ">"(0)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
+                # if(enafcu %>% "/"(enafcd) %>% ">"(2)){ EnaScore0 %>% "*"(enafcu %>% "/"(enafcd) %>% "+"(1) %>% log2) -> EnaScore0 }
+                # if(enafcd %>% "/"(enafcu) %>% "<"(2)){ EnaScore0 %>% "*"(-(enafcd %>% "/"(enafcu) %>% "+"(1) %>% log2)) -> EnaScore0 }
+                # if(enafcd %>% "/"(enafcu) %>% ">"(2)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
+                if(enafcd %>% "/"(enafcu) %>% ">"(1)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
+                # if(length(selfcd) %>% ">"(0) & length(selfcd) %>% ">"(0))
+                # {
+                #   if(length(selfcd) %>% "*"() %>% "/"(length(selfcu)) %>% ">"(1.2)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
+                # }
+                # EnaScore0 
+                # if(  OverlapSize0 >= overlapmin & EnaScore0 > enascoremin )
+                # if(  OverlapSize0 >= overlapmin )
+                if(  OverlapSize0 >= overlapmin & (EnaScore0 > enascoremin | EnaScore0 < -enascoremin ) )
                 {
                   c(OverlapSize0,ListSize0,GenesetSize0,bg) %>% matrix(ncol=2) -> ContTable0
                   ContTable0 %>% fisher.test %>% unlist %>% "["(1) %>% as.numeric -> Pval0
@@ -538,30 +589,38 @@ ena <- function(
                     OverlapSize0,GenesetSize0,OverlapRatio0,EnaScore0,Pval0)
                 }
               }
-            #
+            # plot
             if(!is.null(Ena0))
             {
               Ena0 %>% data.frame(stringsAsFactors=F) %>%
-              stats::setNames(c("Name","SymbolList","GeneIDList","OverlapSize","GenesetSize","OverlapRatio","ENAScore","pval")) -> Ena1
+                stats::setNames(c("Name","SymbolList","GeneIDList","OverlapSize","GenesetSize","OverlapRatio","ENAScore","pval")) -> Ena1
+              Ena1 %>% head
               Ena1 %>% colnames
               Ena1$OverlapSize %>% as.numeric -> Ena1$OverlapSize
               Ena1$GenesetSize %>% as.numeric -> Ena1$GenesetSize
               Ena1$OverlapRatio %>% as.numeric -> Ena1$OverlapRatio
               Ena1$ENAScore %>% as.numeric -> Ena1$ENAScore
               Ena1$pval %>% as.numeric -> Ena1$pval
-              Ena1 %>% mutate( pvalFDR = .data$pval %>% p.adjust(method = "fdr") ) %>%
-                mutate( log10pvalFDR = .data$pvalFDR %>% log10 %>% '*'( . , -1 ) %>% round( . , 4) ) %>%
-                arrange( .data$pvalFDR  ) -> Ena1
-              Ena1 %>% colnames  
-              Ena1 %>% dplyr::select(c(1,4,5,2,8,7,3)) %>% 
-                setNames(c("Name","OverlapSize","GeneSetSize","OverlapSymbolList","pval","NES","OverlapGeneIDList")) -> Ena1
-              Ena1 %>% dplyr::arrange(.data$pval) -> Ena1
-              Ena1 -> fgseapval1
-              Genesetdb0 %>% names %>% "["(i) %>% strsplit("\\|") %>% unlist %>% "["(2) %>% stringr::str_to_upper(.) -> DirName1
+              Ena1 %>% mutate(pvalFDR = .data$pval %>% p.adjust(method="fdr")) %>%
+                mutate(log10pvalFDR = .data$pvalFDR %>% log10 %>% '*'(.,-1) %>% round(.,4)) %>%
+                arrange(.data$pvalFDR ) -> Ena2
+              Ena2 %>% colnames
+              Ena2 %>% head
+              Ena2 %>% dplyr::select(c(1,4,5,2,8,7,3)) %>%
+                setNames(c("Name","OverlapSize","GeneSetSize","OverlapSymbolList","pval","NES","OverlapGeneIDList")) %>% 
+                dplyr::arrange(.data$pval) -> Ena3
+              Ena1 %>% colnames
+              Ena1 %>% head
+              Ena3 -> fgseapval1
+              fgseapval1 %>% colnames
+              # Ena1 %>% dplyr::select(.data$Name,.data$) -> fgseapval1
+              Genesetdb1 %>% names %>% "["(i) %>% strsplit("\\|") %>% unlist %>% "["(2) %>% stringr::str_to_upper(.) -> DirName1
               paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1),".tsv",sep="") -> FileName0
               fgseapval1 %>% output(file.path(Path0,"ena",FileName0))
               #
               fgseapval1 %>% dplyr::slice(1:topena) -> fgseapval1plot
+              fgseapval1plot %>% colnames
+              fgseapval1plot %>% head
               if(fgseapval1plot %>% nrow %>% ">"(0))
               {
                 fgseapval1plot$pval %>% log10 %>% "*"(-1) -> Log10Pval
@@ -574,20 +633,67 @@ ena <- function(
                   fgseapval1plot2$Name[selNchar] %>% substr(1,45) -> Head0
                   fgseapval1plot2$Name[selNchar] %>% substr(Nchar0-10,Nchar0)-> Tail0
                   fgseapval1plot2$Name %>% as.character -> NameNchar0
-                  NameNchar0
                   fgseapval1plot2$Name[selNchar] <- paste(Head0,Tail0,sep="...")
                 }
                 fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,Log10Pval)) -> fgseapval1plot3
                 # barplot 
-                fgseapval1plot3 %>% ggplot( aes(x=Log10Pval,y=.data$Name,fill=.data$NES)) -> p
+                
+                # fgseapval1plot3 %>% colnames
+                # fgseapval1plot3 %>% head
+                # fgseapval1plot3 %>% dim
+                # fgseapval1plot3 %>% rbind(fgseapval1plot3) %>% rbind(fgseapval1plot3) %>% rbind(fgseapval1plot3) -> t
+                # t %>% head
+                # t %>% dim
+                # t %>% dplyr::arrange(Name) %>% dplyr::arrange(.data$pval) -> tt
+                # tt %>% head
+                # tt %>% dim
+                # value <- foreach(l=1:nrow(fgseapval1plot3),.combine = "c") %do%
+                # { c(fgseapval1plot3$Log10Pval[l],fgseapval1plot3$NES[l],fgseapval1plot3$GeneSetSize[l],fgseapval1plot3$OverlapSize[l]) }
+                # value %>% length
+                # tt$Name %>% data.frame(Name=.,NES=rep(c("Log10Pval","NES","GeneSetSize","Overlap"),fgseapval1plot3 %>% nrow),
+                #                        value=value) -> ttt
+                # ttt %>% head
+                # ttt %>% dim
+                # rep(c("Log10Pval","NES","GeneSetSize","Overlap"),fgseapval1plot3 %>% nrow) %>% length
+                # c(fgseapval1plot3$Log10Pval,fgseapval1plot3$NES,
+                #   fgseapval1plot3$GeneSetSize,fgseapval1plot3$OverlapSize) %>% length
+                # 
+                # ttt %>% ggplot( aes(x=.data$value,y=.data$Name,fill=.data$NES)) -> p
+                # p + geom_bar(stat="identity") -> p
+                # p + geom_bar(position="dodge", stat="identity") -> p
+                # p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
+                # p + theme_bw() -> p
+                # p + theme(axis.title.x=element_text(size=12,face="bold"),
+                #           axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
+                #           plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
+                # p + labs(x="log10(p-value)",y="Genesets") -> p
+                # p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12))
+                # p + ggtitle(DirName1) -> p
+                # p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.2,linetype="dashed") -> p
+                # # output plot
+                # paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
+                # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
+                
+                
+                
+                fgseapval1plot3 %>% colnames
+                fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
+                  lapply(paste0,collapse="") %>% unlist -> Overlap
+                fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
+                fgseapval1plot3 %>% head
+                fgseapval1plot3 %>% ggplot( aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
                 p + geom_bar(stat="identity") -> p
                 p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
                 p + theme_bw() -> p
+                # p + geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white") -> p
+                # p + geom_text(aes(label = .data$GeneSetSize), stat = "count", vjust = 1.5, colour = "white") -> p
+                # p + geom_text(data = fgseapval1plot3, aes(label = .data$GeneSetSize)) -> p
+                p + geom_text(data = fgseapval1plot3, aes(label = .data$Overlap),hjust=1.1,size = 2) -> p
                 p + theme(axis.title.x=element_text(size=12,face="bold"),
                           axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
                           plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
                 p + labs(x="log10(p-value)",y="Genesets") -> p
-                p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12))
+                # p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12)) -> p
                 p + ggtitle(DirName1) -> p
                 p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.2,linetype="dashed") -> p
                 # output plot

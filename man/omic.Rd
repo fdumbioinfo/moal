@@ -42,6 +42,9 @@ omic(
   dotopnetwork = TRUE,
   dotopheatmap = TRUE,
   layout = 2,
+  mings = 5,
+  maxgs = 500,
+  overlapmin = 2,
   dotopgenesetnetwork = FALSE,
   dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,
@@ -130,6 +133,12 @@ omic(
 \item{dotopheatmap}{logical do top heatmap}
 
 \item{layout}{numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere}
+
+\item{mings}{numeric minimal size of a gene set}
+
+\item{maxgs}{numeric maximal size of a gene set}
+
+\item{overlapmin}{numeric minimal overlap to keep for gene set analysis}
 
 \item{dotopgenesetnetwork}{logical do geneset networks}
 

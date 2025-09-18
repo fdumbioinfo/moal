@@ -48,6 +48,9 @@
 #' @param doenaora logical msigdb enrichement analysis using ora method for diff list
 #' @param gmtfiles character gmt files list path
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
+#' @param mings numeric minimal size of a gene set
+#' @param maxgs numeric maximal size of a gene set
+#' @param overlapmin numeric minimal overlap to keep for gene set analysis
 #' @param dotopnetwork logical do top networks
 #' @param dotopheatmap logical do top heatmap
 #' @param dotopgenesetnetwork logical do geneset networks
@@ -148,7 +151,7 @@ omic <- function(
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
   doena = TRUE, gsearank = "logfc",topdeg = 60 , topena = 60, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
-  dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2,
+  dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 500, overlapmin = 2,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE, sample = NULL , seed = 123679, dopar = NULL,
@@ -1378,7 +1381,8 @@ omic <- function(
         ena(
           omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
-          doena=doena,gsearank=gsearank,topdeg=topdeg,topena=topena,layout=layout,bg=bg,
+          doena=doena,gsearank=gsearank,topdeg=topdeg,topena=topena,layout=layout,
+          mings=mings,maxgs=maxgs,overlapmin=overlapmin,bg=bg,
           dotopgenesetnetwork=dotopgenesetnetwork,dotopgenesetheatmap=dotopgenesetheatmap,
           dogmtgenesetnetwork=dogmtgenesetnetwork,dogmtgenesetheatmap=dogmtgenesetheatmap,
           dat=dat,factor=FactorEna1,path=Path,dirname=FactorEna0,dopar=F)
@@ -1430,7 +1434,7 @@ omic <- function(
           enanopar(
             omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
             filtergeneset=filtergeneset,dotopnetwork=T,dotopheatmap=T,
-            doena=doena,layout=layout,bg=bg,
+            doena=doena,layout=layout,bg=bg,mings=mings,maxgs=maxgs,overlapmin=overlapmin,
             dotopgenesetnetwork=F,dotopgenesetheatmap=F,
             dogmtgenesetnetwork=F,dogmtgenesetheatmap=F,
             dat=dat,factor=FactorEna1,path=PathEna,dirname=DirNameDiff,dopar=F)

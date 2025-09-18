@@ -23,6 +23,9 @@ ena(
   doena = TRUE,
   gsearank = "logfc",
   layout = 1,
+  mings = 5,
+  maxgs = 500,
+  overlapmin = 2,
   dotopnetwork = TRUE,
   dotopgenesetnetwork = FALSE,
   dogmtgenesetnetwork = FALSE,
@@ -70,6 +73,12 @@ ena(
 \item{gsearank}{character to choose gsea rank type among fc (by default) logration logfc sqrt}
 
 \item{layout}{numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere}
+
+\item{mings}{numeric minimal size of a gene set}
+
+\item{maxgs}{numeric maximal size of a gene set}
+
+\item{overlapmin}{numeric minimal overlap to keep for gene set analysis}
 
 \item{dotopnetwork}{logical do top networks}
 
