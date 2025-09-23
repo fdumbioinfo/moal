@@ -51,6 +51,7 @@
 #' @param mings numeric minimal size of a gene set
 #' @param maxgs numeric maximal size of a gene set
 #' @param overlapmin numeric minimal overlap to keep for gene set analysis
+#' @param addenarankbarplot logical if TRUE add ena barplot ranked by NES score
 #' @param dotopnetwork logical do top networks
 #' @param dotopheatmap logical do top heatmap
 #' @param dotopgenesetnetwork logical do geneset networks
@@ -151,7 +152,7 @@ omic <- function(
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
   doena = TRUE, gsearank = "logfc",topdeg = 60 , topena = 60, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
-  dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 500, overlapmin = 2,
+  dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 500, overlapmin = 2, addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE, sample = NULL , seed = 123679, dopar = NULL,
@@ -1382,7 +1383,7 @@ omic <- function(
           omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
           doena=doena,gsearank=gsearank,topdeg=topdeg,topena=topena,layout=layout,
-          mings=mings,maxgs=maxgs,overlapmin=overlapmin,bg=bg,
+          mings=mings,maxgs=maxgs,overlapmin=overlapmin,addenarankbarplot=addenarankbarplot,bg=bg,
           dotopgenesetnetwork=dotopgenesetnetwork,dotopgenesetheatmap=dotopgenesetheatmap,
           dogmtgenesetnetwork=dogmtgenesetnetwork,dogmtgenesetheatmap=dogmtgenesetheatmap,
           dat=dat,factor=FactorEna1,path=Path,dirname=FactorEna0,dopar=F)
@@ -1434,7 +1435,7 @@ omic <- function(
           enanopar(
             omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
             filtergeneset=filtergeneset,dotopnetwork=T,dotopheatmap=T,
-            doena=doena,layout=layout,bg=bg,mings=mings,maxgs=maxgs,overlapmin=overlapmin,
+            doena=doena,layout=layout,bg=bg,mings=mings,maxgs=maxgs,overlapmin=overlapmin,addenarankbarplot=addenarankbarplot,
             dotopgenesetnetwork=F,dotopgenesetheatmap=F,
             dogmtgenesetnetwork=F,dogmtgenesetheatmap=F,
             dat=dat,factor=FactorEna1,path=PathEna,dirname=DirNameDiff,dopar=F)

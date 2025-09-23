@@ -22,6 +22,7 @@
 #' @param maxgs numeric maximal size of a gene set
 #' @param overlapmin numeric minimal overlap to keep for gene set analysis
 #' @param addratioena logical if TRUE add overlap and geneset size on enrichment barplot
+#' @param addenarankbarplot logical if TRUE add ena barplot ranked by NES score
 #' @param dotopnetwork logical do top networks
 #' @param dotopheatmap logical do top heatmap
 #' @param dotopgenesetnetwork logical do geneset networks
@@ -71,7 +72,8 @@ enanopar <- function(
     omicdata = NULL, gmtfiles = NULL, species = "hs", dat = NULL, factor = NULL,
     filtergeneset = NULL, threshold = 1 , topdeg = 50, rangedeg = NULL, topena = 50, twotailena = TRUE, 
     topgeneset = 50, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
-    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 500, overlapmin = 2, addratioena = TRUE,
+    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 500, overlapmin = 2, 
+    addratioena = TRUE, addenarankbarplot = TRUE,
     dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = FALSE,
     dotopheatmap = TRUE, dotopgenesetheatmap = FALSE, dogmtgenesetheatmap = TRUE,
     path = NULL, dirname = NULL, dopar = TRUE)
@@ -419,6 +421,9 @@ enanopar <- function(
               fgseapval1plot2$Name[selNchar] <- paste(Head0,Tail0,sep="...")
             }
             fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,Log10Pval)) -> fgseapval1plot3
+            fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
+              lapply(paste0,collapse="") %>% unlist -> Overlap
+            fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
             # barplot 
             fgseapval1plot3 %>% ggplot( aes(x=Log10Pval,y=.data$Name,fill=.data$NES)) -> p
             p + geom_bar(stat="identity",width = 0.95) -> p
@@ -431,13 +436,72 @@ enanopar <- function(
                       axis.text.y = element_text(angle = 0, vjust = 0.4, hjust=1,size = 6)) -> p
             p + labs(x="log10(p-value)",y="Genesets") -> p
             p + ggtitle(DirName1,subtitle=gseastats2[[i]][[1]]) -> p
-            p + theme(axis.title.x=element_text(size=12,face="bold"),
-                      axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
-                      plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
-            p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.2,linetype="dashed") -> p
+            # p + theme(axis.title.x=element_text(size=12,face="bold"),
+            #           axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
+            #           plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
+            
+            if(addratioena){p + geom_text(data=fgseapval1plot3,aes(label=.data$Overlap),hjust=1.1,size=2) -> p}
+            p + theme(plot.title=element_text(size=10,hjust=0.5),
+                      plot.subtitle=element_text(size=8,hjust=0.5),
+                      axis.title.x=element_text(size=6,face="bold"),
+                      axis.text.x = element_text(size=6,face="bold"),
+                      axis.title.y=element_text(size=6,face="bold"),
+                      axis.text.y=element_text(size=8,face="bold"),
+                      legend.position="bottom",
+                      legend.title=element_text(size = 5),
+                      legend.text=element_text(size = 5)) -> p
+            p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.4,linetype="dashed") -> p
+            p -> p1
+            
+            if(addenarankbarplot)
+            {
+              fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,abs(.data$NES))) -> fgseapval1plot3
+              fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
+                lapply(paste0,collapse="") %>% unlist -> Overlap
+              fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
+              fgseapval1plot3 %>% ggplot( aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
+              p + geom_bar(stat="identity") -> p
+              p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
+              p + theme_bw() -> p
+              if(addratioena){p + geom_text(data = fgseapval1plot3, aes(label = .data$Overlap),hjust=1.1,size = 2) -> p}
+              p + theme(plot.title=element_text(size=10,hjust=0.5),
+                        plot.subtitle=element_text(size=8,hjust=0.5),
+                        axis.title.x=element_text(size=6,face="bold"),
+                        axis.text.x=element_text(size=6,face="bold"),
+                        axis.title.y=element_text(size=6,,face="bold"),
+                        axis.text.y=element_text(size=8,face="bold"),
+                        legend.position="bottom",
+                        legend.title=element_text(size = 5), 
+                        legend.text=element_text(size = 5)) -> p
+              p + labs(x="log10(p-value)",y="Genesets") -> p
+              p + ggtitle(DirName1,subtitle=gseastats2[[i]][[1]]) -> p
+              p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.4,linetype="dashed") -> p
+              p -> p2
+              # gridExtra::grid.arrange( p1, p2, nrow = 1 ) -> p
+              # gridExtra::grid.arrange(p1,p2,heights = c(5, 5),nrow=2,) -> p
+              # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),nrow=2) -> p
+              # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),nrow=2) -> p
+              # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),ncol=2) -> p
+              # gridExtra::grid.arrange(p1,p2,heights = c(5,5),ncol=2) -> p
+              gridExtra::grid.arrange(p1,p2,ncol=2) -> p
+              # gridExtra::grid.arrange(p1,p2,heights=c(10, 10)) -> p
+              # ggpubr::ggarrange(p1, p2, widths = c(5,5)) -> p
+              # plot_grid(p1, p2, labels = c('A', 'B'), label_size = 12)
+            }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             # output plot
             paste(DirName1,"_ena_",gseastats2[[i]][[1]],"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
-            ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
+            # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
+            ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width=40,height=30,scale=1,units="cm")
           }
         }
       }
@@ -635,68 +699,85 @@ enanopar <- function(
                   fgseapval1plot2$Name %>% as.character -> NameNchar0
                   fgseapval1plot2$Name[selNchar] <- paste(Head0,Tail0,sep="...")
                 }
-                fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,Log10Pval)) -> fgseapval1plot3
-                # barplot 
-                
-                # fgseapval1plot3 %>% colnames
-                # fgseapval1plot3 %>% head
-                # fgseapval1plot3 %>% dim
-                # fgseapval1plot3 %>% rbind(fgseapval1plot3) %>% rbind(fgseapval1plot3) %>% rbind(fgseapval1plot3) -> t
-                # t %>% head
-                # t %>% dim
-                # t %>% dplyr::arrange(Name) %>% dplyr::arrange(.data$pval) -> tt
-                # tt %>% head
-                # tt %>% dim
-                # value <- foreach(l=1:nrow(fgseapval1plot3),.combine = "c") %do%
-                # { c(fgseapval1plot3$Log10Pval[l],fgseapval1plot3$NES[l],fgseapval1plot3$GeneSetSize[l],fgseapval1plot3$OverlapSize[l]) }
-                # value %>% length
-                # tt$Name %>% data.frame(Name=.,NES=rep(c("Log10Pval","NES","GeneSetSize","Overlap"),fgseapval1plot3 %>% nrow),
-                #                        value=value) -> ttt
-                # ttt %>% head
-                # ttt %>% dim
-                # rep(c("Log10Pval","NES","GeneSetSize","Overlap"),fgseapval1plot3 %>% nrow) %>% length
-                # c(fgseapval1plot3$Log10Pval,fgseapval1plot3$NES,
-                #   fgseapval1plot3$GeneSetSize,fgseapval1plot3$OverlapSize) %>% length
-                # 
-                # ttt %>% ggplot( aes(x=.data$value,y=.data$Name,fill=.data$NES)) -> p
-                # p + geom_bar(stat="identity") -> p
-                # p + geom_bar(position="dodge", stat="identity") -> p
-                # p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
-                # p + theme_bw() -> p
-                # p + theme(axis.title.x=element_text(size=12,face="bold"),
-                #           axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
-                #           plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
-                # p + labs(x="log10(p-value)",y="Genesets") -> p
-                # p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12))
-                # p + ggtitle(DirName1) -> p
-                # p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.2,linetype="dashed") -> p
-                # # output plot
-                # paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
-                # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
-                
-                
-                
+                # barplot log10Pval ranking
+                fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,.data$Log10Pval)) -> fgseapval1plot3
                 fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
                   lapply(paste0,collapse="") %>% unlist -> Overlap
                 fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
-                fgseapval1plot3 %>% ggplot( aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
+                fgseapval1plot3 %>% ggplot(aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
                 p + geom_bar(stat="identity") -> p
                 p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
                 p + theme_bw() -> p
-                # p + geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white") -> p
-                # p + geom_text(aes(label = .data$GeneSetSize), stat = "count", vjust = 1.5, colour = "white") -> p
-                # p + geom_text(data = fgseapval1plot3, aes(label = .data$GeneSetSize)) -> p
-                if(addratioena){p + geom_text(data = fgseapval1plot3, aes(label = .data$Overlap),hjust=1.1,size = 2) -> p}
-                p + theme(axis.title.x=element_text(size=12,face="bold"),
-                          axis.title.y=element_text(size=12),axis.text.y=element_text(size=6),
-                          plot.title=element_text(size=8,hjust=0.5),plot.subtitle=element_text(size=8,hjust=0.5)) -> p
+                if(addratioena){p + geom_text(data=fgseapval1plot3,aes(label=.data$Overlap),hjust=1.1,size=2) -> p}
+                p + theme(plot.title=element_text(size=10,hjust=0.5),
+                          plot.subtitle=element_text(size=8,hjust=0.5),
+                          axis.title.x=element_text(size=6,face="bold"),
+                          axis.text.x = element_text(size=6,face="bold"),
+                          axis.title.y=element_text(size=6,face="bold"),
+                          axis.text.y=element_text(size=8,face="bold"),
+                          legend.position="bottom",
+                          legend.title=element_text(size = 5),
+                          legend.text=element_text(size = 5)) -> p
+                # p + annotate("text", x = Inf, y = 2.9, label = "overlap / Gene set Size", hjust = -0.08, size = 3) -> p
+                # p + annotate("text", x = Inf, y = 2.9, label = "overlap / Gene set Size", hjust = 30, size = 3) -> p
+                # p + annotate("text", x = 0, y=-2, label = "overlap / Gene set Size") + 
+                #   coord_cartesian(ylim = c(0, 8), clip = "off") -> p
+                # p + annotate("text", x = fgseapval1plot3$Log10Pval %>% max %>% "+"(-3), y= -8, label = "overlap / geneset", size = 5) +
+                #   coord_cartesian(ylim = c(0,fgseapval1plot3$Name[1]),clip = "off") -> p
                 p + labs(x="log10(p-value)",y="Genesets") -> p
-                # p + theme(axis.title.x =element_text(size=12,face="bold"),axis.title.y=element_text(size=12)) -> p
-                p + ggtitle(DirName1) -> p
-                p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.2,linetype="dashed") -> p
+                # p + ggtitle(DirName1) -> p
+                
+                p + ggtitle(DirName1,subtitle=Omicdataf1 %>% colnames %>% "["(2) %>% gsub("p_","",.)) -> p
+                # if(addenarankbarplot){p + theme(legend.position="bottom") -> p}
+                p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.4,linetype="dashed") -> p
+                p -> p1
+                # barplot NES ranking
+                # F -> addenarankbarplot 
+                if(addenarankbarplot)
+                {
+                  fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,abs(.data$NES))) -> fgseapval1plot3
+                  fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
+                    lapply(paste0,collapse="") %>% unlist -> Overlap
+                  fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
+                  fgseapval1plot3 %>% ggplot( aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
+                  p + geom_bar(stat="identity") -> p
+                  p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
+                  p + theme_bw() -> p
+                  if(addratioena){p + geom_text(data = fgseapval1plot3, aes(label = .data$Overlap),hjust=1.1,size = 2) -> p}
+                  p + theme(plot.title=element_text(size=10,hjust=0.5),
+                            plot.subtitle=element_text(size=8,hjust=0.5),
+                            axis.title.x=element_text(size=6,face="bold"),
+                            axis.text.x=element_text(size=6,face="bold"),
+                            axis.title.y=element_text(size=6,,face="bold"),
+                            axis.text.y=element_text(size=8,face="bold"),
+                            legend.position="bottom",
+                            legend.title=element_text(size = 5), 
+                            legend.text=element_text(size = 5)) -> p
+                  p + labs(x="log10(p-value)",y="Genesets") -> p
+                  # p + ggtitle(DirName1) -> p
+                  p + ggtitle(DirName1,subtitle=Omicdataf1 %>% colnames %>% "["(2) %>% gsub("p_","",.)) -> p
+                  p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.4,linetype="dashed") -> p
+                  p -> p2
+                  # gridExtra::grid.arrange( p1, p2, nrow = 1 ) -> p
+                  # gridExtra::grid.arrange(p1,p2,heights = c(5, 5),nrow=2,) -> p
+                  # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),nrow=2) -> p
+                  # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),nrow=2) -> p
+                  # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),ncol=2) -> p
+                  # gridExtra::grid.arrange(p1,p2,heights = c(5,5),ncol=2) -> p
+                  gridExtra::grid.arrange(p1,p2,ncol=2) -> p
+                  # gridExtra::grid.arrange(p1,p2,heights=c(10, 10)) -> p
+                  # ggpubr::ggarrange(p1, p2, widths = c(5,5)) -> p
+                  # plot_grid(p1, p2, labels = c('A', 'B'), label_size = 12)
+                }
                 # output plot
+                # paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
                 paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1plot3),".pdf",sep="") -> FileName0
-                ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
+                # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width =10 ,height =5 )
+                # ggsave(file="a4_output.pdf", width = 210, height = 297, units = "mm")
+                # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width=550,height =200,units="mm",scale = 2, limitsize=F)
+                # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width=1100,height =400,units="mm",scale = 1, limitsize=F)
+                # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width=40,height=30,units="cm")
+                ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width=40,height=30,scale=1,units="cm")
               }
             }
           }

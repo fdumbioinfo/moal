@@ -27,6 +27,7 @@ ena(
   maxgs = 500,
   overlapmin = 2,
   addratioena = TRUE,
+  addenarankbarplot = TRUE,
   dotopnetwork = TRUE,
   dotopgenesetnetwork = FALSE,
   dogmtgenesetnetwork = FALSE,
@@ -82,6 +83,8 @@ ena(
 \item{overlapmin}{numeric minimal overlap to keep for gene set analysis}
 
 \item{addratioena}{logical if TRUE add overlap and geneset size on enrichment barplot}
+
+\item{addenarankbarplot}{logical if TRUE add ena barplot ranked by NES score}
 
 \item{dotopnetwork}{logical do top networks}
 

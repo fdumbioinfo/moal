@@ -45,6 +45,7 @@ omic(
   mings = 5,
   maxgs = 500,
   overlapmin = 2,
+  addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE,
   dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,
@@ -139,6 +140,8 @@ omic(
 \item{maxgs}{numeric maximal size of a gene set}
 
 \item{overlapmin}{numeric minimal overlap to keep for gene set analysis}
+
+\item{addenarankbarplot}{logical if TRUE add ena barplot ranked by NES score}
 
 \item{dotopgenesetnetwork}{logical do geneset networks}
 
