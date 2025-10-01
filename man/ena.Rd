@@ -24,7 +24,7 @@ ena(
   gsearank = "logfc",
   layout = 1,
   mings = 5,
-  maxgs = 500,
+  maxgs = 700,
   overlapmin = 2,
   addratioena = TRUE,
   addenarankbarplot = TRUE,

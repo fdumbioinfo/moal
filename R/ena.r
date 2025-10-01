@@ -72,7 +72,7 @@ ena <- function(
     omicdata = NULL, gmtfiles = NULL, species = "hs", dat = NULL, factor = NULL,
     filtergeneset = NULL, threshold = 1 , topdeg = 50, rangedeg = NULL, topena = 50, twotailena = TRUE, 
     topgeneset = 50, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
-    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 500, overlapmin = 2, 
+    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 700, overlapmin = 2,
     addratioena = TRUE, addenarankbarplot = TRUE,
     dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = FALSE,
     dotopheatmap = TRUE, dotopgenesetheatmap = FALSE, dogmtgenesetheatmap = TRUE,
@@ -322,7 +322,6 @@ ena <- function(
         if(length(selgs)>0){ Genesetdb0[[i]][selgs] -> tt }else{ Genesetdb0[[i]] -> tt }
       }
     Genesetdb0 %>% names -> names(Genesetdb1)
-    #
     # preprocessing
     gseastats0 <- foreach(j=1:length(t6)) %do%
       {
@@ -568,7 +567,7 @@ ena <- function(
     Genesetdb1 <- foreach(i=1:length(Genesetdb0)) %do%
       {
         Genesetdb0[[i]] %>% lapply("[",4) %>% unlist(recursive = F) %>% lapply(length) %>% unlist -> t
-        (t %>% ">"(mings) & t %>% "<="(.,maxgs)) %>% which -> selgs
+        (t %>% ">="(mings) & t %>% "<="(.,maxgs)) %>% which -> selgs
         if(length(selgs)>0){ Genesetdb0[[i]][selgs] -> tt }else{ Genesetdb0[[i]] -> tt }
       }
     Genesetdb0 %>% names -> names(Genesetdb1)
@@ -797,7 +796,7 @@ ena <- function(
         l0[selgs] %>% file.copy(file.path(Path0,"ena","PATHWAYS")) 
       }
       # Gene Ontology
-      l0 %>% basename %>% grep("^GOBP|^GOCC|^GOMM|^HPO",.) -> selgs   
+      l0 %>% basename %>% grep("^GOBP|^GOCC|^GOMF|^HPO",.) -> selgs   
       if(length(selgs)>0)
       {
         Path0 %>% file.path("ena","GO") %>% dir.create

@@ -152,7 +152,7 @@ omic <- function(
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
   doena = TRUE, gsearank = "logfc",topdeg = 60 , topena = 60, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
-  dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 500, overlapmin = 2, addenarankbarplot = TRUE,
+  dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 700, overlapmin = 2, addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE, sample = NULL , seed = 123679, dopar = NULL,

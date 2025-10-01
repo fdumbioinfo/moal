@@ -43,7 +43,7 @@ omic(
   dotopheatmap = TRUE,
   layout = 2,
   mings = 5,
-  maxgs = 500,
+  maxgs = 700,
   overlapmin = 2,
   addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE,
