@@ -1,5 +1,6 @@
 #' @title ena barplot
 #' @param dat data.frame enrichment analysis results with 3 column
+#' @param datnes data.frame enrichment analysis results with 3 column
 #' @param labsize numeric feature size
 #' @param addratioena logical if TRUE add overlap and geneset size on enrichment barplot
 #' @param addenarankbarplot logical if TRUE add ena barplot ranked by NES score
@@ -14,7 +15,7 @@
 #' @importFrom gridExtra grid.arrange
 #' @importFrom stats reorder
 #' @noRd
-enabarplot <- function( dat = NULL, labsize = 7, addratioena = TRUE, addenarankbarplot = TRUE, title = "ena", subtitle = "")
+enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRUE, addenarankbarplot = TRUE, title = "ena", subtitle = "")
 {
   # barplot
   
@@ -51,6 +52,7 @@ enabarplot <- function( dat = NULL, labsize = 7, addratioena = TRUE, addenarankb
   p -> p1
   if(addenarankbarplot)
   {
+    if(!is.null(datnes)){ datnes -> dat }
     dat %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,abs(.data$NES))) -> dat
     # dat$OverlapSize %>% paste("/",dat$GenesetSize) %>% 
     #   lapply(paste0,collapse="") %>% unlist -> Overlap
