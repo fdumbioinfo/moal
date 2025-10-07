@@ -416,7 +416,6 @@ enanopar <- function(
               paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
             "PATHWAY$" -> Grepcol1
             fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-            fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
             
             fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
             Nchar0 %>% ">"(50) %>% which -> selNchar
@@ -444,7 +443,6 @@ enanopar <- function(
               paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
             "PATHWAY$" -> Grepcol1
             fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-            fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
             
             fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
             Nchar0 %>% ">"(50) %>% which -> selNchar
@@ -592,12 +590,14 @@ enanopar <- function(
                   Omicdataf2 %>% dplyr::slice(selfcu) %>% dplyr::select(.data[[colnames(Omicdataf0)[3]]]) %>% unlist %>% abs %>%
                     "*"(Omicdataf2 %>% dplyr::slice(selfcu) %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "+"(1)) %>%
                     mean %>% "*"(length(selfcu)) %>% log2 -> enafcu
+                  if(is.na(enafcu) %>% all){ 1 -> enafcu }
                 }else{ 1 -> enafcu }
                 if(length(selfcd) %>% ">"(0))
                 {
                   Omicdataf2 %>% dplyr::slice(selfcd) %>% dplyr::select(.data[[colnames(Omicdataf0)[3]]]) %>% unlist %>% abs %>%
                     "*"(Omicdataf2 %>% dplyr::slice(selfcd) %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% unlist %>% log10 %>% "*"(-1) %>% "+"(1)) %>%
                     mean %>% "*"(length(selfcd)) %>% log2 -> enafcd
+                  if(is.na(enafcd) %>% all){ 1 -> enafcd }
                 }else{ 1 -> enafcd }
                 # if(enafcu %>% "-"(enafcd) %>% ">"(0)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
                 # if(enafcu %>% "/"(enafcd) %>% ">"(2)){ EnaScore0 %>% "*"(enafcu %>% "/"(enafcd) %>% "+"(1) %>% log2) -> EnaScore0 }
@@ -666,7 +666,6 @@ enanopar <- function(
                   paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
                 "PATHWAY$" -> Grepcol1
                 fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-                fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
                 
                 fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
                 Nchar0 %>% ">"(50) %>% which -> selNchar
@@ -694,7 +693,6 @@ enanopar <- function(
                   paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
                 "PATHWAY$" -> Grepcol1
                 fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-                fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
                 
                 fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
                 Nchar0 %>% ">"(50) %>% which -> selNchar
