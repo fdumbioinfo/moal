@@ -15,7 +15,7 @@ omic(
   batch = NULL,
   addfactor = NULL,
   doqc = TRUE,
-  threshold = c(2, 3, 4, 10, 11, 12),
+  threshold = c(1, 2, 3, 4, 9, 10, 11, 12),
   padj = "none",
   logratio = FALSE,
   dopattern = TRUE,

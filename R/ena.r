@@ -157,6 +157,7 @@ ena <- function(
   OmicData1$GeneID %>% is.na %>% "!"(.) %>% which -> sel
   if(length(sel) > 0){ OmicData1 %>% dplyr::slice(sel) -> OmicData2 }else{ OmicData1 -> OmicData2 } 
   OmicData2 %>% colnames %>% grep("p_",.) -> sel1
+  if(length(sel1) < 1){1 -> sel1}
   t5 <- foreach(i=1:length(sel1)) %do%
     {
       OmicData2 %>% dplyr::select(1,c(sel1[i],sel1[i]+1),.data$Symbol,.data$GeneID ) -> t
@@ -314,7 +315,80 @@ ena <- function(
   {
     file.path(Path0,"ena") %>% dir.create
     moalannotgene::genesetdb -> Genesetdb0
+    NULL -> gmtfiles2
+    # gsea for gmtfiles
+    if(!(is.null(gmtfiles)))
+    {
+      NULL -> gmtcoll1
+      gmtcoll1 <- foreach(i=1:length(gmtfiles)) %do%
+        {
+          gmtfiles[i] -> g0
+          gmtfiles[i] %>% file("r") -> f
+          f %>% readLines -> rl0
+          close(f)
+          #
+          # if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
+          # gmtcol <- foreach(i=1:length(rl0),.packages = c("moal","magrittr")) %dopar%
+          gmtcoll0 <- foreach(j=1:length(rl0),.packages = c("moal","magrittr")) %do%
+            {
+              rl0[j] %>% strsplit("\t") %>% unlist %>% "["(1) -> Name
+              rl0[j] %>% strsplit("\t") %>% unlist %>% "["(-c(1,2)) -> SymbolList
+              if(SymbolList %>% grepl("^[0-9]+$",.) %>% all)
+              { 
+                SymbolList -> t
+                t -> tt
+                list(Name,Name,length(tt),tt)
+                }else{ 
+                  SymbolList %>% "match"(OutPut1$Symbol) %>% OutPut1$GeneID[.] -> t
+                  if(t %>% is.na %>% all %>% "!"(.)) 
+                  { 
+                    t %>% is.na %>% which -> sel
+                    t[-sel] -> tt
+                    list(Name,Name,length(tt),tt)
+                  } }
+              # SymbolList %>% "match"(Omicdataf0$Symbol) %>% Omicdataf0$GeneID[.] -> t
+              # t %>% is.na %>% which -> sel
+              # SymbolList %>% moal::annot(.) -> t
+              # if((t %>% is.na %>% all %>% "!"(.)) | (SymbolList %>% grepl("^[0-9]+$",.) %>% all %>% "!"(.))) 
+              # { 
+              #   t %>% is.na %>% which -> sel
+              #   t[-sel] -> tt
+              #   list(Name,Name,length(tt),tt)
+              # } 
+            }
+          # gmtcol0
+          # gmtcol0[1] %>% names
+          # names(gmtcol0) <- "zidane"
+          if(gmtcoll0 %>% unlist %>% is.null %>% "!"(.)){ gmtcoll0 }
+          # gmtcol0 %>% "list"(gmtcol1,.) -> gmtcol1
+          # if(dopar){parallel::stopCluster(cl);doParallel::stopImplicitCluster()}
+        }
+      # NULL -> gmtfiles2 
+      if( gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% all %>% "!"(.) )
+      {
+        gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% which -> selcoll
+        if(length(selcoll) > 0)
+        {
+          gmtcoll1[-selcoll] -> gmtcoll2
+          gmtcoll2 %>% length
+          gmtfiles[-selcoll] -> gmtfiles2 
+        }
+      }
+      #
+      if(!is.null(gmtfiles2))
+      { 
+        gmtfiles2 %>% basename %>% gsub("\\.gmt","",.) -> t
+        collNames <- foreach(i=1:length(t)) %do%
+          {
+            c(t[i],t[i],gmtcoll2[[i]] %>% length) %>% paste(collapse = "|")
+          }
+        gmtcoll2 %>% names
+        collNames %>% unique -> names(gmtcoll2)
+        Genesetdb0 %>% "c"(gmtcoll2) -> Genesetdb0
+      }
+    }
     # remove min and max geneset
+    Genesetdb0 %>% names
     Genesetdb1 <- foreach(i=1:length(Genesetdb0)) %do%
       {
         Genesetdb0[[i]] %>% lapply("[",4) %>% unlist(recursive = F) %>% lapply(length) %>% unlist -> t
@@ -322,6 +396,9 @@ ena <- function(
         if(length(selgs)>0){ Genesetdb0[[i]][selgs] -> tt }else{ Genesetdb0[[i]] -> tt }
       }
     Genesetdb0 %>% names -> names(Genesetdb1)
+    Genesetdb1 %>% lapply(length)
+    Genesetdb1 %>% names
+    # Genesetdb1[[29]] %>% head
     # preprocessing
     gseastats0 <- foreach(j=1:length(t6)) %do%
       {
@@ -479,8 +556,10 @@ ena <- function(
     if(length(l0) > 0)
     {
       Path0 %>% file.path("ena") %>% list.files(full.names = T) -> l0
-      # pathways
-      l0 %>% basename %>% grep("^REACTOME|^KEGG|^WIKI|^HALLMAR|^KEGG|^CGP|^PID|^BIOCARTA",.) -> selgs   
+      # PATHWAYS
+      # Genesetdb1 %>% names
+      # "^REACTOME|^KEGG|^WIKI|^HALLMAR|^KEGG|^CGP|^PID|^BIOCARTA"
+      l0 %>% basename %>% grep("^REACTOME|^KEGG|^WIKI|^HALLMAR|^KEGG|^CGP|^PID|^BIOCARTA",.) -> selgs
       if(length(selgs)>0)
       {
         Path0 %>% file.path("ena","PATHWAYS") %>% dir.create
@@ -521,6 +600,20 @@ ena <- function(
         Path0 %>% file.path("ena","REGULATORS") %>% dir.create
         l0[selgs] %>% file.copy(file.path(Path0,"ena","REGULATORS")) 
       }
+      # gmtfiles
+      if(!is.null(gmtfiles2))
+      {
+        Path0 %>% file.path("ena","gmtfiles") %>% dir.create
+        foreach(i=1:length(gmtfiles2)) %do%
+          {
+            gmtfiles2[i] %>% basename %>% gsub("\\.gmt","",.) %>% paste("^",.,sep="") -> Grepgmt
+            l0 %>% basename %>% grep(Grepgmt,.,ignore.case=T) -> selgs
+            if(length(selgs)>0)
+            {
+              l0[selgs] %>% file.copy(file.path(Path0,"ena","gmtfiles")) 
+            }
+          }
+      }
     l0 %>% file.remove
     }
   }
@@ -531,6 +624,89 @@ ena <- function(
   {
     file.path(Path0,"ena") %>% dir.create
     moalannotgene::genesetdb -> Genesetdb0
+    NULL -> gmtfiles2
+    # ora for gmtfiles
+    if(!(is.null(gmtfiles)))
+    {
+      NULL -> gmtcoll1
+      NULL -> gmtfiles2
+      gmtcoll1 <- foreach(i=1:length(gmtfiles)) %do%
+        {
+          gmtfiles[i] -> g0
+          gmtfiles[i] %>% file("r") -> f
+          f %>% readLines -> rl0
+          close(f)
+          #
+          # if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
+          # gmtcol <- foreach(i=1:length(rl0),.packages = c("moal","magrittr")) %dopar%
+          gmtcoll0 <- foreach(j=1:length(rl0),.packages = c("moal","magrittr")) %do%
+            {
+              rl0[j] %>% strsplit("\t") %>% unlist %>% "["(1) -> Name
+              rl0[j] %>% strsplit("\t") %>% unlist %>% "["(-c(1,2)) -> SymbolList
+              if(SymbolList %>% grepl("^[0-9]+$",.) %>% all)
+              { 
+                SymbolList -> t
+                t -> tt
+                list(Name,Name,length(tt),tt)
+              }else{ 
+                SymbolList %>% "match"(OutPut1$Symbol) %>% OutPut1$GeneID[.] -> t
+                if(t %>% is.na %>% all %>% "!"(.)) 
+                { 
+                  t %>% is.na %>% which -> sel
+                  t[-sel] -> tt
+                  list(Name,Name,length(tt),tt)
+                } }
+              # SymbolList %>% "match"(Omicdataf0$Symbol) %>% Omicdataf0$GeneID[.] -> t
+              # t %>% is.na %>% which -> sel
+              # SymbolList %>% moal::annot(.) -> t
+              # if((t %>% is.na %>% all %>% "!"(.)) | (SymbolList %>% grepl("^[0-9]+$",.) %>% all %>% "!"(.))) 
+              # { 
+              #   t %>% is.na %>% which -> sel
+              #   t[-sel] -> tt
+              #   list(Name,Name,length(tt),tt)
+              # } 
+            }
+          # gmtcol0
+          # gmtcol0[1] %>% names
+          # names(gmtcol0) <- "zidane"
+          if(gmtcoll0 %>% unlist %>% is.null %>% "!"(.)){ gmtcoll0 }
+          # gmtcol0 %>% "list"(gmtcol1,.) -> gmtcol1
+          # if(dopar){parallel::stopCluster(cl);doParallel::stopImplicitCluster()}
+        }
+      # NULL -> gmtfiles2 
+      if( gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% all %>% "!"(.) )
+      {
+        gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% which -> selcoll
+        if(length(selcoll) > 0)
+        {
+          gmtcoll1[-selcoll] -> gmtcoll2
+          gmtcoll2 %>% length
+          gmtfiles[-selcoll] -> gmtfiles2 
+        }
+      }
+      #
+      if(!is.null(gmtfiles2))
+      { 
+        gmtfiles2 %>% basename %>% gsub("\\.gmt","",.) -> t
+        collNames <- foreach(i=1:length(t)) %do%
+          {
+            c(t[i],t[i],gmtcoll2[[i]] %>% length) %>% paste(collapse = "|")
+          }
+        gmtcoll2 %>% names
+        collNames %>% unique -> names(gmtcoll2)
+        Genesetdb0 %>% "c"(gmtcoll2) -> Genesetdb0
+      }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     # remove min and max geneset
     Genesetdb1 <- foreach(i=1:length(Genesetdb0)) %do%
       {
@@ -625,6 +801,7 @@ ena <- function(
             # plot
             if(!is.null(Ena0))
             {
+              if(Ena0 %>% is.vector){ Ena0 %>% data.frame %>% t -> Ena0 }
               Ena0 %>% data.frame(stringsAsFactors=F) %>%
                 stats::setNames(c("Name","SymbolList","GeneIDList","OverlapSize","GenesetSize","OverlapRatio","ENAScore","pval")) -> Ena1
               Ena1 %>% head
@@ -656,8 +833,6 @@ ena <- function(
               fgseapval1plot %>% head
               if(fgseapval1plot %>% nrow %>% ">"(0))
               {
-                
-                
                 # pval ranking
                 fgseapval1plot$pval %>% log10 %>% "*"(-1) -> Log10Pval
                 fgseapval1plot %>% data.frame(Log10Pval) -> fgseapval1plot2
@@ -810,6 +985,20 @@ ena <- function(
         Path0 %>% file.path("ena","REGULATORS") %>% dir.create
         l0[selgs] %>% file.copy(file.path(Path0,"ena","REGULATORS")) 
       }
+      # gmtfiles
+      if(!is.null(gmtfiles2))
+      {
+        Path0 %>% file.path("ena","gmtfiles") %>% dir.create
+        foreach(i=1:length(gmtfiles2)) %do%
+          {
+            gmtfiles2[i] %>% basename %>% gsub("\\.gmt","",.) %>% paste("^",.,sep="") -> Grepgmt
+            l0 %>% basename %>% grep(Grepgmt,.,ignore.case=T) -> selgs
+            if(length(selgs)>0)
+            {
+              l0[selgs] %>% file.copy(file.path(Path0,"ena","gmtfiles")) 
+            }
+          }
+      }
       l0 %>% file.remove
     }
   }
@@ -913,11 +1102,12 @@ ena <- function(
     }
   }
   # ----
-  # 7 - geneset heatmap 
+  # 7 - top geneset heatmap 
   # ----
   if(dotopgenesetheatmap)
   {
     moalannotgene::genesetdb -> Genesetdb0
+    Genesetdb0 %>% names
     topgeneset -> Topgenesetval0
     if(!is.null(filtergeneset))
     {
@@ -1036,7 +1226,7 @@ ena <- function(
     file.path(Path0,DirName1) %>% dir.create
     GenesetLists1 <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% basename %>% sub("(.*)\\.gmt","\\1",.) -> Keyword0
         file.path(Path0,DirName1,Keyword0) %>% dir.create
         gmtfiles[i] %>% file("r") -> f 
         readLines(f,warn=FALSE) -> rl0
@@ -1079,11 +1269,11 @@ ena <- function(
     "HeatmapGMT" -> DirName1
     file.path(Path0,DirName1) %>% dir.create
     # moal:::thresholdlist[threshold] -> Threshold0
-    gmtfiles %>% basename %>% sub("(.*).gmt","\\1",.) -> DirNameGMT0
+    gmtfiles %>% basename %>% sub("(.*)\\.gmt","\\1",.) -> DirNameGMT0
     file.path(Path0,DirName1,DirNameGMT0) %>% lapply(dir.create)
     GenesetLists1 <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% basename %>% sub("(.*)\\.gmt","\\1",.) -> Keyword0
         gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
@@ -1094,7 +1284,7 @@ ena <- function(
       }
     GenesetListsSymbol <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% basename %>% sub("(.*)\\.gmt","\\1",.) -> Keyword0
         gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
@@ -1113,10 +1303,11 @@ ena <- function(
         # a0$Symbol -> nodelist
         GenesetListsSymbol[[i]] -> nodelist
         # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
-        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
-        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset
-        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
+        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> title
+        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> FileNameGeneset
+        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) %>% gsub("/"," ",.) -> DirNameN0
         # reduce long geneset name
+        # FileNameGeneset %>% as.character %>% nchar -> Nchar0
         FileNameGeneset %>% as.character %>% nchar -> Nchar0
         Nchar0 %>% ">"(50) %>% which -> selNchar
         if(length(selNchar)>0)
@@ -1189,11 +1380,11 @@ ena <- function(
     length(levels(factor)) -> NbLevels0
     paste("HeatmapGMT_",NbLevels0,sep = "") -> DirName1
     file.path(Path0,DirName1) %>% dir.create
-    gmtfiles %>% basename %>% sub("(.*).gmt","\\1",.) -> DirNameGMT0
+    gmtfiles %>% basename %>% sub("(.*)\\.gmt","\\1",.) -> DirNameGMT0
     file.path(Path0,DirName1,DirNameGMT0) %>% lapply(dir.create)
     GenesetLists1 <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% basename %>% sub("(.*)\\.gmt","\\1",.) -> Keyword0
         gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
@@ -1205,7 +1396,7 @@ ena <- function(
     GenesetLists1 %>% length
     GenesetListsSymbol <- foreach(i=1:length(gmtfiles), .combine = "c") %do%
       {
-        gmtfiles[i] %>% basename %>% sub("(.*).gmt","\\1",.) -> Keyword0
+        gmtfiles[i] %>% basename %>% sub("(.*)\\.gmt","\\1",.) -> Keyword0
         gmtfiles[i] %>% file("r") -> f
         readLines(f,warn=FALSE) -> rl0
         close(f)
@@ -1233,9 +1424,9 @@ ena <- function(
         # symbollist %>% annot(.,idtype = "SYMBOL") -> a0
         # a0$Symbol -> nodelist
         GenesetListsSymbol[[i]] -> nodelist
-        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
-        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset
-        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
+        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> title
+        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> FileNameGeneset
+        GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) %>% gsub("/"," ",.) -> DirNameN0
         nodelist %>% data.frame(Symbol=.) %>% inner_join(MatHeatmap1) -> tt
         if(nrow(tt) > 2)
         {
