@@ -566,7 +566,7 @@ enanopar <- function(
         l0[selgs] %>% file.copy(file.path(Path0,"ena","PATHWAYS")) 
       }
       # Gene Ontology
-      l0 %>% basename %>% grep("^GOBP|^GOCC|^GOMM|^HPO",.) -> selgs   
+      l0 %>% basename %>% grep("^GOBP|^GOCC|^GOMF|^HPO",.) -> selgs   
       if(length(selgs)>0)
       {
         Path0 %>% file.path("ena","GO") %>% dir.create
