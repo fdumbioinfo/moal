@@ -34,6 +34,8 @@ Workflow summary:
 RopenSci r-universe:
 https://fdumbioinfo.r-universe.dev/moal
 
+UMS IPSIT BIOINFO at Paris Saclay University: https://www.ipsit.universite-paris-saclay.fr/?-bioinfo-
+
 bioRxiv preprint:
 https://doi.org/10.1101/2023.10.17.562686
 
