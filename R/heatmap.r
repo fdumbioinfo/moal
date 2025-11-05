@@ -29,7 +29,7 @@
 #' @export
 heatmap <- function(
   dat , factor , method = "complete" , dendrogram = "both", k = NULL,
-  labCol = "" , cexCol = 0.85 , labRow = "" , cexRow = NULL,
+  labCol = "" , cexCol = 0.5 , labRow = "" , cexRow = NULL,
   cexlegend = 0.65 , keysize = 0.9, keycolor = c( "darkgreen", "orange" , "darkred") , parmar = c(5,4,5,6), scale = "row")
 {
   par(xpd=T, mar=parmar)

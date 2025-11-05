@@ -311,7 +311,7 @@ enanopar <- function(
   # gsea enrichment
   #
   if(dotopgenesetnetwork | dotopgenesetheatmap){ doena <- T }
-  if(doena & nrow(OutPut1) > 2000)
+  if(doena & nrow(OutPut1) > 4000)
   {
     file.path(Path0,"ena") %>% dir.create
     moalannotgene::genesetdb -> Genesetdb0
@@ -454,7 +454,6 @@ enanopar <- function(
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %do%
       {
         set.seed(123679)
-        # fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=15,maxSize=500,scoreType="std",nproc=1)
         fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=mings,maxSize=maxgs,scoreType="std",nproc=1)
         if(nrow(fgsea0)>0)
         {
@@ -493,7 +492,6 @@ enanopar <- function(
               paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
             "PATHWAY$" -> Grepcol1
             fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-            
             fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
             Nchar0 %>% ">"(50) %>% which -> selNchar
             if(length(selNchar)>0)
@@ -503,7 +501,7 @@ enanopar <- function(
               fgseapval1plot2$Name %>% as.character -> NameNchar0
               fgseapval1plot2$Name[selNchar] <- paste(Head0,Tail0,sep="...")
             }
-            fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,Log10Pval)) -> fgseapval1plot3
+            fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,.data$Log10Pval)) -> fgseapval1plot3
             fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
               lapply(paste0,collapse="") %>% unlist -> Overlap
             fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
@@ -620,7 +618,7 @@ enanopar <- function(
   #
   # ORA enrichment
   #
-  if(doena & nrow(OutPut1) < 2000)
+  if(doena & nrow(OutPut1) < 4000)
   {
     file.path(Path0,"ena") %>% dir.create
     moalannotgene::genesetdb -> Genesetdb0

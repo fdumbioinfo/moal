@@ -11,7 +11,7 @@ heatmap(
   dendrogram = "both",
   k = NULL,
   labCol = "",
-  cexCol = 0.85,
+  cexCol = 0.5,
   labRow = "",
   cexRow = NULL,
   cexlegend = 0.65,
