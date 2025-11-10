@@ -1383,7 +1383,7 @@ omic <- function(
         ena(
           omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
-          doena=doena,gsearank=gsearank,topdeg=topdeg,topena=topena,layout=layout,
+          doena=doena,gsearank=gsearank,gseatail=gseatail,topdeg=topdeg,topena=topena,layout=layout,
           mings=mings,maxgs=maxgs,overlapmin=overlapmin,addenarankbarplot=addenarankbarplot,bg=bg,
           dotopgenesetnetwork=dotopgenesetnetwork,dotopgenesetheatmap=dotopgenesetheatmap,
           dogmtgenesetnetwork=dogmtgenesetnetwork,dogmtgenesetheatmap=dogmtgenesetheatmap,
