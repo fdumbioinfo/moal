@@ -11,12 +11,12 @@
 #' @param topena numeric top geneset for ena plot
 #' @param rangedeg numeric top DEGs from 1 to topdeg by rangedeg to plot on network
 #' @param topgeneset numeric top geneset number to plot on network
-#' @param twotailena logical do
 #' @param bg numeric background used for functional analysis over-representation test
 #' @param intmaxdh numeric maximum number of interaction to use for Davidson and Harel algorithm layout
 #' @param nodesize numeric change Symbol size
 #' @param doena logical do MSigDB enrichment analysis
 #' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt 
+#' @param gseatail character to choose gsea twotail (by default) or onetail
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
 #' @param mings numeric minimal size of a gene set
 #' @param maxgs numeric maximal size of a gene set
@@ -70,9 +70,9 @@
 #' @noRd
 enanopar <- function(
     omicdata = NULL, gmtfiles = NULL, species = "hs", dat = NULL, factor = NULL,
-    filtergeneset = NULL, threshold = 1 , topdeg = 100, rangedeg = NULL, topena = 50, twotailena = TRUE, 
+    filtergeneset = NULL, threshold = 1 , topdeg = 100, rangedeg = NULL, topena = 50, 
     topgeneset = 50, intmaxdh = 5000, nodesize = 0.60, bg = 25000,
-    doena = TRUE, gsearank = "logfc", layout = 1, mings = 5, maxgs = 700, overlapmin = 2,
+    doena = TRUE, gsearank = "logfc", gseatail = "twotail", layout = 1, mings = 5, maxgs = 700, overlapmin = 2,
     addratioena = TRUE, addenarankbarplot = TRUE,
     dotopnetwork = TRUE, dotopgenesetnetwork = FALSE, dogmtgenesetnetwork = FALSE,
     dotopheatmap = TRUE, dotopgenesetheatmap = TRUE, dogmtgenesetheatmap = TRUE,
@@ -364,6 +364,7 @@ enanopar <- function(
           # if(dopar){parallel::stopCluster(cl);doParallel::stopImplicitCluster()}
         }
       # NULL -> gmtfiles2 
+      gmtcoll1
       if( gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% all %>% "!"(.) )
       {
         gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% which -> selcoll
@@ -450,11 +451,20 @@ enanopar <- function(
           }
       }
     gseastats1 %>% unlist(recursive = F) -> gseastats2
+    gseastats2 %>% head
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %do%
       {
         set.seed(123679)
-        fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=mings,maxSize=maxgs,scoreType="std",nproc=1)
+        # gseastats2[[i]][[2]] %>% data.frame -> test
+        if(gseatail=="twotail")
+        {
+          fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=mings,maxSize=maxgs,scoreType="std",nproc=1)
+        }
+        if(gseatail=="onetail")
+        {
+          fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]] %>% abs,minSize=mings,maxSize=maxgs,scoreType="pos",nproc=1)
+        }
         if(nrow(fgsea0)>0)
         {
           fgsea0 -> fgsea1

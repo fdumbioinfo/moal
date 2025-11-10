@@ -33,6 +33,7 @@ omic(
   doboxplotrow = TRUE,
   doena = TRUE,
   gsearank = "logfc",
+  gseatail = "twotail",
   topdeg = 100,
   topena = 50,
   doenaora = FALSE,
@@ -116,6 +117,8 @@ omic(
 \item{doena}{logical msigdb enrichement analysis using gsea method without filtering}
 
 \item{gsearank}{character to choose gsea rank type among fc (by default) logration logfc sqrt}
+
+\item{gseatail}{character to choose gsea twotail (by default) or onetail}
 
 \item{topdeg}{numeric top DEGs number to plot on network}
 

@@ -15,13 +15,13 @@ ena(
   topdeg = 100,
   rangedeg = NULL,
   topena = 50,
-  twotailena = TRUE,
   topgeneset = 50,
   intmaxdh = 5000,
   nodesize = 0.6,
   bg = 25000,
   doena = TRUE,
   gsearank = "logfc",
+  gseatail = "twotail",
   layout = 1,
   mings = 5,
   maxgs = 700,
@@ -60,8 +60,6 @@ ena(
 
 \item{topena}{numeric top geneset for ena plot}
 
-\item{twotailena}{logical do}
-
 \item{topgeneset}{numeric top geneset number to plot on network}
 
 \item{intmaxdh}{numeric maximum number of interaction to use for Davidson and Harel algorithm layout}
@@ -73,6 +71,8 @@ ena(
 \item{doena}{logical do MSigDB enrichment analysis}
 
 \item{gsearank}{character to choose gsea rank type among fc (by default) logration logfc sqrt}
+
+\item{gseatail}{character to choose gsea twotail (by default) or onetail}
 
 \item{layout}{numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere}
 

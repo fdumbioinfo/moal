@@ -43,6 +43,7 @@
 #' @param doboxplotrow logical do boxplot for significant features with Kruskal
 #' @param doena logical msigdb enrichement analysis using gsea method without filtering
 #' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt
+#' @param gseatail character to choose gsea twotail (by default) or onetail
 #' @param topdeg numeric top DEGs number to plot on network
 #' @param topena numeric top geneset for ena plot
 #' @param doenaora logical msigdb enrichement analysis using ora method for diff list
@@ -151,7 +152,7 @@ omic <- function(
   doheatmap = TRUE, heatmapcluster = "row", maxheatmap = 2000, minheatmap = 3,
   dovolcanoplot = TRUE, nbgenevolc = 5,
   dolineplot = TRUE, doboxplotrow = TRUE,
-  doena = TRUE, gsearank = "logfc",topdeg = 100 , topena = 50, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
+  doena = TRUE, gsearank = "logfc", gseatail = "twotail",topdeg = 100 , topena = 50, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 700, overlapmin = 2, addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
