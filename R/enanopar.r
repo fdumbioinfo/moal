@@ -1341,7 +1341,7 @@ enanopar <- function(
             }else{ t6[[j]] -> p }
             if(species=="hs"){p %>% dplyr::select(1,4) %>% inner_join(dat) -> t }else{p %>% dplyr::select(1,6) %>% inner_join(dat) -> t}
             nodelist %>% data.frame(Symbol=.) %>% inner_join(t) -> tt
-            if(nrow(tt) > 2)
+            if(nrow(tt) > 1)
             {
               t6[[j]] %>% colnames %>% "["(2) %>% sub("^p_(.*)vs(.*)","\\1",.) -> GrN
               t6[[j]] %>% colnames %>% "["(2) %>% sub("^p_(.*)vs(.*)","\\2",.) -> GrD
@@ -1436,7 +1436,7 @@ enanopar <- function(
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> FileNameGeneset
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) %>% gsub("/"," ",.) -> DirNameN0
         nodelist %>% data.frame(Symbol=.) %>% inner_join(MatHeatmap1) -> tt
-        if(nrow(tt) > 2)
+        if(nrow(tt) > 1)
         {
           tt %>% dplyr::select(-c(1,2)) -> ttt
           factor -> Factor0
