@@ -5,7 +5,7 @@
 \title{Volcanoplot}
 \usage{
 volcanoplot(
-  dat,
+  dat = NULL,
   pval = 0.05,
   fc = 1.5,
   dogenename = TRUE,

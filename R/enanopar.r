@@ -451,7 +451,6 @@ enanopar <- function(
           }
       }
     gseastats1 %>% unlist(recursive = F) -> gseastats2
-    gseastats2 %>% head
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %do%
       {

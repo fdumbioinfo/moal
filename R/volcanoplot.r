@@ -21,7 +21,7 @@
 #' @import ggplot2
 #' @export
 volcanoplot <- function(
-    dat, pval = 0.05, fc = 1.5, dogenename = TRUE,
+    dat = NULL, pval = 0.05, fc = 1.5, dogenename = TRUE,
     GeneNameN = 5 , GeneNameList = NULL, GeneNameSize = 2, title = "Volcanoplot" )
 {
   dat[,2] %>% log10 %>% "*"(.,-1) -> dat[,2]
@@ -64,17 +64,32 @@ volcanoplot <- function(
       {
         GeneNameList %>% as.character %>% unique %>% data.frame(Symbol=.) %>% 
           dplyr::inner_join(dat, by="Symbol") %>% dplyr::select(c(2,3,4,1)) -> GeneName0
-        # up
-        GeneName0[order(-GeneName0[,2]),] %>% dplyr::slice(1:GeneNameN) -> GeneNameUp
-        GeneNameUp %>% slice(which(GeneNameUp[,3] > 1)) -> GeneNameUp
-        p + aes(x=GeneNameUp[,3], y=GeneNameUp[,2]) -> p
-        p + geom_point(aes(x=GeneNameUp[,3], y=GeneNameUp[,2]), colour="red") -> p
-        p + geom_text(aes(x=GeneNameUp[,3], y=GeneNameUp[,2]), label=GeneNameUp[,4], size=GeneNameSize, fontface=2, hjust=-0.2) -> p
-        # down
-        GeneName0[order(-GeneName0[,2]),] %>% dplyr::slice(1:GeneNameN)-> GeneNameDown
-        GeneNameDown %>% dplyr::slice(which(GeneNameDown[,3] < -1)) -> GeneNameDown
-        p + geom_point(aes(x=GeneNameDown[,3], y=GeneNameDown[,2]), colour="green4") -> p
-        p + geom_text(aes(x=GeneNameDown[,3], y=GeneNameDown[,2]), label=GeneNameDown[,4], size=GeneNameSize, fontface=2, hjust=1) -> p
+        p + geom_point(aes(x=GeneName0[,3],y=GeneName0[,2]),colour="darkorange") -> p
+        GeneName0 %>% dplyr::filter(.[[colnames(GeneName0)[3]]] > 0 ) -> GeneNameUp
+        GeneName0 %>% dplyr::filter(.[[colnames(GeneName0)[3]]] < 0 ) -> GeneNameDown
+        # Up
+        if(nrow(GeneNameUp) > 0)
+        {
+          p + geom_text(aes(x=GeneNameUp[,3],y=GeneNameUp[,2]),label=GeneNameUp[,4],
+                        size=GeneNameSize,fontface=2,hjust=-0.2) -> p
+        }
+        # Down
+        if(nrow(GeneNameDown) > 0)
+        {
+          p + geom_text(aes(x=GeneNameDown[,3],y=GeneNameDown[,2]),label=GeneNameDown[,4],
+                        size=GeneNameSize,fontface=2,hjust=1) -> p
+        }
+        # # up
+        # GeneName0[order(-GeneName0[,2]),] %>% dplyr::slice(1:GeneNameN) -> GeneNameUp
+        # GeneNameUp %>% slice(which(GeneNameUp[,3] > 1)) -> GeneNameUp
+        # p + aes(x=GeneNameUp[,3], y=GeneNameUp[,2]) -> p
+        # p + geom_point(aes(x=GeneNameUp[,3], y=GeneNameUp[,2]), colour="red") -> p
+        # p + geom_text(aes(x=GeneNameUp[,3], y=GeneNameUp[,2]), label=GeneNameUp[,4], size=GeneNameSize, fontface=2, hjust=-0.2) -> p
+        # # down
+        # GeneName0[order(-GeneName0[,2]),] %>% dplyr::slice(1:GeneNameN)-> GeneNameDown
+        # GeneNameDown %>% dplyr::slice(which(GeneNameDown[,3] < -1)) -> GeneNameDown
+        # p + geom_point(aes(x=GeneNameDown[,3], y=GeneNameDown[,2]), colour="green4") -> p
+        # p + geom_text(aes(x=GeneNameDown[,3], y=GeneNameDown[,2]), label=GeneNameDown[,4], size=GeneNameSize, fontface=2, hjust=1) -> p
       }
   }
   p + theme_bw() -> p
