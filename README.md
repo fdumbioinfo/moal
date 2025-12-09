@@ -1,12 +1,12 @@
-MOAL: Multi-Omic Analysis at Lab. 
+<b>MOAL: Multi Omic Analysis at Lab</b>
+
 A simplified workflow function to make reproducible omic bioanalysis.
 
 Workflow summary:
  - Quality controls: histogram, boxplot, PCA and sample hierarchical clustering.
  - Supervised analysis: analysis of variance (ANOVA), Fratio barplot and filtering.
- - Unsupervised analysis for selected features: row hierarchical clustering, PCA and pattern search across factor levels.
- - Graph generation for selected features: volcanoplots, heatmaps, lineplots, boxplots, PCA, Fratio.
- - Functional analysis: GSEA MSigDB enrichment analysis and StringDB interaction network
+ - volcanoplots, heatmaps, lineplots, boxplots, PCA, Fratio.
+ - Functional analysis: GSEA MSigDB enrichment analysis and StringDB interaction networks
 
 Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):
 
