@@ -8,8 +8,8 @@ Workflow summary:
  - Graph generation for selected features: volcanoplots, heatmaps, lineplots, boxplots, PCA, Fratio.
  - Functional analysis: GSEA MSigDB enrichment analysis and StringDB interaction network
 
+Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):
 
-Install from r-universe (v 1.2.1):
 ```r
 # annotation packages
 if(!require("moalannotgene",quietly=TRUE)){install.packages("moalannotgene",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
@@ -21,7 +21,7 @@ if(!require("moalstringdbmm",quietly=TRUE)){install.packages("moalstringdbmm",re
 if(!require("moalstringdbrn",quietly=TRUE)){install.packages("moalstringdbrn",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
 if(!require("moalstringdbdr",quietly=TRUE)){install.packages("moalstringdbdr",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
 if(!require("moalstringdbss",quietly=TRUE)){install.packages("moalstringdbss",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-# depends packages
+# depend packages
 if(!require("BiocManager",quietly=TRUE)){install.packages("BiocManager")}
 if(!require("Rgraphviz",quietly=TRUE)){BiocManager::install("Rgraphviz",update=F)}
 if(!require("limma",quietly=TRUE)){BiocManager::install("limma",update=F)}
@@ -29,6 +29,7 @@ if(!require("fgsea",quietly=TRUE)){BiocManager::install("fgsea",update=F)}
 # moal
 if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}```
 ```
+
 
 ```r
 # omic() workflow example using internal GEO dataset GSE65055 (doi: 10.1111/cge.12731):
