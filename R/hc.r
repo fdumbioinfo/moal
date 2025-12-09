@@ -30,7 +30,7 @@ hc <- function( dat, factor = NULL, title = "Hierarchical Clustering" , plot = T
   {
     dend0 %>% labels %>% match(rownames(dat)) %>% "["(factor,.) %>% factortocolor -> factorcol
     dend0 %>% dendextend::set("labels_colors", value=factorcol) %>% 
-      dendextend::set("labels_cex",cexlabel) %>% plot(main=title,cex.main=0.8,ylab="distance correlation")
+      dendextend::set("labels_cex",cexlabel) %>% graphics::plot(main=title,cex.main=0.8,ylab="distance correlation")
     # legend
     if(legend)
     {
@@ -41,6 +41,6 @@ hc <- function( dat, factor = NULL, title = "Hierarchical Clustering" , plot = T
     FALSE -> plot
   }
   #
-  if(plot){ dend0 %>% dendextend::set("labels_cex",cexlabel ) %>% plot(main=title,cex.main=0.8,ylab="distance correlation") }
+  if(plot){ dend0 %>% dendextend::set("labels_cex",cexlabel ) %>% graphics::plot(main=title,cex.main=0.8,ylab="distance correlation") }
   dend0 %>% return()
 }

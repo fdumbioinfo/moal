@@ -26,7 +26,6 @@
 #' @importFrom foreach foreach
 #' @importFrom colourvalues colour_values
 #' @importFrom grDevices colorRamp
-#' @importFrom Rgraphviz plot
 #' @import moalstringdbhs
 #' @import moalstringdbmm
 #' @import moalstringdbrn

@@ -710,7 +710,7 @@ omic <- function(
           statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% length -> Nb0
           statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0-1) %>% sub("(.*)_.*","\\1",.) %>%
             paste("_",statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0),sep="") -> DirName
-          Allstat1 %>% qc(sif=sif,dohisto=F,doboxplot=F,dohc=F,doacp=T,path=Path %>% file.path("pca"),dirname=DirName)
+          Allstat1 %>% qc(sif=sif,dohisto=F,doboxplot=F,dohc=F,dopca=T,path=Path %>% file.path("pca"),dirname=DirName)
         }
     }
     paste("pca threshold done.\n") %>% cat
@@ -1244,8 +1244,7 @@ omic <- function(
         #
         foreach(j=1:length(Threshold0),.packages=c("magrittr","dplyr","moal")) %do%
           {
-            DatVolcanoplot1 %>% volcanoplot(pval=Threshold0[[j]][[1]],fc=Threshold0[[j]][[2]],
-                                            dogenename=T,GeneNameN=nbgenevolc) -> Vplot
+            DatVolcanoplot1 %>% volcanoplot(pval=Threshold0[[j]][[1]],fc=Threshold0[[j]][[2]]) -> Vplot
             which(DatVolcanoplot1[,2] < Threshold0[[j]][[1]] & 
                     abs(DatVolcanoplot1[,3]) > Threshold0[[j]][[2]] ) %>% length -> NbGeneDiff
             paste("Volcanoplot_p",sub("0\\.(.*)","\\1",Threshold0[[j]][[1]] ),"_","fc",

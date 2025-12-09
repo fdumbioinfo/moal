@@ -115,6 +115,7 @@ enanopar <- function(
   }
   #
   mode(omicdata[,1]) <- "character"
+  if(!is.null(dat)){ mode(dat[,1]) <- "character" }
   ### check Symbol
   omicdata$Symbol %>% as.character -> omicdata$Symbol 
   omicdata$Symbol %>% is.na %>% which -> sel
@@ -399,7 +400,6 @@ enanopar <- function(
     Genesetdb0 %>% names -> names(Genesetdb1)
     Genesetdb1 %>% lapply(length)
     Genesetdb1 %>% names
-    # Genesetdb1[[29]] %>% head
     # preprocessing
     gseastats0 <- foreach(j=1:length(t6)) %do%
       {
@@ -811,23 +811,17 @@ enanopar <- function(
               if(Ena0 %>% is.vector){ Ena0 %>% data.frame %>% t -> Ena0 }
               Ena0 %>% data.frame(stringsAsFactors=F) %>%
                 stats::setNames(c("Name","SymbolList","GeneIDList","OverlapSize","GenesetSize","OverlapRatio","ENAScore","pval")) -> Ena1
-              Ena1 %>% head
-              Ena1 %>% colnames
               Ena1$OverlapSize %>% as.numeric -> Ena1$OverlapSize
               Ena1$GenesetSize %>% as.numeric -> Ena1$GenesetSize
               Ena1$OverlapRatio %>% as.numeric -> Ena1$OverlapRatio
               Ena1$ENAScore %>% as.numeric -> Ena1$ENAScore
               Ena1$pval %>% as.numeric -> Ena1$pval
-              Ena1 %>% mutate(pvalFDR = .data$pval %>% p.adjust(method="fdr")) %>%
-                mutate(log10pvalFDR = .data$pvalFDR %>% log10 %>% '*'(.,-1) %>% round(.,4)) %>%
-                arrange(.data$pvalFDR ) -> Ena2
-              Ena2 %>% colnames
-              Ena2 %>% head
+              Ena1 %>% dplyr::mutate(pvalFDR = .data$pval %>% p.adjust(method="fdr")) %>%
+                dplyr::mutate(log10pvalFDR = .data$pvalFDR %>% log10 %>% '*'(.,-1) %>% round(.,4)) %>%
+                dplyr::arrange(.data$pvalFDR ) -> Ena2
               Ena2 %>% dplyr::select(c(1,4,5,2,8,7,3)) %>%
                 setNames(c("Name","OverlapSize","GeneSetSize","OverlapSymbolList","pval","NES","OverlapGeneIDList")) %>% 
                 dplyr::arrange(.data$pval) -> Ena3
-              Ena1 %>% colnames
-              Ena1 %>% head
               Ena3 -> fgseapval1
               fgseapval1 %>% colnames
               # Ena1 %>% dplyr::select(.data$Name,.data$) -> fgseapval1
@@ -836,8 +830,6 @@ enanopar <- function(
               fgseapval1 %>% output(file.path(Path0,"ena",FileName0))
               #
               fgseapval1 %>% dplyr::slice(1:topena) -> fgseapval1plot
-              fgseapval1plot %>% colnames
-              fgseapval1plot %>% head
               if(fgseapval1plot %>% nrow %>% ">"(0))
               {
                 # pval ranking
@@ -1297,8 +1289,6 @@ enanopar <- function(
         close(f)
         rl0 %>% strsplit("\t") %>% lapply("[",-c(1,2))
       }
-    GenesetListsSymbol %>% length
-    GenesetListsSymbol %>% head
     GenesetListsSymbol %>% lapply(length) %>% "<"(3) %>% which -> sel2
     if(length(sel2)>0){ GenesetListsSymbol[-sel2] -> GenesetListsSymbol ; GenesetLists1[-sel2] -> GenesetLists1 }
     #

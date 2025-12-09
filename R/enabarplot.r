@@ -24,7 +24,7 @@ enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRU
   
   
   # fgseapval1plot3 %>% colnames
-  dat %>% ggplot( aes(x=Log10Pval,y=.data$Name,fill=.data$NES)) -> p
+  dat %>% ggplot( aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
   p + geom_bar(stat="identity",width = 0.95) -> p
   p + scale_color_gradient2(low="blue",mid="white",high="red",aesthetics="fill") -> p
   # p + theme_minimal() -> p
@@ -88,5 +88,5 @@ enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRU
     # ggpubr::ggarrange(p1, p2, widths = c(5,5)) -> p
     # plot_grid(p1, p2, labels = c('A', 'B'), label_size = 12)
   }
-  p %>% return(.)
+  p %>% return()
 }

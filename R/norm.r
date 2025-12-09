@@ -16,7 +16,7 @@
 norm <- function( dat , method = NULL , log = TRUE )
 {
   if(is.null(method)){method <- "quantile"}
-  dat %>% normalizeBetweenArrays( method=method ) %>% as.data.frame -> dat
-  if( log ){ dat %>% "+"(.,1.01) %>% log2 -> dat }
+  dat %>% limma::normalizeBetweenArrays(method=method) %>% as.data.frame -> dat
+  if(log){ dat %>% "+"(.,1.01) %>% log2 -> dat }
   dat %>% return()
 }

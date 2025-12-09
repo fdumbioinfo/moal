@@ -6,7 +6,7 @@
 #' @return no values
 #' @examples
 #' # not run
-#' # acp( mat1 , sif1 )
+#' # network(Symbollist)
 #' @author Florent Dumont <florent.dumont@univresite-paris-saclay.fr>
 #' @importFrom magrittr %>%
 #' @import ggplot2

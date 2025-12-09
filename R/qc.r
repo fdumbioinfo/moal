@@ -8,7 +8,7 @@
 #' @param dohisto logical if TRUE (by default) do histogram
 #' @param doboxplot logical if TRUE (by default) do boxplot
 #' @param dohc logical if TRUE (by default)do hierarchical clustering
-#' @param doacp logical if TRUE (by default) do PCA
+#' @param dopca logical if TRUE (by default) do PCA
 #' @param breaks numeric break number for histogramm function
 #' @param dirname character
 #' @param path character
@@ -28,7 +28,7 @@
 #' @export
 qc <- function(
     dat , sif = NULL, dooutputinput = FALSE,
-    dohisto = TRUE, doboxplot = TRUE, dohc = TRUE, doacp = TRUE,
+    dohisto = TRUE, doboxplot = TRUE, dohc = TRUE, dopca = TRUE,
     breaks = 70,
     dirname = NULL , path = "." )
 {
@@ -124,16 +124,16 @@ qc <- function(
       Dat1 %>% select(-1) %>% hc( title = Title )
       graphics.off()
     }
-    # acp
-    if(doacp)
+    # pca
+    if(dopca)
     {
       Dat1 %>% apply(1,sd) %>% "=="(0) %>% which -> selsd
       if( length(selsd) > 0 ){ Dat1[-selsd,] -> t }else{ Dat1 -> t }
-      paste("acp_data_",ncol(t),"_",nrow(t),".pdf",sep = "") -> FileName0
+      paste("pca_data_",ncol(t),"_",nrow(t),".pdf",sep = "") -> FileName0
       Path %>% file.path(FileName0) -> FileName1
       paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
       # plot
-      t %>% acp(title=Title)
+      t %>% pca(title=Title)
       ggsave(FileName1)
     }
   }
@@ -183,10 +183,10 @@ qc <- function(
           graphics.off()
         }
     }
-    # ACP
-    if(doacp)
+    # PCA
+    if(dopca)
     {
-      # ACP
+      # PCA
       Path %>% file.path( "pca") %>% dir.create
       Dat1 %>% apply(1,sd) %>% "=="(0) %>% which -> selsd
       if( length(selsd) > 0 ){ Dat1[-selsd,] -> t }else{ Dat1 -> t }
@@ -197,7 +197,7 @@ qc <- function(
           Path %>% file.path("pca",FileName0) -> FileName1
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% acp(factor=sif[,sel[i]], pc1=1, pc2=2, title=Title, legendtitle=colnames(sif)[sel[i]])
+          t %>% pca(factor=sif[,sel[i]], pc1=1, pc2=2, title=Title, legendtitle=colnames(sif)[sel[i]])
           ggsave(FileName1)
         }
       # pc 1 3
@@ -207,7 +207,7 @@ qc <- function(
           Path %>% file.path("pca",FileName0) -> FileName1
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% acp(factor=sif[,sel[i]], pc1=1, pc2=3, title=Title, legendtitle=colnames(sif)[sel[i]])
+          t %>% pca(factor=sif[,sel[i]], pc1=1, pc2=3, title=Title, legendtitle=colnames(sif)[sel[i]])
           ggsave(FileName1)
         }
       # pc 1 4
@@ -217,7 +217,7 @@ qc <- function(
           Path %>% file.path("pca",FileName0) -> FileName1
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t), sep = ""  ) -> Title
           #
-          t %>% acp( factor=sif[ , sel[i] ], pc1=1, pc2=4, title=Title, legendtitle=colnames(sif)[ sel[i] ] )
+          t %>% pca(factor=sif[,sel[i] ],pc1=1,pc2=4,title=Title,legendtitle=colnames(sif)[sel[i]])
           ggsave( FileName1 )
         }
     }
@@ -232,7 +232,7 @@ qc <- function(
       sif %>% sapply(is.numeric) %>% which -> sel
       Dat1 %>% apply(1,sd) %>% "=="(0) %>% which -> selsd
       if( length(selsd) > 0 ){ Dat1[-selsd,] -> t }else{ Dat1 -> t }
-      # ACP
+      # PCA
       if( !dir.exists(Path %>% file.path("pca")) ){ Path %>% file.path("pca") %>% dir.create }
       # pc 1 2
       foreach( i=1:length(sel) ) %do%
@@ -241,27 +241,27 @@ qc <- function(
           Path %>% file.path( "pca", FileName ) -> FileName
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% acp( factor=sif[ , sel[i] ], pc1=1, pc2=2, title=Title, legendtitle=colnames(sif)[sel[i]] )
-          ggsave( FileName )
+          t %>% pca(factor=sif[,sel[i]],pc1=1,pc2=2,title=Title,legendtitle=colnames(sif)[sel[i]])
+          ggsave(FileName)
         }
       # pc 1 3
-      foreach( i=1:length(sel) ) %do%
+      foreach(i=1:length(sel)) %do%
         {
-          paste("pca_data_",colnames(sif)[ sel[i] ],"_pc13_",ncol(Dat1),"_",nrow(t),".pdf" , sep = "" ) -> FileName
-          Path %>% file.path( "pca", FileName ) -> FileName
+          paste("pca_data_",colnames(sif)[sel[i] ],"_pc13_",ncol(Dat1),"_",nrow(t),".pdf",sep="") -> FileName
+          Path %>% file.path("pca",FileName) -> FileName
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% acp( factor=sif[ , sel[i] ], pc1=1, pc2=3, title=Title, legendtitle=colnames(sif)[sel[i]] )
-          ggsave( FileName )
+          t %>% pca(factor=sif[,sel[i]],pc1=1,pc2=3,title=Title,legendtitle=colnames(sif)[sel[i]])
+          ggsave(FileName)
         }
       # pc 1 4
       foreach( i=1:length(sel) ) %do%
         {
-          paste("acp_data_",colnames(sif)[ sel[i] ],"_pc14_",ncol(t),"_",nrow(t),".pdf" , sep = "" ) -> FileName
+          paste("pca_data_",colnames(sif)[sel[i]],"_pc14_",ncol(t),"_",nrow(t),".pdf",sep="") -> FileName
           Path %>% file.path( "pca", FileName ) -> FileName
-          paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t), sep = ""  ) -> Title
+          paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% acp( factor=sif[ , sel[i] ], pc1=1, pc2=4, title=Title, legendtitle=colnames(sif)[ sel[i] ] )
+          t %>% pca(factor=sif[,sel[i] ],pc1=1,pc2=4,title=Title,legendtitle=colnames(sif)[sel[i]])
           ggsave( FileName )
         }
     }
