@@ -1,29 +1,25 @@
 MOAL: Multi-Omic Analysis at Lab. A simplified workflow function to make reproducible omic bioanalysis.
 
-MOAL install from r-universe (v 1.2.1):
+Install from r-universe (v 1.2.1):
 ```
-install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
+# annotation packages
+if(!require("moalannotgene",quietly=TRUE)){install.packages("moalannotgene",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalannotensg",quietly=TRUE)){install.packages("moalannotensg",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalannotenst",quietly=TRUE)){install.packages("moalannotenst",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalannotensp",quietly=TRUE)){install.packages("moalannotensp",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalstringdbhs",quietly=TRUE)){install.packages("moalstringdbhs",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalstringdbmm",quietly=TRUE)){install.packages("moalstringdbmm",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalstringdbrn",quietly=TRUE)){install.packages("moalstringdbrn",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalstringdbdr",quietly=TRUE)){install.packages("moalstringdbdr",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+if(!require("moalstringdbss",quietly=TRUE)){install.packages("moalstringdbss",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+# depends packages
+if(!require("BiocManager",quietly=TRUE)){install.packages("BiocManager")}
+if(!require("Rgraphviz",quietly=TRUE)){BiocManager::install("Rgraphviz",update=F)}
+if(!require("limma",quietly=TRUE)){BiocManager::install("limma",update=F)}
+if(!require("fgsea",quietly=TRUE)){BiocManager::install("fgsea",update=F)}
+# moal
+if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}```
 ```
-annotation depends packages:
-
-install.packages('moalannotgene',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalannotensg',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalannotenst',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalannotensp',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalstringdbhs',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalstringdbmm',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalstringdbrn',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalstringdbdr',repos=c('https://fdumbioinfo.r-universe.dev'))
-install.packages('moalstringdbss',repos=c('https://fdumbioinfo.r-universe.dev'))
-
-other depend packages if necessary :
-
-if (!require("BiocManager", quietly = TRUE)){install.packages("BiocManager")}
-
-BiocManager::install("Rgraphviz")
-
-
-
 
 Workflow summary:
  - Quality controls: histogram, boxplot, PCA and sample hierarchical clustering.
@@ -32,20 +28,11 @@ Workflow summary:
  - Graph generation for selected features: volcanoplots, heatmaps, lineplots, boxplots, PCA, Fratio.
  - Functional analysis: GSEA MSigDB enrichment analysis and StringDB interaction network
 
-
-RopenSci r-universe:
-https://fdumbioinfo.r-universe.dev/moal
-
 UMS IPSIT BIOINFO at Paris Saclay University: https://www.ipsit.universite-paris-saclay.fr/?-bioinfo-
 
-bioRxiv preprint:
-https://doi.org/10.1101/2023.10.17.562686
+bioRxiv preprint: https://doi.org/10.1101/2023.10.17.562686
 
-Zenodo repository:
-https://zenodo.org/records/15309968
-
-github:
-https://github.com/fdumbioinfo/moal
+Zenodo repository: https://zenodo.org/records/15309968
 
 Release updates:
 
