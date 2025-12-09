@@ -36,16 +36,17 @@ if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumb
 ??moal::omic
 # loading libraries
 library(moal);moal::env()
-# loading norm data
+# norm data
 moal:::GSE65055normdata -> dat
-# loading sample information file
+# sample information file
 moal:::GSE65055sampledata -> sif
-# Ordering factors for pairwise comparison fold-changes
+# Ordering factors for pairwise comparisons and fold-changes
 sif$ANEUPLOIDY %>% ordered(c("Control","T13","T18","T21")) -> sif$ANEUPLOIDY
+sif$ANEUPLOIDY
 sif$TISSUE %>% as.factor -> sif$TISSUE
-# create annotation
-dat$rowID %>% moal::annot(species= "hs",idtype="GENE",dboutput = "ncbi") -> annot
-annot
+# annotation
+dat$rowID %>% moal::annot(species= "hs",idtype="GENE",dboutput="ncbi") -> annot
+annot %>% str
 # omic analysis
 moal::omic(dat,sif,annot,species="hs",model="ANEUPLOIDY",paired="TISSUE",dirname="GSE65055")
 #
