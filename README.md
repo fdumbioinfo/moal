@@ -4,7 +4,7 @@ Workflow summary:
  - Quality controls: histogram, boxplot, PCA, HC
  - Supervised analysis: analysis of variance
  - volcanoplots, heatmaps, lineplots, boxplots (Kruskal-Wallis), ANOVA Fratio
- - Functional analysis: GSEA MSigDB enrichment analysis and StringDB interaction networks
+ - Functional analysis: GSEA MSigDB enrichment analysis, StringDB interaction networks
 
 Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):
 
@@ -50,8 +50,6 @@ annot
 moal::omic(dat,sif,annot,species="hs",model="ANEUPLOIDY",paired="TISSUE",dirname="GSE65055")
 #
 ```
-
-
 
 
 
