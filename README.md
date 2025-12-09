@@ -35,7 +35,7 @@ if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumb
 
 ```r
 # omic() workflow example using internal GEO dataset GSE65055 (doi: 10.1111/cge.12731):
-help("omic")
+??moal::omic
 # loading libraries
 library(moal);moal::env()
 # loading norm data
