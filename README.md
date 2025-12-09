@@ -1,10 +1,9 @@
 MOAL: Multi-Omic Analysis at Lab. A simplified workflow function to make reproducible omic bioanalysis.
 
 MOAL install (v 1.2.1):
-```r
 
 install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
-```r
+
 annotation depends packages:
 
 install.packages('moalannotgene',repos=c('https://fdumbioinfo.r-universe.dev'))
