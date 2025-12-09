@@ -1,9 +1,9 @@
 MOAL: Multi-Omic Analysis at Lab. A simplified workflow function to make reproducible omic bioanalysis.
 
-MOAL install (v 1.2.1):
-
+MOAL install from r-universe (v 1.2.1):
+```
 install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org","https://bioc.r-universe.dev"))
-
+```
 annotation depends packages:
 
 install.packages('moalannotgene',repos=c('https://fdumbioinfo.r-universe.dev'))
@@ -21,6 +21,8 @@ other depend packages if necessary :
 if (!require("BiocManager", quietly = TRUE)){install.packages("BiocManager")}
 
 BiocManager::install("Rgraphviz")
+
+
 
 
 Workflow summary:
