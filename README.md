@@ -11,6 +11,7 @@ Workflow summary:
 Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):
 
 ```r
+# moal install
 # annotation packages
 if(!require("moalannotgene",quietly=TRUE)){install.packages("moalannotgene",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
 if(!require("moalannotensg",quietly=TRUE)){install.packages("moalannotensg",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
@@ -26,14 +27,15 @@ if(!require("BiocManager",quietly=TRUE)){install.packages("BiocManager")}
 if(!require("Rgraphviz",quietly=TRUE)){BiocManager::install("Rgraphviz",update=F)}
 if(!require("limma",quietly=TRUE)){BiocManager::install("limma",update=F)}
 if(!require("fgsea",quietly=TRUE)){BiocManager::install("fgsea",update=F)}
-# moal
-if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}```
+# moal package
+if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
+#
 ```
 
 
 ```r
 # omic() workflow example using internal GEO dataset GSE65055 (doi: 10.1111/cge.12731):
-# See help("omic") to copy and run code.
+help("omic")
 # loading libraries
 library(moal);moal::env()
 # loading norm data
