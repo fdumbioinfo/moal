@@ -7,7 +7,8 @@ Authors@R:
 Description: Multi Omic Analysis at Lab.
 License: GPL-3
 Depends: 
-    R (>= 4.3)
+    R (>= 4.3),
+    Rgraphviz
 Imports: 
     broom,
     dendextend,
@@ -19,7 +20,7 @@ Imports:
     ggplot2,
     ggpubr,
     gplots,
-    graphics,
+    ggrepel,
     grDevices,
     gridExtra,
     igraph,
@@ -36,7 +37,7 @@ Imports:
     moalstringdbss,
     parallel,
     plyr,
-    Rgraphviz,
+    graphics,
     rlang,
     scales,
     stats,
@@ -52,4 +53,4 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
