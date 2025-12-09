@@ -11,7 +11,7 @@ qc(
   dohisto = TRUE,
   doboxplot = TRUE,
   dohc = TRUE,
-  doacp = TRUE,
+  dopca = TRUE,
   breaks = 70,
   dirname = NULL,
   path = "."
@@ -30,7 +30,7 @@ qc(
 
 \item{dohc}{logical if TRUE (by default)do hierarchical clustering}
 
-\item{doacp}{logical if TRUE (by default) do PCA}
+\item{dopca}{logical if TRUE (by default) do PCA}
 
 \item{breaks}{numeric break number for histogramm function}
 

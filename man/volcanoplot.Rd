@@ -8,10 +8,10 @@ volcanoplot(
   dat = NULL,
   pval = 0.05,
   fc = 1.5,
-  dogenename = TRUE,
-  GeneNameN = 5,
-  GeneNameList = NULL,
-  GeneNameSize = 2,
+  topgenename = TRUE,
+  topgenenamen = 5,
+  genenamelist = NULL,
+  genenamesize = 3,
   title = "Volcanoplot"
 )
 }
@@ -22,13 +22,13 @@ volcanoplot(
 
 \item{fc}{numeric fold-change threshold}
 
-\item{dogenename}{logical displya GeneName or not. TRUE by default}
+\item{topgenename}{logical display gene label TRUE by default}
 
-\item{GeneNameN}{logical the number of gene to be displayed. 50 by default}
+\item{topgenenamen}{numeric increase number of gene label}
 
-\item{GeneNameList}{character vector of gene Symbol. see details.}
+\item{genenamelist}{character vector of gene list to label}
 
-\item{GeneNameSize}{numeric}
+\item{genenamesize}{numeric label size for gene name}
 
 \item{title}{character}
 }

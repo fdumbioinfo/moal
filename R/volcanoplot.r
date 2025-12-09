@@ -49,7 +49,7 @@ volcanoplot <- function(
       u %>% dplyr::arrange(-.[[colnames(u)[2]]]) %>% dplyr::slice(1:topgenenamen) -> up
       u %>% dplyr::arrange(-.[[colnames(u)[3]]]) %>% dplyr::slice(1:topgenenamen) -> ufc
       rbind(up,ufc) %>% unique -> uname
-      p + geom_label_repel(data=uname,aes(x=.data[[colnames(uname)[3]]],y=.data[[colnames(uname)[2]]],
+      p + ggrepel::geom_label_repel(data=uname,aes(x=.data[[colnames(uname)[3]]],y=.data[[colnames(uname)[2]]],
                                           label=.data[[colnames(uname)[4]]]),
                            size=genenamesize,color="black") -> p
     }
@@ -59,7 +59,7 @@ volcanoplot <- function(
       d %>% dplyr::arrange(-.[[colnames(d)[2]]]) %>% dplyr::slice(1:topgenenamen) -> dp
       d %>% dplyr::arrange(-.[[colnames(d)[3]]]) %>% dplyr::slice(1:topgenenamen) -> dfc
       rbind(dp,dfc) %>% unique -> dname
-      p + geom_label_repel(data=dname,aes(x=.data[[colnames(dname)[3]]],y=.data[[colnames(dname)[2]]],
+      p + ggrepel::geom_label_repel(data=dname,aes(x=.data[[colnames(dname)[3]]],y=.data[[colnames(dname)[2]]],
                                           label=.data[[colnames(dname)[4]]]),
                            size=genenamesize,color="black") -> p
     }
@@ -75,7 +75,7 @@ volcanoplot <- function(
     if(nrow(genename) > 0)
     {
       p + geom_point(data=genename,aes(x=.data[[colnames(genename)[3]]],y=.data[[colnames(d)[2]]]),color="orange") -> p 
-      p + geom_label_repel(data=genename,aes(x=.data[[colnames(genename)[3]]],y=.data[[colnames(genename)[2]]],
+      p + ggrepel::geom_label_repel(data=genename,aes(x=.data[[colnames(genename)[3]]],y=.data[[colnames(genename)[2]]],
                                           label=.data[[colnames(genename)[4]]]),
                            size=genenamesize,color="black",max.overlaps=nrow(genename)) -> p
     }
