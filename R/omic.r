@@ -179,7 +179,7 @@ omic <- function(
     data.frame(SampleID,TREATMENT,SampleName) -> sif
     set.seed(seed)
     rnorm(15*2000,20,4) %>% matrix(ncol=15,nrow=2000) -> Dat0
-    Dat0 %>%"<"(0) %>% which %>% length
+    Dat0 %>%"<"(.,0) %>% which %>% length
     Dat0 %>% min -> Min0
     Dat0 %>% "+"(Min0) -> Dat1
     Dat1 %>% data.frame(rowID=paste("rowID",1:2000,sep=""),.) %>% setNames(c("rowID",sif$SampleName)) -> Dat2 
@@ -467,7 +467,7 @@ omic <- function(
       sif %>% colnames %>% grep(IntFactorName,.) %>% sif[,.] -> Comp0
       Comp0 %>% levels %>% rev %>% as.character %>% combn(2,simplify=F) -> Comp1
       Comp1 %>% lapply(strsplit,"-") %>% lapply(unlist) %>% lapply(unique) %>% lapply(length) %>%
-        "<"(4) %>% "!"(.) %>% which %>% Comp1[.] -> Comp2
+        "<"(.,4) %>% "!"(.) %>% which %>% Comp1[.] -> Comp2
       Comp2 %>% lapply(paste0,collapse="vs") %>% unlist -> Comp3
       Comp3 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
       All %>% colnames %>% sub(".*_(.*)","\\1",.) %>% grep(grep,.,value=F) -> sel
@@ -476,7 +476,7 @@ omic <- function(
     # remove comparison when for unbalanced design
     if(INTERACTION)
     {
-      if(IntFactor3 %>% levels %>% length %>% ">"(IntFactor3 %>% as.character %>% table %>% length))
+      if(IntFactor3 %>% levels %>% length %>% ">"(.,IntFactor3 %>% as.character %>% table %>% length))
       {
         All %>% lapply(is.na) %>% lapply(all) %>% unlist %>% which -> sel
         All %>% as.data.frame %>% dplyr::select( -all_of(sel) ) -> All
@@ -741,10 +741,10 @@ omic <- function(
       {
         VENN3 <- F ; VENN4 <- F ; VENN5 <- F ; VENNSUP5 <- F ; VENN4INT <- F
         if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% "=="(.,3)){ VENN3 <- T }
-        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% "=="(4) & !INTERACTION){ VENN4 <- T }
-        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% "=="(5) & !INTERACTION){ VENN5 <- T }
-        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% ">"(5) & !INTERACTION){ VENNSUP5 <- T }
-        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% ">="(4) & INTERACTION){ VENN4INT <- T }
+        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% "=="(.,4) & !INTERACTION){ VENN4 <- T }
+        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% "=="(.,5) & !INTERACTION){ VENN5 <- T }
+        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% ">"(.,5) & !INTERACTION){ VENNSUP5 <- T }
+        if(FactorVenn2[i] %>% lapply(levels) %>% lapply(length) %>% ">="(.,4) & INTERACTION){ VENN4INT <- T }
         # VENN3
         if(VENN3)
         {
@@ -939,7 +939,7 @@ omic <- function(
                   FactorVennIntMax3 %>% rev %>% combn( 2 , simplify = F ) %>% lapply(gsub,pattern=":",replacement="-") %>%
                     lapply( paste0 , collapse = "vs" ) %>% unlist -> FactorVennIntMax4
                   FactorVennIntMax4 %>% sub("(.*)-(.*)vs(.*)-(.*)","\\1 \\2 \\3 \\4",.) %>% strsplit(" ") %>%
-                    lapply(table) %>% lapply(length) %>% "=="(4) %>% "!"(.) %>% which %>% FactorVennIntMax4[.] -> FactorVennIntMax5
+                    lapply(table) %>% lapply(length) %>% "=="(.,4) %>% "!"(.) %>% which %>% FactorVennIntMax4[.] -> FactorVennIntMax5
                   FactorVennIntMax5 %>% paste0(collapse="|") -> grep
                   ListFileVenn0 %>% basename %>% grep( grep , . , value=F ) %>% ListFileVenn0[.] -> ListFileVenn1
                   # up

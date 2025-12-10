@@ -122,7 +122,7 @@ enanopar <- function(
   if(length(sel) > 0){ omicdata %>% dplyr::slice(-sel) -> omicdata }
   omicdata$Symbol %>% grep("^$",.) -> sel
   if(length(sel) > 0){ omicdata %>% dplyr::slice(-sel) -> omicdata }
-  omicdata$Symbol %>% "=="("NA") %>% which -> sel
+  omicdata$Symbol %>% "=="(.,"NA") %>% which -> sel
   if(length(sel) > 0){ omicdata %>% dplyr::slice(-sel) -> omicdata }
   ### check NA p-value
   omicdata %>% colnames %>% grep("^p_",.) -> sel
@@ -200,9 +200,9 @@ enanopar <- function(
           Deg1$Symbol %>% sort %>% unique -> nodelist
           file.path(Path0,DirName1) -> pathn
           paste("top",topdeg,colnames(t5[[j]])[2] %>% gsub("p_","",.),sep="") -> filename
-          networkgena4pval4(nodelist=nodelist,foldchange=foldchange,pval=pval,species=species,
-                            intmaxdh=intmaxdh,filename=filename,path=pathn, layout = layout,
-                            nodelabelsize=0.7,nodesize=0.7,edgeweight=0.1,edgewidth=0.7)
+          network(nodelist=nodelist,foldchange=foldchange,pval=pval,species=species,
+                  intmaxdh=intmaxdh,filename=filename,path=pathn, layout = layout,
+                  nodelabelsize=0.7,nodesize=0.7,edgeweight=0.1,edgewidth=0.7)
         }
       }
     #
@@ -407,10 +407,10 @@ enanopar <- function(
         # pval rank
         Omicdataf0 %>% dplyr::arrange(.data[[colnames(Omicdataf0)[2]]]) -> Omicdataf1
         # replace 0 value 
-        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(0) %>% which -> sel
+        Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(.,0) %>% which -> sel
         if(length(sel) > 0)
         {
-          Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(0) %>% which -> sel
+          Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(.,0) %>% which -> sel
           colnames(Omicdataf0)[2] %>% grep(colnames(Omicdataf0)) -> selCol
           Omicdataf1[sel,selCol] <- 25
         }
@@ -737,10 +737,10 @@ enanopar <- function(
             # pval rank
             Omicdataf0 %>% dplyr::arrange(.data[[colnames(Omicdataf0)[2]]]) -> Omicdataf1
             # 0 value 
-            Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(0) %>% which -> sel
+            Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(.,0) %>% which -> sel
             if(length(sel) > 0)
             {
-              Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(0) %>% which -> sel
+              Omicdataf1 %>% dplyr::select(.data[[colnames(Omicdataf0)[2]]]) %>% "=="(.,0) %>% which -> sel
               colnames(Omicdataf0)[2] %>% grep(colnames(Omicdataf0)) -> selCol
               Omicdataf1[sel,selCol] <- 25
             }
@@ -1083,9 +1083,9 @@ enanopar <- function(
         TopGeneset2[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
         file.path(Path0,DirName1,DirNameN0) -> pathn
         # intmaxdh <- 10000
-        networkgena4pval4(nodelist=nodelist,foldchange=foldchange,pval=pval,species="hs",
-                          intmaxdh=intmaxdh,filename=FileNameTop,path=pathn,title=title, layout=layout,
-                          nodelabelsize=0.7,nodesize=0.7,edgeweight=0.1,edgewidth=0.7)
+        network(nodelist=nodelist,foldchange=foldchange,pval=pval,species="hs",
+                intmaxdh=intmaxdh,filename=FileNameTop,path=pathn,title=title, layout=layout,
+                nodelabelsize=0.7,nodesize=0.7,edgeweight=0.1,edgewidth=0.7)
       }
     if(dopar){parallel::stopCluster(cl); doParallel::stopImplicitCluster()}
     #
@@ -1246,9 +1246,9 @@ enanopar <- function(
         GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset
         GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
         file.path(Path0,DirName1,DirNameN0) -> pathn
-        networkgena4pval4(nodelist=nodelist,foldchange=foldchange,pval=pval,species="hs",
-                          intmaxdh=intmaxdh,filename=FileNameGeneset,path=pathn,title=title,layout = layout,
-                          nodelabelsize=0.7,nodesize=0.7,edgeweight=0.1,edgewidth=0.7)
+        network(nodelist=nodelist,foldchange=foldchange,pval=pval,species="hs",
+                intmaxdh=intmaxdh,filename=FileNameGeneset,path=pathn,title=title,layout = layout,
+                nodelabelsize=0.7,nodesize=0.7,edgeweight=0.1,edgewidth=0.7)
       }
     if(dopar){parallel::stopCluster(cl); doParallel::stopImplicitCluster()}
     #

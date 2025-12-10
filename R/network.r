@@ -32,7 +32,7 @@
 #' @import moalstringdbdr
 #' @import moalstringdbss
 #' @noRd
-networkgena4pval4 <- function(
+network <- function(
     nodelist = NULL, foldchange = NULL, pval = NULL, species = NULL, layout = 1, seed = 1234567,
     intmaxdh = 5000, nodelabelsize = 0.39, nodesize = 0.5, edgeweight = 0.1, edgewidth = 0.2, title = "Network", path = ".", filename = NULL)
 {
@@ -52,8 +52,8 @@ networkgena4pval4 <- function(
   NodeList0 %>% annot( species=Species0[1], dboutput="ebi", idtype = "SYMBOL" ) -> NodeList1
   # check
   if( nrow(NodeList1) > 0 &
-      (((((NodeList1$ENSGID %>% is.na)|(NodeList1$ENSGID %>% "=="(""))|(NodeList1$ENSGID %>% "=="("NA"))) %>% all)|
-      (((NodeList1$ENSPIDs %>% is.na)|(NodeList1$ENSPIDs %>% "=="(""))|(NodeList1$ENSPIDs %>% "=="("NA"))) %>% all)) %>%
+      (((((NodeList1$ENSGID %>% is.na)|(NodeList1$ENSGID %>% "=="(.,""))|(NodeList1$ENSGID %>% "=="(.,"NA"))) %>% all)|
+      (((NodeList1$ENSPIDs %>% is.na)|(NodeList1$ENSPIDs %>% "=="(.,""))|(NodeList1$ENSPIDs %>% "=="(.,"NA"))) %>% all)) %>%
       any %>% "!"(.)))
     { NWNODE1 <- TRUE }else{ NWNODE1 <- FALSE }
   #

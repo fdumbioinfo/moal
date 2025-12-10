@@ -131,7 +131,7 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
       GeneDb2 %>% dplyr::select(-.data$Syn) -> Annot
       # if not 100% match check synonyms
       MATCHALL <- F
-      ifelse( GeneDb2$GeneID %>% is.na %>% "!"(.) %>% which %>% length %>% "=="(nrow(GeneDb2)) , MATCHALL <- T, MATCHALL <- F  )
+      ifelse( GeneDb2$GeneID %>% is.na %>% "!"(.) %>% which %>% length %>% "=="(.,nrow(GeneDb2)) , MATCHALL <- T, MATCHALL <- F  )
       if( !MATCHALL )
       {
         # check synonyms
@@ -166,7 +166,7 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
       GeneDb2 %>% dplyr::select(-.data$Syn) -> Annot
       # if not 100% match check synonyms
       MATCHALL <- F
-      ifelse( GeneDb2$ENSGID %>% is.na %>% "!"(.) %>% which %>% length %>% "=="(nrow(GeneDb2)) , MATCHALL <- T, MATCHALL <- F  )
+      ifelse( GeneDb2$ENSGID %>% is.na %>% "!"(.) %>% which %>% length %>% "=="(.,nrow(GeneDb2)) , MATCHALL <- T, MATCHALL <- F  )
       if( !MATCHALL )
       {
         # check synonyms
