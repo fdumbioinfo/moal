@@ -10,6 +10,7 @@ Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v
 
 ```r
 # moal install
+options(pkgType = "binary")
 # annotation packages
 if(!require("moalannotgene",quietly=TRUE)){install.packages("moalannotgene",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
 if(!require("moalannotensg",quietly=TRUE)){install.packages("moalannotensg",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
