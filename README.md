@@ -53,6 +53,8 @@ moal::omic(dat,sif,annot,species="hs",model="ANEUPLOIDY",paired="TISSUE",dirname
 #
 ```
 
+Install from <a href="https://github.com/fdumbioinfo/rtools">r-See fdumbioin/rtools repository for more examples.</a> (v 1.2.1):
+
 
 
 UMS IPSIT BIOINFO at Paris Saclay University: https://www.ipsit.universite-paris-saclay.fr/?-bioinfo-
