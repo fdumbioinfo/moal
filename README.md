@@ -54,7 +54,7 @@ moal::omic(dat,sif,annot,species="hs",model="ANEUPLOIDY",paired="TISSUE",dirname
 ```
 
 <p>
-See more examples at <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">fdumbioin/rtools</a> repository.
+<b>See more examples at <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">fdumbioin/rtools</a> repository.</b>
 </p>
 
 
