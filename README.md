@@ -1,4 +1,4 @@
-<b>MOAL: Multi Omic Analysis at Lab</b>
+<b><h3>MOAL: Multi Omic Analysis at Lab</h3></b>
 
 Workflow summary:
  - Quality controls: histogram, boxplot, PCA, HC
@@ -6,7 +6,7 @@ Workflow summary:
  - volcanoplots, heatmaps, lineplots, boxplots (Kruskal-Wallis), ANOVA Fratio
  - Functional analysis: GSEA MSigDB enrichment analysis, StringDB interaction networks
 
-# Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):
+<b>Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):</b>
 
 ```r
 # -----
@@ -38,7 +38,7 @@ if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumb
 #
 ```
 
-# Test moal::omic() workflow:
+<b>Test moal::omic() workflow:</b>
 
 ```r
 # -----
