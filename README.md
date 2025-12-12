@@ -6,7 +6,7 @@ Workflow summary:
  - volcanoplots, heatmaps, lineplots, boxplots (Kruskal-Wallis), ANOVA Fratio
  - Functional analysis: GSEA MSigDB enrichment analysis, StringDB interaction networks
 
-Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):
+# Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):
 
 ```r
 # -----
@@ -38,7 +38,7 @@ if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumb
 #
 ```
 
-Test moal::omic() workflow:
+# Test moal::omic() workflow:
 
 ```r
 # -----
