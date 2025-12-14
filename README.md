@@ -81,7 +81,7 @@ moal::omic(dat=dat,sif=sif,annot=annot,species="hs",model="ANEUPLOIDY",batch="TI
 ```
 
 <p>
-<b>Other examples for functional analysis, volcanoplot, heatmap, venn diagramm, unsupervised analysis quality controls.. at <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">fdumbioinfo/rtools/moal-demo/ </a></b>
+<b>Other examples at <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">fdumbioinfo/rtools/moal-demo/ </a></b>
 </p>
 
 
