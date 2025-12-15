@@ -6,39 +6,8 @@ Workflow summary:
  - volcanoplots, heatmaps, lineplots, boxplots (Kruskal-Wallis), ANOVA Fratio
  - Functional analysis: GSEA MSigDB enrichment analysis, StringDB interaction networks
 
-<b>Install from <a href="https://fdumbioinfo.r-universe.dev/moal">r-universe</a> (v 1.2.1):</b>
 
-```r
-# -----
-# UMS IPSIT BIOINFO - Licence GPL-3
-# https://github.com/fdumbioinfo/moal
-# title: moal install from r-universe
-# date: 11122025
-# -----
-# 
-# moal install
-options(pkgType = "binary")
-# annotation packages
-if(!require("moalannotgene",quietly=TRUE)){install.packages("moalannotgene",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalannotensg",quietly=TRUE)){install.packages("moalannotensg",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalannotenst",quietly=TRUE)){install.packages("moalannotenst",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalannotensp",quietly=TRUE)){install.packages("moalannotensp",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalstringdbhs",quietly=TRUE)){install.packages("moalstringdbhs",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalstringdbmm",quietly=TRUE)){install.packages("moalstringdbmm",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalstringdbrn",quietly=TRUE)){install.packages("moalstringdbrn",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalstringdbdr",quietly=TRUE)){install.packages("moalstringdbdr",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-if(!require("moalstringdbss",quietly=TRUE)){install.packages("moalstringdbss",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-# depend packages
-if(!require("BiocManager",quietly=TRUE)){install.packages("BiocManager")}
-if(!require("Rgraphviz",quietly=TRUE)){BiocManager::install("Rgraphviz",update=F)}
-if(!require("limma",quietly=TRUE)){BiocManager::install("limma",update=F)}
-if(!require("fgsea",quietly=TRUE)){BiocManager::install("fgsea",update=F)}
-# moal package
-if(!require("moal",quietly=TRUE)){install.packages("moal",repos=c("https://fdumbioinfo.r-universe.dev","https://cloud.r-project.org"))}
-#
-```
-
-<b>Test moal::omic() workflow:</b>
+<b>Install and test moal::omic() workflow:</b>
 
 ```r
 # -----
@@ -86,6 +55,8 @@ Other examples <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-dem
 
 
 UMS IPSIT BIOINFO at Paris Saclay University: https://www.ipsit.universite-paris-saclay.fr/?-bioinfo-
+
+r-universe: https://fdumbioinfo.r-universe.dev/moal
 
 bioRxiv preprint: https://doi.org/10.1101/2023.10.17.562686
 
