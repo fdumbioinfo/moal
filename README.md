@@ -49,7 +49,7 @@ moal::omic(dat=dat,sif=sif,annot=annot,species="hs",model="ANEUPLOIDY",batch="TI
 #
 ```
 
-<p><b>Other examples <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">fdumbioinfo/rtools/moal-demo/ </a></b>b></p>
+<p><b>Test <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">other examples </a> for functional analysis, volcanoplot, heatmap...</b></p>
 
 
 UMS IPSIT BIOINFO at Paris Saclay University: https://www.ipsit.universite-paris-saclay.fr/?-bioinfo-
