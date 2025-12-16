@@ -154,7 +154,7 @@ omic <- function(
   dolineplot = TRUE, doboxplotrow = TRUE,
   doena = TRUE, gsearank = "logfc", gseatail = "twotail",topdeg = 100 , topena = 50, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 700, overlapmin = 2, addenarankbarplot = TRUE,
-  dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = FALSE,
+  dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = TRUE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE, sample = NULL , seed = 123679, dopar = NULL,
   path = ".", dirname = NULL, zip = FALSE, remove = FALSE )
