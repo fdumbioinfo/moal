@@ -48,7 +48,7 @@ omic(
   overlapmin = 2,
   addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE,
-  dotopgenesetheatmap = FALSE,
+  dotopgenesetheatmap = TRUE,
   dogmtgenesetnetwork = FALSE,
   dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE,
