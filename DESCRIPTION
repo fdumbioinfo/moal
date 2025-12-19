@@ -8,6 +8,7 @@ Description: Multi Omic Analysis at Lab.
 License: GPL-3
 Depends: 
     R (>= 4.3),
+    magrittr
 Imports: 
     broom,
     dendextend,
@@ -24,7 +25,6 @@ Imports:
     gridExtra,
     igraph,
     limma,
-    magrittr,
     moalannotensg,
     moalannotensp,
     moalannotenst,
