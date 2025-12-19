@@ -48,7 +48,7 @@ enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRU
             legend.position="bottom",
             legend.title=element_text(size = 5),
             legend.text=element_text(size = 5)) -> p
-  p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.4,linetype="dashed") -> p
+  p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",linewidth=0.4,linetype="dashed") -> p
   p -> p1
   if(addenarankbarplot)
   {
@@ -75,7 +75,7 @@ enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRU
     title %>% paste(" (NES ranking)",sep="") -> Title0
     # p + ggtitle(Title0) -> p
     p + ggtitle(Title0,subtitle=subtitle) -> p
-    p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",size=0.4,linetype="dashed") -> p
+    p + geom_vline(xintercept=-log10(0.05),color="darkgoldenrod1",linewidth=0.4,linetype="dashed") -> p
     p -> p2
     # gridExtra::grid.arrange( p1, p2, nrow = 1 ) -> p
     # gridExtra::grid.arrange(p1,p2,heights = c(5, 5),nrow=2,) -> p

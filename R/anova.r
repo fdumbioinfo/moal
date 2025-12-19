@@ -16,7 +16,6 @@
 #' @importFrom rlang .data
 #' @importFrom foreach foreach %dopar%
 #' @importFrom stats lm aov rnorm TukeyHSD
-#' @importFrom utils capture.output
 #' @importFrom broom tidy
 #' @noRd
 anova <- function( dat, model, logratio = FALSE )

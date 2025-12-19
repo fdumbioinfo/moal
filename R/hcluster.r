@@ -48,7 +48,7 @@ hcluster <- function( dat , factor = NULL , Symbol = NULL , nc = c(2,3,6,12),
     # Dat1 %>% heatmap(factor=factor,dendrogram = "row",labCol=colnames(Dat1),cexCol=0.45,labRow=Symbol,k=i)
     # graphics.off()
   }
-  Dat1 %>% t %>% hc( plot = F ) -> dend0
+  Dat1 %>% t %>% hc( doplot = F ) -> dend0
   Dend1 <- foreach( i=nc ) %do% { dend0 %>% dendextend::set( "branches_k_color" , value = palette0[1:i] , k=i ) %>% list(.,i) }
   foreach(i=1:length( Dend1 ) ) %do%
   {

@@ -19,7 +19,6 @@
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
 #' @import ggplot2
-#' @importFrom gplots venn
 #' @importFrom ggforce geom_circle
 #' @importFrom rlang .data
 #' @importFrom dplyr full_join inner_join

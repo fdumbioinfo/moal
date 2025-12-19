@@ -129,11 +129,10 @@
 #' 
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
-#' @importFrom dplyr select inner_join left_join
+#' @importFrom dplyr select slice inner_join left_join
 #' @importFrom tidyselect all_of
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggsave
-#' @importFrom graphics hist
 #' @importFrom grDevices pdf graphics.off
 #' @importFrom foreach foreach %dopar% %do%
 #' @importFrom parallel makeCluster stopCluster detectCores
@@ -166,7 +165,7 @@ omic <- function(
   # 1 - data preprocessing
   # ----
   paste( "\n#######################\n", sep="" ) %>% cat
-  paste( "###  moal",packageVersion("moal") %>% gsub( "\\.","",.),"  omic  ###\n", sep="" ) %>% cat
+  paste( "###  moal",utils::packageVersion("moal") %>% gsub( "\\.","",.),"  omic  ###\n", sep="" ) %>% cat
   paste( "#######################\n", sep="" ) %>% cat
   paste("#\n" , sep = "" ) %>% cat
   paste("# 1- data preprocessing...\n" , sep = "" ) %>% cat
@@ -371,7 +370,7 @@ omic <- function(
       batch %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
       sif %>% colnames %>% grep(grep,.) %>% sif[,.] -> Batch0
       model.matrix(eval(expr=parse(text=paste0("~",RbeModel))),sif)  -> Design
-      dat %>% dplyr::select(-1) %>% removeBatchEffect(design=Design,batch=Batch0) %>%
+      dat %>% dplyr::select(-1) %>% limma::removeBatchEffect(design=Design,batch=Batch0) %>%
         data.frame("rowID"=dat[,1] %>% as.character,.,stringsAsFactors=F) -> DatRbe
       # output
       paste("datanorm_RBE_",batch,"_",(ncol(dat)-1),"_",nrow(dat),".tsv",sep="") %>% file.path(Path,"inputdata",.) -> FileName
@@ -393,7 +392,7 @@ omic <- function(
       sif %>% colnames %>% grep(grep,.) %>% sif[,.] -> Paired0
       model.matrix(eval(expr=parse(text=paste0("~",RbeModel))),sif) -> Design
       dat %>% dplyr::select(-1) %>%
-        removeBatchEffect(.,design=Design,batch=Paired0) %>%
+        limma::removeBatchEffect(.,design=Design,batch=Paired0) %>%
         data.frame( "rowID" = dat[,1] %>% as.character,.,stringsAsFactors=F ) -> DatRbe
       # output
       paste("datanorm_RBE_",paired,"_",(ncol(dat) - 1),"_",nrow(dat),".tsv",sep="") %>%
@@ -416,7 +415,7 @@ omic <- function(
       sif %>% colnames %>% grep(grep,.) %>% sif[,.] -> Batch0
       model.matrix(eval(expr=parse(text=paste0("~",RbeModel))),sif) -> Design
       dat %>% dplyr::select(-1) %>%
-        removeBatchEffect(.,design=Design,batch=Batch0,batch2=Paired0) %>%
+        limma::removeBatchEffect(.,design=Design,batch=Batch0,batch2=Paired0) %>%
         data.frame("rowID"=dat[,1] %>% as.character,.,stringsAsFactors=F) -> DatRbe
       # output
       paste("datanorm_RBE_",paired,"_",(ncol(dat)-1),"_",nrow(dat),".tsv",sep="") %>%
@@ -1183,9 +1182,9 @@ omic <- function(
             l2[i] %>% basename %>% sub("(.*).tsv","\\1",.) %>% paste("Heatmap_",.,".pdf",sep="") -> FileName
             l2[i] %>% dirname %>% file.path(FileName) -> FileName
             #
-            pdf(FileName)
+            grDevices::pdf(FileName)
             DatHeatmap1 %>% heatmap(factor=FactorHeatmap3,labRow=Symbol,cexCol=0.45,labCol=colnames(DatHeatmap1))
-            graphics.off()
+            grDevices::graphics.off()
           }
         }
       paste("Heatmap both clustering done.\n",sep = "") %>% cat
@@ -1244,7 +1243,7 @@ omic <- function(
         #
         foreach(j=1:length(Threshold0),.packages=c("magrittr","dplyr","moal")) %do%
           {
-            DatVolcanoplot1 %>% volcanoplot(pval=Threshold0[[j]][[1]],fc=Threshold0[[j]][[2]]) -> Vplot
+            DatVolcanoplot1 %>% volcanoplot(pval=Threshold0[[j]][[1]],fc=Threshold0[[j]][[2]],title=CompVolcano[i]) -> Vplot
             which(DatVolcanoplot1[,2] < Threshold0[[j]][[1]] & 
                     abs(DatVolcanoplot1[,3]) > Threshold0[[j]][[2]] ) %>% length -> NbGeneDiff
             paste("Volcanoplot_p",sub("0\\.(.*)","\\1",Threshold0[[j]][[1]] ),"_","fc",
@@ -1484,7 +1483,7 @@ omic <- function(
     paste("Filter geneset : ",filtergeneset,sep="") %>% c(LogOutput,.) -> LogOutput
   }
   paste("Date : ",format(Sys.time(), "%a %b %d %X %Y"),sep = "") %>% c(LogOutput,.) -> LogOutput
-  capture.output(Sys.time() - start) %>% unlist %>% strsplit(" ") %>% unlist %>% "["(.,-c(1:3)) %>% paste0(collapse=" ") -> Time
+  utils::capture.output(Sys.time() - start) %>% unlist %>% strsplit(" ") %>% unlist %>% "["(.,-c(1:3)) %>% paste0(collapse=" ") -> Time
   paste("analysis time : " , Time, sep = "") %>% c(LogOutput,.) -> LogOutput
   paste("version : ",packageVersion("moal") %>% as.character, sep = "") %>% c(LogOutput,.) -> LogOutput
   #

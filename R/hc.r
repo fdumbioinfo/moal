@@ -3,7 +3,7 @@
 #' @param dat matrix numeric
 #' @param factor factor
 #' @param title character
-#' @param plot logical
+#' @param doplot logical
 #' @param method character to choose agglomerative method of clustering dendrogramm
 #' @param legendtitle character
 #' @param cexlabel numeric
@@ -18,15 +18,15 @@
 #' @importFrom magrittr %>%
 #' @importFrom dendextend rotate set
 #' @importFrom stats hclust as.dendrogram
-#' @importFrom graphics plot legend
+#' @importFrom graphics legend
 #' @noRd
-hc <- function( dat, factor = NULL, title = "Hierarchical Clustering" , plot = TRUE,
+hc <- function( dat, factor = NULL, title = "Hierarchical Clustering" , doplot = TRUE,
                 method = "complete", legendtitle = "TREATMENT", cexlabel = 0.45, legend = TRUE)
 {
   dat %>% t -> dat
   dat %>% dist2 %>% stats::hclust(method=method) %>% stats::as.dendrogram(.) -> dend0
   #
-  if( !is.null(factor) & plot & dim(dat)[1] == length(factor) )
+  if( !is.null(factor) & doplot & dim(dat)[1] == length(factor) )
   {
     dend0 %>% labels %>% match(rownames(dat)) %>% "["(factor,.) %>% factortocolor -> factorcol
     dend0 %>% dendextend::set("labels_colors", value=factorcol) %>% 
@@ -38,9 +38,9 @@ hc <- function( dat, factor = NULL, title = "Hierarchical Clustering" , plot = T
         "topright",title=legendtitle,legend=levels(factor),
         col=palette0[1:length(levels(factor))],lty=1,lwd=5,cex=0.7)
     }
-    FALSE -> plot
+    FALSE -> doplot
   }
   #
-  if(plot){ dend0 %>% dendextend::set("labels_cex",cexlabel ) %>% graphics::plot(main=title,cex.main=0.8,ylab="distance correlation") }
+  if(doplot){ dend0 %>% dendextend::set("labels_cex",cexlabel ) %>% graphics::plot(main=title,cex.main=0.8,ylab="distance correlation") }
   dend0 %>% return()
 }

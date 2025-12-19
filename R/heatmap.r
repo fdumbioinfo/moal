@@ -28,15 +28,15 @@
 #' @importFrom dendextend set
 #' @export
 heatmap <- function(
-  dat , factor , method = "complete" , dendrogram = "both", k = NULL,
+  dat = NULL, factor = NULL , method = "complete" , dendrogram = "both", k = NULL,
   labCol = "" , cexCol = 0.5 , labRow = "" , cexRow = NULL,
   cexlegend = 0.65 , keysize = 0.9, keycolor = c( "darkgreen", "orange" , "darkred") , parmar = c(5,4,5,6), scale = "row")
 {
-  par(xpd=T, mar=parmar)
+  graphics::par(xpd=T, mar=parmar)
   if(dendrogram == "both")
   {
-    dat %>% hc(factor=factor, plot=F , method = method ) -> coldend
-    dat %>% t %>% hc(plot=F, method=method) -> rowdend
+    dat %>% hc(factor=factor,doplot=F,method=method) -> coldend
+    dat %>% t %>% hc(doplot=F,method=method) -> rowdend
   }
   if( dendrogram == "none" )
   {
@@ -98,15 +98,9 @@ heatmap <- function(
       col=colorpanel(50, low=keycolor[1], mid=keycolor[2], high=keycolor[3]), scale=scale, distfun=dist2 )
   if(FactorLevelsNumber > MatLevelsNumber)
   {
-    legend(
-      # "topright", inset = c(-0.22,-0.1), legend = levels( factor( factor ) ),
-      "topright", inset = c(-0.22,-0.1), legend = LevelsLegend1,
-      col = ColLegend1,
-      lty = 1, lwd = 5, cex = cexlegend )
+    graphics::legend("topright",inset=c(-0.22,-0.1),legend=LevelsLegend1,col=ColLegend1,lty=1,lwd=5,cex=cexlegend)
   }else{
-    legend(
-      "topright", inset = c(-0.22,-0.1), legend = levels( factor( factor ) ),
-      col = palette0[1:length( levels( factor( factor ) ) ) ],
-      lty = 1, lwd = 5, cex = cexlegend )
+    graphics::legend("topright",inset=c(-0.22,-0.1),legend=levels(factor(factor)),
+                     col=palette0[1:length(levels(factor(factor)))],lty=1,lwd=5,cex=cexlegend)
   }
 }

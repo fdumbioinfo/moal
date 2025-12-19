@@ -23,7 +23,7 @@
 #' @export
 volcanoplot <- function(
     dat = NULL, pval = 0.05, fc = 1.5, topgenename = TRUE, topgenenamen = 5,
-    genenamelist = NULL, genenamesize = 3, title = "Volcanoplot" )
+    genenamelist = NULL, genenamesize = 2, title = "Volcanoplot" )
 {
   dat -> Dat0
   dat[,2] %>% log10 %>% "*"(.,-1) -> Dat0[,2]

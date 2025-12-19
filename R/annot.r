@@ -10,17 +10,17 @@
 #' @return data.frame
 #' @examples
 #' # not run
-#' # annot(EnsemblGeneIDs)
+#' # annot(Symbol)
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by left_join slice select
+#' @importFrom dplyr group_by left_join slice select inner_join
 #' @importFrom rlang .data
 #' @import moalannotgene
 #' @import moalannotensg
 #' @import moalannotenst
 #' @import moalannotensp
 #' @export
-annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",idtype = NULL )
+annot <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "ncbi", idtype = NULL )
 {
   symbollist %>% as.character -> symbollist0
   GeneDb0 <- NULL ; ens0 <- NULL
@@ -68,10 +68,10 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
     paste("moalannotgene::",paste0("genedb", Species0[1])," -> GeneDb0",sep="") -> text
     eval(expr = parse(text = text ) )
     GeneDb0 -> GeneDb1
-    symbollist0 %>% data.frame("GeneID"=.) %>% left_join(GeneDb1) %>% dplyr::select(-.data$Syn) -> GeneDb1
-    GeneDb1 %>% group_by(.data$GeneID) %>% dplyr::slice(1) %>% data.frame -> GeneDb2
+    symbollist0 %>% data.frame("GeneID"=.) %>% dplyr::left_join(GeneDb1) %>% dplyr::select(-.data$Syn) -> GeneDb1
+    GeneDb1 %>% dplyr::group_by(.data$GeneID) %>% dplyr::slice(1) %>% data.frame -> GeneDb2
     symbollist0 %>% data.frame( "GeneID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
-    GeneDb2 %>% inner_join(symbollist1)  -> GeneDb3
+    GeneDb2 %>% dplyr::inner_join(symbollist1)  -> GeneDb3
     symbollist0 %>% match(GeneDb3$GeneID) %>% GeneDb3[.,] -> Annot
   }
   #
@@ -81,9 +81,9 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
   {
     paste("moalannotensg::",paste0("ensg", Species0[1])," -> ens0",sep="") -> text
     eval(expr = parse(text = text ) )
-    symbollist0 %>% data.frame("ENSGID"=.) %>% left_join(ens0) -> ens1
+    symbollist0 %>% data.frame("ENSGID"=.) %>% dplyr::left_join(ens0) -> ens1
     symbollist0 %>% data.frame( "ENSGID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
-    ens1 %>% inner_join(symbollist1)  -> ens2
+    ens1 %>% dplyr::inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSGID) %>% ens2[.,] -> Annot
     Annot$Symbol %>% grep("^$",.) -> sell
     if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
@@ -95,9 +95,9 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
   {
     paste("moalannotenst::",paste0("enst", Species0[1])," -> ens0",sep="") -> text
     eval(expr = parse(text = text ) )
-    symbollist0 %>% data.frame("ENSTID"=.) %>% left_join(ens0) -> ens1
-    symbollist0 %>% data.frame( "ENSTID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
-    ens1 %>% inner_join(symbollist1)  -> ens2
+    symbollist0 %>% data.frame("ENSTID"=.) %>% dplyr::left_join(ens0) -> ens1
+    symbollist0 %>% data.frame("ENSTID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "")) -> symbollist1
+    ens1 %>% dplyr::inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSTID) %>% ens2[.,] -> Annot
     Annot$Symbol %>% grep("^$",.) -> sell
     if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
@@ -109,9 +109,9 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
   {
     paste("moalannotensp::",paste0("ensp", Species0[1])," -> ens0",sep="") -> text
     eval(expr = parse(text = text ) )
-    symbollist0 %>% data.frame("ENSPID"=.) %>% left_join(ens0) -> ens1
+    symbollist0 %>% data.frame("ENSPID"=.) %>% dplyr::left_join(ens0) -> ens1
     symbollist0 %>% data.frame( "ENSPID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
-    ens1 %>% inner_join(symbollist1)  -> ens2
+    ens1 %>% dplyr::inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSPID) %>% ens2[.,] -> Annot
     Annot$Symbol %>% grep("^$",.) -> sell
     if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
@@ -126,8 +126,8 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
       paste("moalannotgene::",paste0("genedb", Species0[1])," -> GeneDb0",sep="") -> text
       eval(expr = parse(text = text ) )
       GeneDb0 -> GeneDb1
-      GeneDb1 %>% group_by(.data$Symbol) %>% dplyr::slice(1) %>% data.frame -> GeneDb1Symb0
-      symbollist0 %>% as.character %>% data.frame("Symbol"=.) %>% left_join(GeneDb1Symb0) %>% data.frame -> GeneDb2
+      GeneDb1 %>% dplyr::group_by(.data$Symbol) %>% dplyr::slice(1) %>% data.frame -> GeneDb1Symb0
+      symbollist0 %>% as.character %>% data.frame("Symbol"=.) %>% dplyr::left_join(GeneDb1Symb0) %>% data.frame -> GeneDb2
       GeneDb2 %>% dplyr::select(-.data$Syn) -> Annot
       # if not 100% match check synonyms
       MATCHALL <- F
@@ -146,7 +146,7 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
           if( selsel %>% length %>% ">"(.,0) )
           {
             GeneDb3[selsel,] -> GeneDb4
-            GeneDb4$Symbol %>% as.character %>% data.frame("Syn"=.) %>% left_join(GeneDb1Syn0) %>% dplyr::select(-.data$Syn) -> GeneDb2Syn1
+            GeneDb4$Symbol %>% as.character %>% data.frame("Syn"=.) %>% dplyr::left_join(GeneDb1Syn0) %>% dplyr::select(-.data$Syn) -> GeneDb2Syn1
             GeneDb2Syn1[,c(2,1,3:ncol(GeneDb2Syn1))] -> GeneDb2Syn1   
             GeneDb3[selsel,] <- GeneDb2Syn1
             GeneDb2[sel,] <- GeneDb3
@@ -161,18 +161,18 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
       paste("moalannotensg::",paste0("ensg", Species0[1])," -> GeneDb0",sep="") -> text
       eval(expr = parse(text = text ) )
       GeneDb0 -> GeneDb1
-      GeneDb1 %>% group_by(.data$Symbol) %>% dplyr::slice(1) %>% data.frame -> GeneDb1Symb0
-      symbollist0 %>% as.character %>% data.frame("Symbol"=.) %>% left_join(GeneDb1Symb0) %>% data.frame -> GeneDb2
+      GeneDb1 %>% dplyr::group_by(.data$Symbol) %>% dplyr::slice(1) %>% data.frame -> GeneDb1Symb0
+      symbollist0 %>% as.character %>% data.frame("Symbol"=.) %>% dplyr::left_join(GeneDb1Symb0) %>% data.frame -> GeneDb2
       GeneDb2 %>% dplyr::select(-.data$Syn) -> Annot
       # if not 100% match check synonyms
       MATCHALL <- F
-      ifelse( GeneDb2$ENSGID %>% is.na %>% "!"(.) %>% which %>% length %>% "=="(.,nrow(GeneDb2)) , MATCHALL <- T, MATCHALL <- F  )
-      if( !MATCHALL )
+      ifelse(GeneDb2$ENSGID %>% is.na %>% "!"(.) %>% which %>% length %>% "=="(.,nrow(GeneDb2)), MATCHALL <- T, MATCHALL <- F)
+      if(!MATCHALL)
       {
         # check synonyms
-        ( ( GeneDb2$ENSGID %>% is.na ) & ( GeneDb2$Symbol %>% grepl("^row",.) %>% "!"(.) ) ) %>% which -> sel
+        ((GeneDb2$ENSGID %>% is.na) & (GeneDb2$Symbol %>% grepl("^row",.) %>% "!"(.))) %>% which -> sel
         SYN <- F
-        ifelse( sel %>% length %>% ">"(.,0), SYN <- T, SYN <- F )
+        ifelse(sel %>% length %>% ">"(.,0), SYN <- T, SYN <- F)
         if( SYN )
         {
           GeneDb1 %>% dplyr::group_by(.data$Syn) %>% dplyr::slice(1) -> GeneDb1Syn0
@@ -181,7 +181,7 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
           if( selsel %>% length %>% ">"(.,0) )
           {
             GeneDb3[selsel,] -> GeneDb4
-            GeneDb4$Symbol %>% as.character %>% data.frame("Syn"=.) %>% left_join(GeneDb1Syn0) %>% dplyr::select(-.data$Syn) -> GeneDb2Syn1
+            GeneDb4$Symbol %>% as.character %>% data.frame("Syn"=.) %>% dplyr::left_join(GeneDb1Syn0) %>% dplyr::select(-.data$Syn) -> GeneDb2Syn1
             GeneDb2Syn1[,c(2,1,3:ncol(GeneDb2Syn1))] -> GeneDb2Syn1   
             GeneDb3[selsel,] <- GeneDb2Syn1
             GeneDb2[sel,] <- GeneDb3
@@ -202,16 +202,16 @@ annot <- function( symbollist, species = NULL, ortholog = F, dboutput = "ncbi",i
     paste("moalannotgene::",paste0("genedb", Species0[1])," -> GeneDb0",sep="") -> text
     eval(expr = parse(text = text ) )
     GeneDb0 -> GeneDb1
-    symbollist0 %>% data.frame("Symbol"=.) %>% left_join(GeneDb1) -> GeneDb2Symb
-    symbollist0 %>% data.frame("Syn"=.) %>% left_join(GeneDb1) -> GeneDb2Syn
+    symbollist0 %>% data.frame("Symbol"=.) %>% dplyr::left_join(GeneDb1) -> GeneDb2Symb
+    symbollist0 %>% data.frame("Syn"=.) %>% dplyr::left_join(GeneDb1) -> GeneDb2Syn
     rbind(GeneDb2Symb,GeneDb2Syn) %>% data.frame -> GeneDb2
-    GeneDb2 %>% group_by(.data$Symbol) %>% dplyr::slice(1) %>% 
+    GeneDb2 %>% dplyr::group_by(.data$Symbol) %>% dplyr::slice(1) %>% 
       data.frame %>% dplyr::select(c(3,2,3:ncol(GeneDb2))) %>% data.frame -> GeneDb3
-    GeneDb3$GeneID %>% as.character %>% data.frame( "Other_GeneID" = . ) %>% inner_join(OrthoGeneDb1) %>%
+    GeneDb3$GeneID %>% as.character %>% data.frame( "Other_GeneID" = . ) %>% dplyr::inner_join(OrthoGeneDb1) %>%
       dplyr::select(.data$GeneID,.data$Other_GeneID) %>% setNames(c("GeneID","OtherGeneID")) -> Annot0
     moalannotgene::genedbhs -> GeneDb1
-    Annot0 %>% left_join(GeneDb1) %>% dplyr::select(-.data$Syn) -> GeneDb2
-    GeneDb2 %>% group_by(.data$GeneID) %>% dplyr::slice(1) %>% data.frame -> Annot
+    Annot0 %>% dplyr::left_join(GeneDb1) %>% dplyr::select(-.data$Syn) -> GeneDb2
+    GeneDb2 %>% dplyr::group_by(.data$GeneID) %>% dplyr::slice(1) %>% data.frame -> Annot
   }
   Annot %>% return()
 }

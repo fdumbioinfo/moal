@@ -58,11 +58,10 @@
 #' # gsenain( omicdata , species = "mm")
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
-#' @importFrom dplyr mutate arrange select desc last_col
+#' @importFrom dplyr mutate arrange select desc last_col group_by
 #' @importFrom rlang .data
 #' @importFrom stats fisher.test setNames p.adjust
 #' @importFrom foreach foreach %do% %:%
-#' @importFrom utils capture.output
 #' @importFrom fgsea fgsea
 #' @importFrom forcats fct_reorder
 #' @importFrom parallel makeCluster stopCluster detectCores
