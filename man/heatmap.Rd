@@ -5,8 +5,8 @@
 \title{Heatmap}
 \usage{
 heatmap(
-  dat,
-  factor,
+  dat = NULL,
+  factor = NULL,
   method = "complete",
   dendrogram = "both",
   k = NULL,

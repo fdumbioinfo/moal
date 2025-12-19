@@ -5,7 +5,7 @@
 \title{Annotation function for Symbol, NCBI or Ensembl IDs}
 \usage{
 annot(
-  symbollist,
+  symbollist = NULL,
   species = NULL,
   ortholog = F,
   dboutput = "ncbi",
@@ -34,7 +34,7 @@ Use moal:::orthoinfo to see complete species list
 }
 \examples{
 # not run
-# annot(EnsemblGeneIDs)
+# annot(Symbol)
 }
 \author{
 Florent Dumont \href{mailto:florent.dumont@universite-paris-saclay.fr}{florent.dumont@universite-paris-saclay.fr}

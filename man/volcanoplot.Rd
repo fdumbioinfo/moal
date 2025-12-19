@@ -11,7 +11,7 @@ volcanoplot(
   topgenename = TRUE,
   topgenenamen = 5,
   genenamelist = NULL,
-  genenamesize = 3,
+  genenamesize = 2,
   title = "Volcanoplot"
 )
 }
