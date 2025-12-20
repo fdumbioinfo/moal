@@ -2,7 +2,6 @@
 
 export(annot)
 export(ena)
-export(env)
 export(heatmap)
 export(input)
 export(norm)
