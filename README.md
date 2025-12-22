@@ -48,6 +48,12 @@ sif %>% data.frame -> sif
 moal::omic(dat=dat,sif=sif,annot=annot,species="hs",model="ANEUPLOIDY",batch="TISSUE",dirname="GSE65055",path="1-omic-outputdata")
 #
 ```
+Same script in one command line:
+
+```r
+source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/1-moal-omic-demo.r")
+```
+
 
 <p><b>Test <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">other examples </a> for functional analysis, volcanoplot, heatmap...</b></p>
 
