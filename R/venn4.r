@@ -75,7 +75,7 @@ venn4 <- function(
     aes(
       x0 = .data$x, y0 = .data$y,
       a = .data$a , b = .data$b , angle = .data$angle , fill = labels ),
-    alpha = .3, size = 1, colour = 'black' ) -> p
+    alpha = .3, linewidth = 1, colour = 'black' ) -> p
   p + coord_fixed() -> p
   p + theme_void() -> p
   p + theme(

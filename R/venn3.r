@@ -70,7 +70,7 @@ venn3 <- function(
     aes(
       x0 = .data$x, y0 = .data$y,
       r = 1.5, fill = Listnames),
-    alpha = .3, size = 1, colour = 'black' ) -> p
+    alpha = .3, linewidth = 1, colour = 'black' ) -> p
   p + coord_fixed() -> p
   p + theme_void() -> p
   p + theme( legend.position = 'bottom' , legend.text = element_text(size = 6) ) -> p

@@ -54,7 +54,7 @@ venn2 <- function(
     labels = labels ) -> df.venn
   # venn display
   ggplot(df.venn) -> p
-  p + ggforce::geom_circle( aes( x0 = .data$x, y0 = .data$y, r = 1.5 , fill = labels), alpha = .3, size = 1, colour = 'black' ) -> p
+  p + ggforce::geom_circle(aes( x0 = .data$x, y0 = .data$y, r = 1.5 , fill = labels), alpha = .3, linewidth = 1, colour = 'black' ) -> p
   p + coord_fixed() -> p
   p + theme_void() -> p
   p + theme( legend.position = 'bottom', legend.text = element_text(size = 8) ) -> p

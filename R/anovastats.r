@@ -59,7 +59,7 @@ anovastats <- function( dat , path = "." , filename = "anovastatplot" )
   #
   Dat1 %>% data.frame %>% dplyr::select(contains("Fratio")) %>% apply(2,mean) %>% data.frame(Fratio=.,Factor) -> Dat2
   Dat2 %>%
-    ggplot(aes(x=Factor,y=.data$Fratio,fill=Factor)) +
+    ggplot(aes(x=.data$Factor,y=.data$Fratio,fill=Factor)) +
     geom_bar(stat="identity") +
     scale_fill_manual(values=palette0) +
     theme_bw() +
