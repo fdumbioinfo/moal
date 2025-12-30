@@ -22,7 +22,7 @@
 #' @importFrom dplyr group_by left_join slice select slice_max
 #' @importFrom rlang .data
 #' @importFrom stats setNames
-#' @importFrom igraph graph_from_data_frame degree V layout_as_tree layout_in_circle layout_on_grid layout_on_sphere layout_with_dh
+#' @importFrom igraph graph_from_data_frame degree V layout.fruchterman.reingold layout_with_dh layout_as_tree layout_in_circle layout_on_grid layout_on_sphere 
 #' @importFrom foreach foreach
 #' @importFrom colourvalues colour_values
 #' @importFrom grDevices colorRamp
