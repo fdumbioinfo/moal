@@ -8,16 +8,18 @@ Description: Multi Omic Analysis at Lab.
 License: GPL-3
 Depends: 
     R (>= 4.3),
-    magrittr
+    magrittr,
+    ggplot2,
+    igraph
 Imports: 
     broom,
     dendextend,
     doParallel,
     dplyr,
     forcats,
+    fgsea,
     foreach,
     ggforce,
-    ggplot2,
     ggpubr,
     gplots,
     ggrepel,
@@ -36,16 +38,15 @@ Imports:
     moalstringdbss,
     parallel,
     plyr,
-    graphics,
     Rgraphviz,
+    graphics,
     rlang,
     scales,
     stats,
     stringr,
     tidyselect,
     utils,
-    colourvalues,
-    fgsea
+    colourvalues
 Suggests: 
     knitr,
     rmarkdown
