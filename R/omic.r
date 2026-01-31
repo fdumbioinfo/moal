@@ -149,8 +149,7 @@ omic <- function(
   doqc = TRUE, threshold = c(1,2,3,4,9,10,11,12) , padj = "none", logratio = FALSE,
   dopattern = TRUE, dovenn = TRUE, docluster = TRUE, nc = c(2,3,6,12), maxclusterheatmap = 5000,
   doheatmap = TRUE, heatmapcluster = "row", maxheatmap = 2000, minheatmap = 3,
-  dovolcanoplot = TRUE, nbgenevolc = 5,
-  dolineplot = TRUE, doboxplotrow = TRUE,
+  dovolcanoplot = TRUE, nbgenevolc = 5, dolineplot = TRUE, doboxplotrow = TRUE,
   doena = TRUE, gsearank = "logfc", gseatail = "twotail",topdeg = 100 , topena = 50, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 700, overlapmin = 2, addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = TRUE,
@@ -187,7 +186,8 @@ omic <- function(
     "TREATMENT" -> model
   }
   ### dat
-  colnames(dat)[1] <- "rowID" ; mode(dat[,1]) <- "character"
+  colnames(dat)[1] <- "rowID"
+  mode(dat[,1]) <- "character"
   ### annot
   if(is.null(annot))
   { 
@@ -196,14 +196,21 @@ omic <- function(
   }
   if(!is.null(annot) & all(colnames(annot)!="Symbol"))
   {
-    colnames(annot)[1] <- "rowID" ; mode(annot[,1]) <- "character"
-    annot %>% cbind( "Symbol"=dat[,1] %>% as.character ) -> Annot0
+    colnames(annot)[1] <- "rowID"
+    mode(annot[,1]) <- "character"
+    dat$rowID %>% data.frame(rowID=.) %>% dplyr::left_join(annot) -> annot
+    annot %>% cbind("Symbol"=dat[,1] %>% as.character) -> Annot0
     doena <- FALSE ; doenaora <- FALSE 
   }
   if(!is.null(annot) & any(colnames(annot)=="Symbol"))
   {
-    colnames(annot)[1] <- "rowID" ; mode(annot[,1]) <- "character"
-    annot -> Annot0 ; Annot0$Symbol -> Symbol
+    colnames(annot)[1] <- "rowID"
+    mode(annot[,1]) <- "character"
+    dat$rowID %>% data.frame(rowID=.) %>% dplyr::left_join(annot) -> annot
+    annot$Symbol %>% grep("^$",.) -> sel
+    if(length(sel)>1){ annot$Symbol[sel] <- annot$rowID[sel] }
+    annot -> Annot0
+    Annot0$Symbol -> Symbol
     # NCBI annotation
     if(any(colnames(annot)=="GeneID")){annot %>% dplyr::select(-.data$GeneID) -> annot}
     Symbol -> symbollist

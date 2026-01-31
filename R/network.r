@@ -19,10 +19,10 @@
 #' # network(symbollist)
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by left_join slice select slice_max
+#' @importFrom dplyr group_by left_join select
 #' @importFrom rlang .data
 #' @importFrom stats setNames
-#' @importFrom igraph graph_from_data_frame degree V layout.fruchterman.reingold layout_with_dh layout_as_tree layout_in_circle layout_on_grid layout_on_sphere 
+#' @importFrom igraph graph_from_data_frame degree V layout_with_fr layout_with_dh layout_as_tree layout_in_circle layout_on_grid layout_on_sphere 
 #' @importFrom foreach foreach
 #' @importFrom colourvalues colour_values
 #' @importFrom grDevices colorRamp
@@ -38,8 +38,7 @@ network <- function(
     intmaxdh = 5000, nodelabelsize = 0.39, nodesize = 0.5, edgeweight = 0.1, edgewidth = 0.2, title = "Network", path = ".", filename = NULL)
 {
   i=j=k=m=1
-  # moal:::orthoinfo -> orthoinfo
-  c("layout.fruchterman.reingold","layout_with_dh","layout_as_tree","
+  c("layout_with_fr","layout_with_dh","layout_as_tree","
     layout_in_circle","layout_on_grid","layout_on_sphere") -> Layout0
   Layout0[layout] -> Layout1
   # species selection
@@ -80,7 +79,7 @@ network <- function(
       # Edges
       NodeList3 %>% dplyr::inner_join(EdgeList0, by =c("ENSPID"="NodeA")) %>% setNames(c("NodeA","SymbolA","NodeB","CombinedScore")) -> EdgeList1
       # Direct connection filtering
-      NodeList3 %>% inner_join(EdgeList1, by=c("ENSPID"="NodeB")) %>% dplyr::select(c(1:3,5,4)) %>% setNames(c("NodeA","SymbolA","NodeB","CombinedScore","SymbolB")) -> EdgeList2
+      NodeList3 %>% dplyr::inner_join(EdgeList1, by=c("ENSPID"="NodeB")) %>% dplyr::select(c(1:3,5,4)) %>% setNames(c("NodeA","SymbolA","NodeB","CombinedScore","SymbolB")) -> EdgeList2
       # Confidence filtering
       seq(0,999,10) -> Confidence0
       mode(EdgeList2$CombinedScore) <- "numeric"
@@ -138,7 +137,7 @@ network <- function(
             #
             foreach(j=1:length(foldchange)) %do%
               {
-                V(NetWork0)$Symbol %>% data.frame(Symbol=.) %>% left_join(foldchange[[j]]) -> FoldChange0
+                V(NetWork0)$Symbol %>% data.frame(Symbol=.) %>% dplyr::left_join(foldchange[[j]]) -> FoldChange0
                 # foldchange[[j]] -> tt
                 if( nrow(FoldChange0) > 1 )
                 {
@@ -157,14 +156,14 @@ network <- function(
                   # ColorRangeDown2
                   selc19down <- foreach(m=1:(nrow(ColorRangeDown2)-1)) %do%
                     {
-                      ((FoldChange1 %>% dplyr::select(.data[[colnames(FoldChange1)[2]]]) %>% unlist %>% ">"(ColorRangeDown2$value[m])) &
+                      ((FoldChange1 %>% dplyr::select(.data[[colnames(FoldChange1)[2]]]) %>% unlist %>% ">="(ColorRangeDown2$value[m])) &
                          (FoldChange1 %>% dplyr::select(.data[[colnames(FoldChange1)[2]]]) %>% unlist %>% "<"(ColorRangeDown2$value[m+1]))) %>% which
                     }
                   foreach(m=1:length(selc19down)) %do% { ColorNode0 %>% replace(selc19down[[m]],ColorRangeDown2$color[m+1]) -> ColorNode0 }
                   # ColorRangeUp2
                   selc19up <- foreach(m=1:(nrow(ColorRangeUp2)-1)) %do%
                     {
-                      ((FoldChange1 %>% dplyr::select(.data[[colnames(FoldChange1)[2]]]) %>% unlist %>% ">"(ColorRangeUp2$value[m])) &
+                      ((FoldChange1 %>% dplyr::select(.data[[colnames(FoldChange1)[2]]]) %>% unlist %>% ">="(ColorRangeUp2$value[m])) &
                          (FoldChange1 %>% dplyr::select(.data[[colnames(FoldChange1)[2]]]) %>% unlist %>% "<"(ColorRangeUp2$value[m+1]))) %>% which
                     }
                   foreach(m=1:length(selc19up)) %do% { ColorNode0 %>% replace(selc19up[[m]],ColorRangeUp2$color[m+1]) -> ColorNode0 }
@@ -178,7 +177,7 @@ network <- function(
                 }
                 if(!is.null(pval))
                 {
-                  V(NetWork0)$Symbol %>% data.frame(Symbol=.) %>% left_join(pval[[j]]) -> Pval0
+                  V(NetWork0)$Symbol %>% data.frame(Symbol=.) %>% dplyr::left_join(pval[[j]]) -> Pval0
                   c(0.05,0.01,0.001) -> tr0
                   c("*","**","***") -> trs0
                   Pval0$Symbol -> PvalNode

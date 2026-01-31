@@ -65,7 +65,7 @@ volcanoplot <- function(
     }
   }
   # -----
-  # genename label list
+  # genename list label
   # -----
   if(!is.null(genenamelist))
   {
@@ -75,9 +75,17 @@ volcanoplot <- function(
     if(nrow(genename) > 0)
     {
       p + geom_point(data=genename,aes(x=.data[[colnames(genename)[3]]],y=.data[[colnames(d)[2]]]),color="orange") -> p 
-      p + ggrepel::geom_label_repel(data=genename,aes(x=.data[[colnames(genename)[3]]],y=.data[[colnames(genename)[2]]],
-                                          label=.data[[colnames(genename)[4]]]),
-                           size=genenamesize,color="black",max.overlaps=nrow(genename)) -> p
+      # red color for up point
+      Dat0 %>% dplyr::filter(.[[colnames(Dat0)[2]]] %>% ">"(-log10(pval)) & .[[colnames(Dat0)[3]]] > log2(fc)) -> u
+      if(nrow(u)>0){ p + geom_point(data=u,aes(x=.data[[colnames(u)[3]]],y=.data[[colnames(u)[2]]]),color="red") -> p }
+      # green color for down point
+      Dat0 %>% dplyr::filter(.[[colnames(Dat0)[2]]] %>% ">"(-log10(pval)) & .[[colnames(Dat0)[3]]] < -log2(fc)) -> d
+      if(nrow(d)>0){ p + geom_point(data=d,aes(x=.data[[colnames(d)[3]]],y=.data[[colnames(d)[2]]]),color="green") -> p }
+      #
+      p + ggrepel::geom_label_repel(data=genename,
+                                    aes(x=.data[[colnames(genename)[3]]],y=.data[[colnames(genename)[2]]],label=.data[[colnames(genename)[4]]]),
+                                    size=genenamesize,color="black",max.overlaps=nrow(genename)) -> p
+      
     }
   }
   #
@@ -86,7 +94,7 @@ volcanoplot <- function(
   p + geom_hline(yintercept=-log10(pval),linetype="solid",colour="orange",linewidth=0.3) -> p
   p + geom_vline(xintercept=log2(fc),linetype="solid",colour="orange",linewidth=0.3) -> p
   p + geom_vline(xintercept=-log2(fc),linetype="solid",colour="orange",linewidth=0.3) -> p
-  p + labs(x="log2ratio(fc)", y="-log10(p)") -> p
+  p + labs(x=paste("log2ratio(",fc,")",sep=""),y=paste("-log10(",pval,")",sep="")) -> p
   p + ggtitle(paste(title, sep="")) -> p
   p %>% return()
 }
