@@ -38,8 +38,8 @@ network <- function(
     intmaxdh = 5000, nodelabelsize = 0.39, nodesize = 0.5, edgeweight = 0.1, edgewidth = 0.2, title = "Network", path = ".", filename = NULL)
 {
   i=j=k=m=1
-  c("layout_with_fr","layout_with_dh","layout_as_tree","
-    layout_in_circle","layout_on_grid","layout_on_sphere") -> Layout0
+  c("layout_with_fr","layout_with_dh","layout_as_tree",
+    "layout_in_circle","layout_on_grid","layout_on_sphere") -> Layout0
   Layout0[layout] -> Layout1
   # species selection
   ifelse(
