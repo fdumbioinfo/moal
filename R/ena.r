@@ -1415,7 +1415,7 @@ ena <- function(
     MatHeatmap0 %>% unique -> MatHeatmap1
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %dopar%
-      {
+      {  
         # GenesetListsSymbol[[i]] -> symbollist
         # symbollist %>% annot(.,idtype = "SYMBOL") -> a0
         # a0$Symbol -> nodelist
