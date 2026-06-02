@@ -32,10 +32,12 @@
 #' @import moalstringdbrn
 #' @import moalstringdbdr
 #' @import moalstringdbss
+#' @import moalstringdboa
 #' @noRd
 network <- function(
     nodelist = NULL, foldchange = NULL, pval = NULL, species = NULL, layout = 1, seed = 1234567,
-    intmaxdh = 5000, nodelabelsize = 0.39, nodesize = 0.5, edgeweight = 0.1, edgewidth = 0.2, title = "Network", path = ".", filename = NULL)
+    intmaxdh = 5000, nodelabelsize = 0.39, nodesize = 0.5, edgeweight = 0.1, edgewidth = 0.2,
+    title = "Network", path = ".", filename = NULL)
 {
   i=j=k=m=1
   c("layout_with_fr","layout_with_dh","layout_as_tree",
@@ -76,6 +78,7 @@ network <- function(
       if( Species0[1] == "rn" ){ moalstringdbrn::stringdbrn -> EdgeList0 }
       if( Species0[1] == "dr" ){ moalstringdbdr::stringdbdr -> EdgeList0 }
       if( Species0[1] == "ss" ){ moalstringdbss::stringdbss -> EdgeList0 }
+      if( Species0[1] == "oa" ){ moalstringdboa::stringdboa -> EdgeList0 }
       # Edges
       NodeList3 %>% dplyr::inner_join(EdgeList0, by =c("ENSPID"="NodeA")) %>% setNames(c("NodeA","SymbolA","NodeB","CombinedScore")) -> EdgeList1
       # Direct connection filtering

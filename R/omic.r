@@ -18,7 +18,7 @@
 #' @param dat data.frame normalize data table with rowID for first column
 #' @param sif data.frame sample information file including model factors
 #' @param annot data.frame annotation with Symbol column for functional analysis
-#' @param species character available species: bt ce dr dm gg hs mm pt rn ss xt
+#' @param species character available species: hs mm rn ss pt bt oa dr gg xt dm ce
 #' @param doqc logical quality controls
 #' @param model character anova model factors (see details)
 #' @param paired character factor for paired design
@@ -191,8 +191,16 @@ omic <- function(
   ### annot
   if(is.null(annot))
   { 
-    dat[,1] %>% as.character %>% data.frame("rowID"=.,"Symbol"=.,stringsAsFactors=F) -> Annot0
-    doena <- FALSE ; doenaora <- FALSE  
+    dat[,1] %>% as.character %>% moal::annot(species=species) -> annot
+    if(annot$Symbol %>% is.na %>% all)
+    {
+      dat[,1] %>% as.character %>% data.frame("rowID"=.,"Symbol"=.,stringsAsFactors=F) -> Annot0
+      doena <- FALSE ; doenaora <- FALSE  
+    }else
+      { 
+        annot$Symbol %>% grep("^row",.) -> sel
+        if(length(sel)>0){ annot$Symbol[sel] <- annot$rowID[sel] ; annot %>% dplyr::select(.data$rowID,.data$GeneID) }
+      }
   }
   if(!is.null(annot) & all(colnames(annot)!="Symbol"))
   {

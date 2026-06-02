@@ -55,7 +55,7 @@
 #' 
 #' @examples
 #' # not run
-#' # gsenain( omicdata , species = "mm")
+#' # ena( omicdata , species = "mm")
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate arrange select desc last_col group_by
@@ -190,7 +190,7 @@ ena <- function(
       {
         t5[[j]] %>% dplyr::arrange(.data[[colnames(t5[[j]])[2]]]) %>% dplyr::slice(1:topdeg) -> p
         # output
-        p$rowID %>% data.frame(rowID=.) %>% inner_join(OutPut1) -> Deg1
+        p$rowID %>% data.frame(rowID=.) %>% dplyr::inner_join(OutPut1) -> Deg1
         paste("DEGs_top",topdeg,"_",colnames(t5[[j]])[2] %>% gsub("p_","",.),"_",nrow(Deg1),".tsv",sep="") -> FileName0
         # network
         Deg1 %>% output(file.path(Path0,DirName1,FileName0))
@@ -744,7 +744,8 @@ ena <- function(
               Omicdataf1[sel,selCol] <- 25
             }
             #
-            1.1 -> enascoremin
+            # 1.1 -> enascoremin
+            1 -> enascoremin
             # Omicdataf1$GeneID -> GeneidList0
             # Omicdataf1$Symbol -> SymbolList0
             # NULL -> Ena0
@@ -1415,7 +1416,7 @@ ena <- function(
     MatHeatmap0 %>% unique -> MatHeatmap1
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %dopar%
-      {  
+      {
         # GenesetListsSymbol[[i]] -> symbollist
         # symbollist %>% annot(.,idtype = "SYMBOL") -> a0
         # a0$Symbol -> nodelist

@@ -19,7 +19,7 @@ omic(
   padj = "none",
   logratio = FALSE,
   dopattern = TRUE,
-  dovenn = FALSE,
+  dovenn = TRUE,
   docluster = TRUE,
   nc = c(2, 3, 6, 12),
   maxclusterheatmap = 5000,
@@ -68,7 +68,7 @@ omic(
 
 \item{annot}{data.frame annotation with Symbol column for functional analysis}
 
-\item{species}{character available species: bt ce dr dm gg hs mm pt rn ss xt}
+\item{species}{character available species: hs mm rn ss pt bt oa dr gg xt dm ce}
 
 \item{model}{character anova model factors (see details)}
 

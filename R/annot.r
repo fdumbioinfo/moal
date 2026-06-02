@@ -59,7 +59,8 @@ annot <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "
   }
   if(ortholog){ IdType <- "ORTHO"}
   # species check
-  ifelse( is.null(species), orthoinfo[[6]] -> Species0, orthoinfo %>% sapply("[[",1) %>% grep(species,.) %>% "[["(orthoinfo,.) -> Species0 )
+  # ifelse( is.null(species), orthoinfo[[6]] -> Species0, orthoinfo %>% sapply("[[",1) %>% grep(species,.) %>% "[["(orthoinfo,.) -> Species0 )
+  ifelse(is.null(species),orthoinfo %>% lapply("[",1) %>% unlist %>% "=="("hs") %>% which %>% orthoinfo[[.]] -> Species0,orthoinfo %>% sapply("[[",1) %>% grep(species,.) %>% "[["(orthoinfo,.) -> Species0 )
   #
   # NCBI GENE
   #

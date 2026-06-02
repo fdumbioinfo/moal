@@ -131,7 +131,7 @@ See omic function details to display all threshold
 }
 \examples{
 # not run
-# gsenain( omicdata , species = "mm")
+# ena( omicdata , species = "mm")
 }
 \author{
 Florent Dumont \href{mailto:florent.dumont@universite-paris-saclay.fr}{florent.dumont@universite-paris-saclay.fr}

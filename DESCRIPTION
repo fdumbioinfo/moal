@@ -1,28 +1,30 @@
 Package: moal
 Title: Multi Omic Analysis at Lab
-Version: 1.2.1
+Version: 1.2.2
 Authors@R: 
     person("Florent", "Dumont", , "florent.dumont@universite-paris-saclay.fr", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4439-5070"))
 Description: Multi Omic Analysis at Lab.
 License: GPL-3
 Depends: 
-    R (>= 4.3),
-    magrittr,
+    foreach,
     ggplot2,
-    igraph
+    igraph,
+    magrittr,
+    R (>= 4.3)
 Imports: 
     broom,
+    colourvalues,
     dendextend,
     doParallel,
     dplyr,
-    forcats,
     fgsea,
-    foreach,
+    forcats,
     ggforce,
     ggpubr,
-    gplots,
     ggrepel,
+    gplots,
+    graphics,
     grDevices,
     gridExtra,
     limma,
@@ -33,19 +35,18 @@ Imports:
     moalstringdbdr,
     moalstringdbhs,
     moalstringdbmm,
+    moalstringdboa,
     moalstringdbrn,
     moalstringdbss,
     parallel,
     plyr,
     Rgraphviz,
-    graphics,
     rlang,
     scales,
     stats,
     stringr,
     tidyselect,
-    utils,
-    colourvalues
+    utils
 Suggests: 
     knitr,
     rmarkdown
@@ -53,4 +54,4 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0
