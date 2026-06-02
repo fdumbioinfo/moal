@@ -19,7 +19,7 @@ omic(
   padj = "none",
   logratio = FALSE,
   dopattern = TRUE,
-  dovenn = TRUE,
+  dovenn = FALSE,
   docluster = TRUE,
   nc = c(2, 3, 6, 12),
   maxclusterheatmap = 5000,
