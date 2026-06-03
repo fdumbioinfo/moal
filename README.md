@@ -75,7 +75,7 @@ Zenodo repository: https://zenodo.org/records/15309968
 
 Release updates:
 
-1.2.2 03062026
+1.2.2
 
 Automatically annotate and make functional analysis when Ensembl or NCBI gene ID provided in first column of dat argument.
 Add functional analysis for ovis aries
