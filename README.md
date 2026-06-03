@@ -77,7 +77,7 @@ Release updates:
 
 1.2.2
 
-Automatically annotate and make functional analysis when Ensembl or NCBI gene ID provided in first column of dat argument.
+Automatically annotate and make functional analysis when Ensembl or NCBI gene ID provided in first column of dat argument
 
 annotation and functional analysis available for Homo sapiens, Mus musculus, Rattus norvegicus, Sus scrofa, Pan troglodytes, Bos taurus, Drosophila melanogaster, Caenorhabditis elegans
 
