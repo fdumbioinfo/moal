@@ -44,10 +44,12 @@ network <- function(
     "layout_in_circle","layout_on_grid","layout_on_sphere") -> Layout0
   Layout0[layout] -> Layout1
   # species selection
-  ifelse(
-    is.null(species),
-    orthoinfo[[6]] -> Species0,
-    orthoinfo %>% sapply("[[",1) %>% grep(species,.) %>% "[["(orthoinfo,.) -> Species0)
+  # ifelse(
+  #   is.null(species),
+  #   orthoinfo[[1]] -> Species0,
+  #   orthoinfo %>% sapply("[[",1) %>% grep(species,.) %>% "[["(orthoinfo,.) -> Species0)
+  if(is.null(species)){ "hs" -> species}
+  orthoinfo %>% sapply("[[",1) %>% grep(species,.) %>% "[["(orthoinfo,.) -> Species0
   # Nodes
   nodelist %>% as.character -> NodeList0
   nodelist %>% as.character -> NodeList1
