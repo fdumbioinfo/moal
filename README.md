@@ -79,7 +79,9 @@ Release updates:
 
 Automatically annotate and make functional analysis when Ensembl or NCBI gene ID provided in first column of dat argument.
 
-Add functional analysis for ovis aries
+annotation and functional analysis available for: 
+
+   Homo sapiens, Mus musculus, Rattus norvegicus, Sus scrofa, Pan troglodytes, Bos taurus, Drosophila melanogaster, Caenorhabditis elegans
 
 annot argument data.frame can have different number of row compare to dat data.frame
 
