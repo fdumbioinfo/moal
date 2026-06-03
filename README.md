@@ -78,7 +78,9 @@ Release updates:
 1.2.2
 
 Automatically annotate and make functional analysis when Ensembl or NCBI gene ID provided in first column of dat argument.
+
 Add functional analysis for ovis aries
+
 annot argument can have different number of row compare to dat.
 
 1.2.1
