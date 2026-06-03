@@ -81,7 +81,7 @@ Automatically annotate and make functional analysis when Ensembl or NCBI gene ID
 
 Add functional analysis for ovis aries
 
-annot argument can have different number of row compare to dat.
+annot argument data.frame can have different number of row compare to dat data.frame
 
 1.2.1
 
