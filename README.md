@@ -110,7 +110,9 @@ Test omic function witout data to simulate random analysis
 
 Change annot function name to annotdb
 
-Automatically annot when dat matrix first column contains Ensembl gene or NCBI gene ID 
+Automatically annot when dat matrix first column contains Ensembl gene or NCBI gene ID
+
+Automatically join data and annotation tables (so could have different row numbers)
 
 1.2.2
 
