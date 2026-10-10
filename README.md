@@ -20,32 +20,32 @@ Workflow summary:
 # Install moal
 if(!require("moal",quietly=TRUE)){source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-moal-install-r-universe.r")}
 if(!require("data.table",quietly=TRUE)){install.packages("data.table")}
+#
 # Test omic() 
 library(moal)
 ??moal::omic
-# output directory
+# create output directory
 if(!file.exists("1-omic-outputdata")){"1-omic-outputdata" %>% dir.create}
+#
 # loading data
 # normalized expression data
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_datanorm_22_23786.tsv" -> url
 data.table::fread(url) %>% data.frame -> dat
 dat %>% head
-# loading sample information file
+# sample information file
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_metadata_4_22.tsv" -> url
 data.table::fread(url) %>% data.frame -> sif
 sif %>% head
-# Ordering factors for pairwise comparison fold-changes
+# Ordering factors levels for fold-changes
 sif$ANEUPLOIDY %>% ordered(c("Control","T13","T18","T21")) -> sif$ANEUPLOIDY
 sif$TISSUE %>% as.factor -> sif$TISSUE
 # create annotation
 dat$rowID %>% annotdb(species = "hs", idtype = "GENE", dboutput = "ncbi") -> annot
 annot %>% head
-annot %>% str
 annot %>% dplyr::select(GeneID,Symbol) -> annot
 annot %>% head
-# omic analysis with MSigDB GSEA functional analysis
-dat %>% data.frame -> dat
-sif %>% data.frame -> sif
+#
+# omic data biostatistical analysis and MSigDB GSEA functional analysis
 "1-omic-outputdata" -> path
 "GSE65055" -> dirname
 NULL -> sample
