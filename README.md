@@ -14,7 +14,7 @@ source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-mo
 ```
 
 
-<b>Test moal::omic() workflow:</b>
+<b>Install moal and test omic() function workflow:</b>
 
 ```r
 # -----
@@ -23,9 +23,10 @@ source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-mo
 # date: 10-10-2026
 # -----
 #
-# libraries
+# Install moal
 if(!require("moal",quietly=TRUE)){source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-moal-install-r-universe.r")}
 if(!require("data.table",quietly=TRUE)){install.packages("data.table")}
+# Test omic() 
 library(moal)
 ??moal::omic
 # output directory
@@ -98,6 +99,14 @@ bioRxiv preprint: https://doi.org/10.1101/2023.10.17.562686
 Zenodo repository: https://zenodo.org/records/15309968
 
 Release updates:
+
+1.2.3
+
+Add replacena function to replace NA or 0 value matrix by background noise distribution
+Add normalization metho to norm function
+Test omic function witout data to simulate random analysis
+Change annot function name to annotdb
+Automatically annot when dat matrix first column contains Ensembl gene or NCBI gene ID 
 
 1.2.2
 
