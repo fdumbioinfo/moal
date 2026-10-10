@@ -18,10 +18,9 @@ source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-mo
 
 ```r
 # -----
-# UMS IPSIT BIOINFO - Licence GPL-3
-# https://github.com/fdumbioinfo/moal
-# title: moal omic() demo
-# date: 11-12-2025
+# Paris-Saclay - GPL3 - https://github.com/fdumbioinfo/moal
+# title: title
+# date: 29-09-2026
 # -----
 #
 # libraries
