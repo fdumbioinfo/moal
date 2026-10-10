@@ -44,7 +44,7 @@ sif %>% head
 sif$ANEUPLOIDY %>% ordered(c("Control","T13","T18","T21")) -> sif$ANEUPLOIDY
 sif$TISSUE %>% as.factor -> sif$TISSUE
 # create annotation
-dat$rowID %>% annotdb(species ="hs", idtype = "GENE", dboutput = "ncbi") -> annot
+dat$rowID %>% annotdb(species = "hs", idtype = "GENE", dboutput = "ncbi") -> annot
 annot %>% head
 annot %>% str
 annot %>% dplyr::select(GeneID,Symbol) -> annot
@@ -52,7 +52,37 @@ annot %>% head
 # omic analysis with MSigDB GSEA functional analysis
 dat %>% data.frame -> dat
 sif %>% data.frame -> sif
-moal::omic(dat=dat,sif=sif,annot=annot,species="hs",model="ANEUPLOIDY",batch="TISSUE",dirname="GSE65055",path="1-omic-outputdata")
+"1-omic-outputdata" -> path
+"GSE65055" -> dirname
+NULL -> sample
+#
+omic(
+  #
+  # input
+  dat = dat , sif = sif,
+  annot = annot, species = "hs",
+  #
+  # anova model
+  model = "ANEUPLOIDY", padj = "none", anovafc = "anovafc",
+  batch = "TISSUE", 
+  # paired = NULL,
+  #
+  # anova all filtering
+  # threshold = c(1, 2, 3, 4, 9, 10, 11, 12),
+  dovenn = T, docluster = T, dopattern = T,
+  #
+  # plot
+  doheatmap = T, dovolcanoplot = T, dolineplot = T, doboxplotrow = T,
+  #
+  # functional analysis doena for GSEA and doenaora for ORA significant feature lists
+  doena = T, doenaora = F, gmtfiles = NULL,
+  dotopheatmap = T, dotopgenesetheatmap = T, dogmtgenesetheatmap = F, 
+  dotopnetwork = T, dotopgenesetnetwork = F, dogmtgenesetnetwork = F, 
+  # 
+  # other par
+  path = path, dirname = dirname, sample = sample,
+  # parallelisation
+  dopar = T, nbcore = NULL, liblocpath = NULL, savehistory = T )
 #
 ```
 Same script in one command line:
