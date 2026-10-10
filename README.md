@@ -103,9 +103,13 @@ Release updates:
 1.2.3
 
 Add replacena function to replace NA or 0 value matrix by background noise distribution
+
 Add normalization metho to norm function
+
 Test omic function witout data to simulate random analysis
+
 Change annot function name to annotdb
+
 Automatically annot when dat matrix first column contains Ensembl gene or NCBI gene ID 
 
 1.2.2
