@@ -73,7 +73,7 @@ omic(
   dotopheatmap = T, dotopgenesetheatmap = T, dogmtgenesetheatmap = F, 
   dotopnetwork = T, dotopgenesetnetwork = F, dogmtgenesetnetwork = F, 
   # 
-  # other par
+  # output
   path = path, dirname = dirname, sample = sample,
   # parallelisation
   dopar = T, nbcore = NULL, liblocpath = NULL, savehistory = T )
