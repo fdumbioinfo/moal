@@ -61,7 +61,7 @@ omic(
   batch = "TISSUE", 
   # paired = NULL,
   #
-  # anova all filtering
+  # anova filters
   # threshold = c(1, 2, 3, 4, 9, 10, 11, 12),
   dovenn = T, docluster = T, dopattern = T,
   #
