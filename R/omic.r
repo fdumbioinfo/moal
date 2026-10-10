@@ -32,6 +32,7 @@
 #' @param nc numeric number of clusters to cut in dendrogramm
 #' @param maxclusterheatmap numeric max row for cluster analysis
 #' @param padj character fdr by defaut for Benjamini-Hochberg false discovery correction
+#' @param anovafc character fold-change calculate with anova model (by default) use meanfc or meanfcdelog
 #' @param logratio logical change fc (by default) in log2ratio
 #' @param doheatmap logical do heatmaps for all lists
 #' @param heatmapcluster character row clustering only by default both accepted 
@@ -42,11 +43,13 @@
 #' @param dolineplot logical do lineplot for significant features
 #' @param doboxplotrow logical do boxplot for significant features with Kruskal
 #' @param doena logical msigdb enrichement analysis using gsea method without filtering
-#' @param gsearank character to choose gsea rank type among fc (by default) logration logfc sqrt
-#' @param gseatail character to choose gsea twotail (by default) or onetail
+#' @param gsearank character gsea rank type among logfc (by default) logration fc sqrt
+#' @param gseatail character gsea twotail test (by default) or onetail
 #' @param topdeg numeric top DEGs number to plot on network
 #' @param topena numeric top geneset for ena plot
 #' @param doenaora logical msigdb enrichement analysis using ora method for diff list
+#' @param maxenaoralist numeric max diff list size to do enrichment analysis with ora fir diff list
+#' @param minenaoralist numeric max diff list size to do enrichment analysis with ora fir diff list
 #' @param gmtfiles character gmt files list path
 #' @param layout numeric for layout neetwork 1 fr by default 2 dh 3 tree 4 circle 5 grid 6 sphere
 #' @param mings numeric minimal size of a gene set
@@ -64,7 +67,11 @@
 #' @param filtergeneset character regular expression to filter collection geneset (e.g. "reactome|tft")
 #' @param sample numeric analysis using random subset
 #' @param seed numeric seed for random function
-#' @param dopar numeric core number
+#' @param dopar logical if TRUE do parallel computation
+#' @param nbcore numerical core number all available core if NULL
+#' @param liblocpath character path to R local library if need
+#' @param savehistory logical save r session history
+#' @param nrowsim numeric row number for normal distribution simulate matrix analysis 
 #' @param path character results directory path
 #' @param dirname character results directory name
 #' @param zip logical compress results directory if TRUE
@@ -135,7 +142,7 @@
 #' @importFrom ggplot2 ggsave
 #' @importFrom grDevices pdf graphics.off
 #' @importFrom foreach foreach %dopar% %do%
-#' @importFrom parallel makeCluster stopCluster detectCores
+#' @importFrom parallel makeCluster stopCluster detectCores clusterCall
 #' @importFrom doParallel registerDoParallel stopImplicitCluster
 #' @importFrom limma removeBatchEffect
 #' @importFrom stats model.matrix setNames p.adjust
@@ -146,15 +153,16 @@
 omic <- function(
   dat = NULL, sif = NULL, annot = NULL, species = "hs",
   model = NULL, paired = NULL, nested = NULL, batch = NULL , addfactor = NULL,
-  doqc = TRUE, threshold = c(1,2,3,4,9,10,11,12) , padj = "none", logratio = FALSE,
-  dopattern = TRUE, dovenn = FALSE, docluster = TRUE, nc = c(2,3,6,12), maxclusterheatmap = 5000,
+  doqc = TRUE, threshold = c(1,2,3,4,9,10,11,12) , padj = "none", anovafc = "anovafc", logratio = FALSE,
+  dopattern = TRUE, dovenn = TRUE, docluster = TRUE, nc = c(2,3,6,12), maxclusterheatmap = 5000,
   doheatmap = TRUE, heatmapcluster = "row", maxheatmap = 2000, minheatmap = 3,
   dovolcanoplot = TRUE, nbgenevolc = 5, dolineplot = TRUE, doboxplotrow = TRUE,
-  doena = TRUE, gsearank = "logfc", gseatail = "twotail",topdeg = 100 , topena = 50, doenaora = FALSE, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
+  doena = TRUE, gsearank = "logfc", gseatail = "twotail",topdeg = 100 , topena = 50,
+  doenaora = FALSE, maxenaoralist = 2000, minenaoralist = 5, gmtfiles = NULL, filtergeneset = NULL, bg = 25000,
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 700, overlapmin = 2, addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = TRUE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
-  crosscompint = FALSE, sample = NULL , seed = 123679, dopar = NULL,
+  crosscompint = FALSE, sample = NULL , seed = 123679, dopar = TRUE, nbcore = NULL, nrowsim = 2000, liblocpath = NULL, savehistory = TRUE,
   path = ".", dirname = NULL, zip = FALSE, remove = FALSE )
 {
   Sys.time() -> start
@@ -173,17 +181,20 @@ omic <- function(
   {
     rep(c("T0","T1","T2"),5) %>% as.factor -> TREATMENT
     paste("s",1:15,sep="") -> SampleID
-    paste(SampleID,TREATMENT,sep="") -> SampleName
+    paste(SampleID,TREATMENT,sep="_") -> SampleName
     data.frame(SampleID,TREATMENT,SampleName) -> sif
     set.seed(seed)
-    rnorm(15*2000,20,4) %>% matrix(ncol=15,nrow=2000) -> Dat0
+    rnorm(15*nrowsim,20,4) %>% matrix(ncol=15,nrow=nrowsim) -> Dat0
     Dat0 %>%"<"(.,0) %>% which %>% length
     Dat0 %>% min -> Min0
     Dat0 %>% "+"(Min0) -> Dat1
-    Dat1 %>% data.frame(rowID=paste("rowID",1:2000,sep=""),.) %>% setNames(c("rowID",sif$SampleName)) -> Dat2 
+    Dat1 %>% data.frame(rowID=paste("rowID",1:nrowsim,sep=""),.) %>% setNames(c("rowID",sif$SampleName)) -> Dat2 
     Dat2 -> dat
     rm(Dat2)
     "TREATMENT" -> model
+    dat$rowID %>% data.frame(rowID=.) -> annot
+    # doena <- FALSE ; doenaora <- FALSE ; dopattern <- FALSE
+    doena <- FALSE ; doenaora <- FALSE
   }
   ### dat
   colnames(dat)[1] <- "rowID"
@@ -191,17 +202,24 @@ omic <- function(
   ### annot
   if(is.null(annot))
   { 
-    dat[,1] %>% as.character %>% moal::annot(species=species) -> annot
+    dat[,1] %>% as.character %>% annotdb(species=species) -> annot
+    colnames(annot)[1] <- "rowID"
     if(annot$Symbol %>% is.na %>% all)
     {
       dat[,1] %>% as.character %>% data.frame("rowID"=.,"Symbol"=.,stringsAsFactors=F) -> Annot0
       doena <- FALSE ; doenaora <- FALSE  
     }else
       { 
-        annot$Symbol %>% grep("^row",.) -> sel
-        if(length(sel)>0){ annot$Symbol[sel] <- annot$rowID[sel] ; annot %>% dplyr::select(.data$rowID,.data$GeneID) }
+        annot$Symbol %>% grep("^row",.) -> selR
+        # if(length(sel)>0){ annot$Symbol[sel] <- annot$rowID[sel] ; annot %>% dplyr::select(.data$rowID,.data$GeneID) }
+        if(length(selR)>0){ annot$Symbol[selR] <- annot$rowID[selR] }
+        #
+        annot$Symbol %>% is.na %>% which -> selNA
+        # if(length(sel)>0){ annot$Symbol[sel] <- annot$rowID[sel] ; annot %>% dplyr::select(.data$rowID,.data$GeneID) }
+        if(length(selNA)>0){ annot$Symbol[selNA] <- annot$rowID[selNA] }
       }
   }
+  #
   if(!is.null(annot) & all(colnames(annot)!="Symbol"))
   {
     colnames(annot)[1] <- "rowID"
@@ -210,6 +228,7 @@ omic <- function(
     annot %>% cbind("Symbol"=dat[,1] %>% as.character) -> Annot0
     doena <- FALSE ; doenaora <- FALSE 
   }
+  #
   if(!is.null(annot) & any(colnames(annot)=="Symbol"))
   {
     colnames(annot)[1] <- "rowID"
@@ -222,8 +241,8 @@ omic <- function(
     # NCBI annotation
     if(any(colnames(annot)=="GeneID")){annot %>% dplyr::select(-.data$GeneID) -> annot}
     Symbol -> symbollist
-    Symbol %>% annot(species=species) -> AnnotEnaSpecies
-    AnnotEnaSpecies %>% setNames( c("Symbol","GeneID","descriptionNCBI","chromoseNCBI","GeneTypeNCBI","SpeciesNCBI","SynonymsNCBI") ) -> AnnotEnaSpecies
+    Symbol %>% annotdb(species=species) -> AnnotEnaSpecies
+    AnnotEnaSpecies %>% setNames(c("Symbol","GeneID","descriptionNCBI","chromoseNCBI","GeneTypeNCBI","SpeciesNCBI","SynonymsNCBI")) -> AnnotEnaSpecies
     data.frame( rowID = Annot0$rowID %>% as.character , AnnotEnaSpecies , Annot0 %>% dplyr::select( -.data$rowID , -.data$Symbol ) ) -> Annot0
   }
   ### subset sample
@@ -452,28 +471,47 @@ omic <- function(
     #
     paste("anova processing...\n",sep="") %>% cat
     # dopar
-    if(is.null(dopar)){ parallel::detectCores() -> NbCore }else{ parallel::detectCores()/dopar -> NbCore }
-    parallel::makeCluster(NbCore) -> cl ; doParallel::registerDoParallel(cl)
+    # if(is.null(dopar)){ parallel::detectCores() -> NbCore }else{ parallel::detectCores()/dopar -> NbCore }
+    # if(is.null(dopar)){ parallel::detectCores() -> NbCore }else{ dopar -> NbCore }
+    # parallel::makeCluster(NbCore) -> cl ; doParallel::registerDoParallel(cl)
+    #
+    if(dopar)
+    {
+      # parallel::detectCores() -> NbCore
+      if(!is.null(nbcore)){nbcore -> NbCore}else{parallel::detectCores() -> NbCore}
+      parallel::makeCluster(NbCore) -> cl
+      if(!is.null(liblocpath)){parallel::clusterCall(cl,function(libs){.libPaths(c(libs,.libPaths()))},liblocpath)}
+      doParallel::registerDoParallel(cl)
+    }else{ foreach::registerDoSEQ() }
     ### anova
-    All0 <- foreach(i=1:nrow(dat),.packages=c("moal","magrittr","dplyr","broom"),.combine=rbind) %dopar%
-      { anova( dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=dat[i,-1] %>% as.numeric,.), model=model,logratio=logratio ) %>% unlist }
+    All0 <- foreach(i=1:nrow(dat),.packages=c("moal","magrittr","dplyr","foreach","broom"),.combine=rbind) %dopar%
+      { 
+        anova(
+          dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=dat[i,-1] %>% as.numeric,.),
+          model=model,logratio=logratio,anovafc=anovafc) %>% unlist
+      }
     # anovastat data
     All0 %>% colnames %>% grep("(Sumsq_|Meansq_|Fratio)",.,value=F ) -> sel
     All0 %>% as.data.frame %>% dplyr::select(all_of(sel)) %>%
       data.frame("rowID"=dat[,1] %>% as.character,.,stringsAsFactors=F) -> Allstat0
     All0 %>% as.data.frame %>% dplyr::select(-all_of(sel)) -> All
     ### anova RBE to compute fold-change
-    if(RBE)
+    # if(RBE)
+    if(RBE & !is.null(batch))
     {
       AllRbe <- foreach(i=1:nrow(DatRbe),.packages=c("moal","magrittr","dplyr","broom"),.combine=rbind) %dopar%
-        { anova( dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=DatRbe[i,-1] %>% as.numeric,.), model=model,logratio=logratio ) %>% unlist }
+        { 
+          anova(
+            dat = sif %>% dplyr::select(AnovaFactors) %>% data.frame(y=DatRbe[i,-1] %>% as.numeric,.),
+            model=model,logratio=logratio,anovafc=anovafc) %>% unlist
+        }
       # anovastat data RBE
-      AllRbe %>% colnames %>% grep("(Sumsq_|Meansq_|Fratio)",.,value=F ) -> sel
+      # AllRbe %>% colnames %>% grep("(Sumsq_|Meansq_|Fratio)",.,value=F ) -> sel
       # AllRbe %>% as.data.frame %>% dplyr::select(all_of(sel)) %>%
       #   data.frame("rowID"=dat[,1] %>% as.character,.,stringsAsFactors=F) -> AllstatRbe0
       AllRbe %>% as.data.frame %>% dplyr::select(-all_of(sel)) -> AllRbe
       AllRbe %>% colnames %>% grep("^fc_",.) -> selRbe
-      All[,selRbe] <- AllRbe[,selRbe] 
+      All[,selRbe] <- AllRbe[,selRbe]
     }
     # remove cross comparisons for interaction factor 
     if(INTERACTION & !crosscompint)
@@ -558,7 +596,8 @@ omic <- function(
     #   paste("anovastat all RBE done. \n",sep="") %>% cat
     # }
     ### RBE
-    if(RBE){DatRbe -> dat}
+    # if(RBE){DatRbe -> dat}
+    if(RBE){dat -> datnoRBE ; DatRbe -> dat}
   }
   # ----
   # 4 - filter
@@ -568,6 +607,7 @@ omic <- function(
     dovenn <- F ; docluster <- F ; doheatmap <- F ;
     dolineplot <- F ;  doboxplotrow <- F ; dovolcanoplot <- F ; doenaora <- FALSE 
   }
+  #
   if(!is.null(threshold))
   {
     ifelse(threshold == "all", 1:length(thresholdlist) -> Threshold0, threshold -> Threshold0) 
@@ -739,13 +779,12 @@ omic <- function(
     Path %>% list.dirs(recursive=F) -> d0
     d0 %>% basename %>% grep("^DiffLists",.) %>% d0[.] -> d1
     d1 %>% basename %>% sub("^.*_(.*)","\\1",.) -> FactorVenn0
-    FactorVenn0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") %>%
-      grep(colnames(sif)) %>% dplyr::select(sif,.) -> FactorVenn1
+    FactorVenn0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") %>% grep(colnames(sif)) %>% dplyr::select(sif,.) -> FactorVenn1
     # check if more than 2 levels in factors
     FactorVenn1 %>% lapply(levels) %>% lapply(length) %>% ">"(.,2) %>% which -> sel
     if(length(sel) > 0){ FactorVenn1[sel] -> FactorVenn2 ; dovenn <- T }else{ dovenn <- F }
     if(UNBALANCED){ dovenn <- F }
-    paste( "Venn preprocessing done.\n", sep="" ) %>% cat
+    paste("Venn preprocessing done.\n",sep="") %>% cat
   }
   # venn processing
   if(dovenn)
@@ -1100,31 +1139,28 @@ omic <- function(
   {
     paste("Cluster analysis processing...\n",sep="") %>% cat
     Path %>% file.path("cluster") %>% dir.create
-    foreach( i=1:length(statList1),.packages=c("magrittr","moal","dplyr","foreach") ) %dopar%
+    foreach(i=1:length(statList1),.packages=c("magrittr","moal","dplyr","foreach","gplots")) %dopar%
       {
         statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% length -> Nb0
-        statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0-1) %>% sub("(.*)_.*" , "\\1" , . ) %>%
+        statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0-1) %>% sub("(.*)_.*","\\1",.) %>%
           paste("_",statList1[[i]][[1]] %>% strsplit("\\/") %>% unlist %>% "["(Nb0) , sep = "" ) -> DirName
         # create list for Symbol and output
-        statList1[[i]][[2]] %>%
-          data.frame( "rowID" = . , stringsAsFactors = F ) %>%
-          inner_join( r0 , by = "rowID" ) -> r1
+        statList1[[i]][[2]] %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(r0,by="rowID") -> r1
         # factor for heatmap
         DirName %>% strsplit("_") %>% unlist %>% length -> Nb0
         DirName %>% strsplit("_") %>% unlist %>% "["(Nb0-1) -> ClusterFactor0
-        ClusterFactor0 %>% paste("^" , . , "$" , sep = "" ) -> grep
-        sif %>% colnames %>% grep( grep , . ) %>% sif[ , . ] -> ClusterFactor1
+        ClusterFactor0 %>% paste("^",.,"$",sep="") -> grep
+        # sif %>% colnames %>% grep(grep,.) %>% sif[,.] -> ClusterFactor1
+        sif %>% colnames %>% grep(grep,.) %>% dplyr::select(sif,.) %>% unlist -> ClusterFactor1
         # matrix data
-        statList1[[i]][[2]] %>%
-          data.frame( "rowID" = . , stringsAsFactors = F ) %>%
-          inner_join( dat , by = "rowID" ) -> Dat2
+        statList1[[i]][[2]] %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(dat,by="rowID") -> Dat2
         # clustering
-        Dat2 %>% hcluster( Symbol=r1$Symbol, factor=ClusterFactor1 , nc=nc,
-                           path=Path %>% file.path("cluster"), dirname=DirName )
+        # Dat2=dat;Symbol=r1$Symbol;factor=ClusterFactor1;nc=nc;path=Path %>% file.path("cluster");dirname=DirName
+        Dat2 %>% hcluster(Symbol=r1$Symbol,factor=ClusterFactor1,nc=nc,path=Path %>% file.path("cluster"),dirname=DirName)
         # output
-        DirName %>% strsplit("_") %>% unlist %>% "["(c(2:4)) %>% paste0(collapse = "_") %>%
-          paste( "List_",.,"_cluster_",nrow(r1),".tsv" , sep = "" ) -> FileName
-        Path %>% file.path( "cluster" , DirName , FileName ) %>% output( r1 , . )
+        DirName %>% strsplit("_") %>% unlist %>% "["(c(2:4)) %>% paste0(collapse="_") %>%
+          paste("List_",.,"_cluster_",nrow(r1),".tsv",sep="") -> FileName
+        Path %>% file.path("cluster",DirName,FileName) %>% output(r1,.)
       }
     # annotations
     Path %>% file.path("cluster") %>% list.files(recursive = T ,full.names = T) -> l0
@@ -1148,13 +1184,12 @@ omic <- function(
     d1 %>% list.files(recursive=T,full.names=T) -> l0
     l0 %>% basename %>% grep("^List_.*.tsv",.) %>% l0[.] -> l0
     l0 %>% basename %>% sub("^List_.*_(.*).tsv$","\\1",.) %>% as.numeric %>% ">="(.,minheatmap) %>% which -> sel
-    if( length(sel) > 0 ){ l0[sel] -> l1 }else{ heatmap <- FALSE }
+    if( length(sel) > 0 ){ l0[sel] -> l1 }else{ doheatmap <- FALSE ; paste("Not enough significant rows to make heatmap \n",sep="") %>% cat }
     if(doheatmap)
     {
       # if( is.null(maxheatmap) ){ maxheatmap <- nrow(dat)}
       l1 %>% basename %>% sub( "^List_.*_(.*).tsv$", "\\1",. ) %>% as.numeric %>% "<="(.,maxheatmap) %>% which -> sel
-      if(length(sel)>0){ l1[sel] -> l2 }else
-        { doheatmap <- FALSE ; paste("Not enough rows to make heatmap \n",sep="") %>% cat }
+      if(length(sel)>0){ l1[sel] -> l2 }else{ doheatmap <- FALSE ; paste("Not enough significant rows to make heatmap \n",sep="") %>% cat }
     }
     paste("Heatmap preprocessing done.\n",sep = "") %>% cat
   }
@@ -1276,25 +1311,27 @@ omic <- function(
   if(UNBALANCED){ dolineplot <- FALSE }
   if(dolineplot)
   {
-    paste( "Line plot processing...\n" , sep = "" ) %>% cat
-    Path %>% list.dirs(recursive = F) -> d0
-    d0 %>% basename %>% grep("^DiffLists_" , . ) %>% d0[.] -> d1
-    d1 %>% list.files( recursive = T , full.names = T ) -> l0
-    l0 %>% basename %>% grep("^List_.*.tsv" , . , value = F ) %>% l0[.] -> l1
-    l1 %>% basename %>% sub( "List_.*_(.*).tsv" , "\\1" , .  ) %>%
-      as.numeric %>% ">"(.,0) %>% which %>% l1[.] -> l2
-    if( length(l2)==0 ){ dolineplot <- FALSE ; paste("No significant feature for lineplot done.\n",sep="") %>% cat }
+    paste("Line plot processing...\n",sep="") %>% cat
+    Path %>% list.dirs(recursive=F) -> d0
+    d0 %>% basename %>% grep("^DiffLists_",.) %>% d0[.] -> d1
+    d1 %>% list.files(recursive=T,full.names=T) -> l0
+    l0 %>% basename %>% grep("^List_.*.tsv",.,value=F) %>% l0[.] -> l1
+    # l1 %>% basename %>% sub("List_.*_(.*).tsv","\\1",.) %>% as.numeric %>% ">"(.,0) %>% which %>% l1[.] -> l2
+    l1 %>% basename %>% sub("List_.*_(.*).tsv","\\1",.) %>% as.numeric %>% ">"(.,0) %>% which -> sellineplot 
+    # if( length(l2)==0 ){ dolineplot <- FALSE ; paste("No significant feature for lineplot done.\n",sep="") %>% cat }
+    if(length(sellineplot) < 1){ dolineplot <- FALSE ; paste("No significant feature for lineplot\n",sep="") %>% cat }else{ l1[sellineplot] -> l2 }
+    if(RBE){ datnoRBE -> datLineplot}else{ dat -> datLineplot }
     if(dolineplot)
     {
-      ll1 <- foreach( i=1:length(l2), .packages=c("magrittr","dplyr") ) %dopar%
-        { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
+      ll1 <- foreach(i=1:length(l2),.packages=c("magrittr","dplyr")) %dopar% { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
       ll1 %>% unlist %>% as.character %>% unique -> ll2
       # only for symbol in line plot
-      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(r0, by="rowID") -> r1
-      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(dat, by="rowID") -> Dat2
+      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(r0,by="rowID") -> r1
+      # ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(dat,by="rowID") -> Dat2
+      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(datLineplot,by="rowID") -> Dat2
       paste("lineplot_",nrow(Dat2),sep="") -> DirName
       Path %>% file.path(DirName) %>% dir.create
-      foreach( i=1:length(CompFactors) ) %do%
+      foreach(i=1:length(CompFactors)) %do%
         {
           Path %>% file.path( DirName , CompFactors[i] ) %>% dir.create
           CompFactors[i] -> CompFactors0
@@ -1307,9 +1344,9 @@ omic <- function(
               Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
               CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
               sif %>% colnames %>% grep(grep, ., value=FALSE) %>% sif[,.] -> Sif0
-              Sif0 %>% data.frame( y=Dat2[j,-1] %>% as.numeric, . ) -> Sif1
-              dplot( dat=Sif1, title=r1$Symbol[j],log = T ) -> p0
-              ggsave( plot=p0, filename=FileName )
+              Sif0 %>% data.frame(y=Dat2[j,-1] %>% as.numeric,.) -> Sif1
+              dplot(dat=Sif1,title=r1$Symbol[j],log=F) -> p0
+              ggsave(plot=p0,filename=FileName)
             }
         }
       paste("Lineplot done.\n",sep="") %>% cat
@@ -1321,21 +1358,23 @@ omic <- function(
   if(doboxplotrow)
   {
     paste( "boxplot processing...\n" , sep = "" ) %>% cat
-    Path %>% list.dirs(recursive = F) -> d0
-    d0 %>% basename %>% grep("^DiffLists_" , . ) %>% d0[.] -> d1
-    d1 %>% list.files( recursive = T , full.names = T ) -> l0
-    l0 %>% basename %>% grep("^List_.*.tsv" , . , value = F ) %>% l0[.] -> l1
-    l1 %>% basename %>% sub( "List_.*_(.*).tsv" , "\\1" , .  ) %>%
-      as.numeric %>% ">"(.,0) %>% which %>% l1[.] -> l2
-    if( length(l2)==0 ){ doboxplotrow <- FALSE ; paste("No significant feature for boxplot done.\n",sep="") %>% cat }
+    Path %>% list.dirs(recursive=F) -> d0
+    d0 %>% basename %>% grep("^DiffLists_",.) %>% d0[.] -> d1
+    d1 %>% list.files(recursive=T,full.names=T) -> l0
+    l0 %>% basename %>% grep("^List_.*.tsv",.,value=F) %>% l0[.] -> l1
+    # l1 %>% basename %>% sub( "List_.*_(.*).tsv","\\1",. ) %>% as.numeric %>% ">"(.,0) %>% which %>% l1[.] -> l2
+    l1 %>% basename %>% sub("List_.*_(.*).tsv","\\1",.) %>% as.numeric %>% ">"(.,0) %>% which -> selboxplot
+    # if( length(l2)==0 ){ doboxplotrow <- FALSE ; paste("No significant feature for boxplot done.\n",sep="") %>% cat }
+    if(length(selboxplot) < 1){ doboxplotrow <- F ; paste("No significant feature for boxplot \n",sep="") %>% cat }else{ l1[selboxplot] -> l2 }
+    if(RBE){ datnoRBE -> datboxplot}else{ dat -> datboxplot }
     if(doboxplotrow)
     {
       ll1 <- foreach( i=1:length(l2), .packages=c("magrittr","dplyr") ) %dopar%
         { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
       ll1 %>% unlist %>% as.character %>% unique -> ll2
       # only for symbol in line plot
-      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(r0, by="rowID") -> r1
-      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(dat, by="rowID") -> Dat2
+      ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(r0, by="rowID") -> r1
+      ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(datboxplot, by="rowID") -> Dat2
       paste("boxplot_",nrow(Dat2),sep="") -> DirName
       Path %>% file.path(DirName) %>% dir.create
       foreach( i=1:length(CompFactors) ) %do%
@@ -1349,7 +1388,7 @@ omic <- function(
               paste("boxplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileName
               Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
               CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
-              sif %>% colnames %>% grep(grep, ., value=FALSE) %>% sif[,.] -> Sif0
+              sif %>% colnames %>% grep(grep, ., value=F) %>% sif[,.] -> Sif0
               Sif0 %>% data.frame( y=Dat2[j,-1] %>% as.numeric, . ) -> Sif1
               boxplot1( dat=Sif1 , xlab =CompFactors[i], ylab = r1$Symbol[j], log = F) -> p0
               ggsave( plot=p0, filename=FileName )
@@ -1396,7 +1435,7 @@ omic <- function(
         ena(
           omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
           filtergeneset=filtergeneset,dotopnetwork=dotopnetwork,dotopheatmap=dotopnetwork,
-          doena=doena,gsearank=gsearank,gseatail=gseatail,topdeg=topdeg,topena=topena,layout=layout,
+          doena=T,gsearank=gsearank,gseatail=gseatail,topdeg=topdeg,topena=topena,layout=layout,
           mings=mings,maxgs=maxgs,overlapmin=overlapmin,addenarankbarplot=addenarankbarplot,bg=bg,
           dotopgenesetnetwork=dotopgenesetnetwork,dotopgenesetheatmap=dotopgenesetheatmap,
           dogmtgenesetnetwork=dogmtgenesetnetwork,dogmtgenesetheatmap=dogmtgenesetheatmap,
@@ -1407,31 +1446,33 @@ omic <- function(
   #
   # ORA
   #
-  if(doena & doenaora)
+  # if(doena & doenaora)
+  if(doenaora)
   {
     paste("#\n") %>% cat
     paste("ORA Functional analysis :\n") %>% cat
     paste("ena preprocessing...\n") %>% cat
     #
-    Path %>% list.dirs(recursive = F) -> d0
+    Path %>% list.dirs(recursive=F) -> d0
     # Lists
     if(INTERACTION){ CompFactors[3] -> FactorEna0 }else{ CompFactors[1] -> FactorEna0 }
     paste("^DiffLists_",FactorEna0,sep="") -> GrepFactorEna
     d0 %>% basename %>% grep(GrepFactorEna, .) %>% d0[.] -> d1
-    d1 %>% lapply(list.files,recursive=T, full.names=T ) %>% unlist -> l0
+    d1 %>% lapply(list.files,recursive=T,full.names=T) %>% unlist -> l0
     l0 %>% basename %>% grep("^List_p.*.*.tsv", .) %>% l0[.] -> l1
-    l1 %>% basename %>% sub("^List_.*_(.*).tsv$", "\\1", .) %>% as.numeric %>% ">="(.,5) %>% which -> sel
-    if( length(sel) > 0 ){ l1[sel]-> l1 }
-    l1 %>% basename %>% sub("^List_.*_(.*).tsv$", "\\1", .) %>% as.numeric %>% "<"(.,2000) %>% which -> sel
-    if( length(sel) > 0 ){ l1[sel]-> l1 }
-    if(length(l1) > 0){ doenaora <- TRUE }else{ doenaora <- FALSE }
+    l1 %>% basename %>% sub("^List_.*_(.*).tsv$","\\1",.) %>% as.numeric %>% ">="(.,minenaoralist) %>% which -> sel
+    if(length(sel) > 0){ l1[sel]-> l1 }
+    l1 %>% basename %>% sub("^List_.*_(.*).tsv$","\\1",.) %>% as.numeric %>% "<"(.,maxenaoralist) %>% which -> sel
+    if(length(sel) > 0){ l1[sel]-> l1 }
+    if(length(l1) > 0){ doenaora <- T }else{ doenaora <- F }
+    #
     if(doenaora)
     {
       Path %>% file.path("ena_DiffList") -> PathEna
       PathEna %>% dir.create
       threshold %>% min -> thresholdEna0
       #
-      foreach(i=1:length(l1), .packages=c("magrittr","dplyr","moal")) %dopar%
+      foreach(i=1:length(l1),.packages=c("magrittr","dplyr","moal")) %dopar%
         {
           l1[i] %>% input -> ll1
           l1[i] %>% basename %>% gsub(".tsv","",.) -> DirNameDiff
@@ -1449,7 +1490,7 @@ omic <- function(
           enanopar(
             omicdata=omicdata,gmtfiles=gmtfiles,species=species,threshold=thresholdEna0,
             filtergeneset=filtergeneset,dotopnetwork=T,dotopheatmap=T,
-            doena=doena,layout=layout,bg=bg,mings=mings,maxgs=maxgs,overlapmin=overlapmin,addenarankbarplot=addenarankbarplot,
+            doena=T,layout=layout,bg=bg,mings=mings,maxgs=maxgs,overlapmin=overlapmin,addenarankbarplot=addenarankbarplot,
             dotopgenesetnetwork=F,dotopgenesetheatmap=F,
             dogmtgenesetnetwork=F,dogmtgenesetheatmap=F,
             dat=dat,factor=FactorEna1,path=PathEna,dirname=DirNameDiff,dopar=F)
@@ -1458,7 +1499,8 @@ omic <- function(
     paste("gsea enrichment analysis done.\n",sep="") %>% cat
   }
   #
-  parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()
+  # parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()
+  if(dopar){parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()}
   #
   # ----
   # log
@@ -1478,13 +1520,14 @@ omic <- function(
           Threshold0 %>% lapply("[",c(1,2)) %>% lapply(unlist) %>%
             lapply(paste0,collapse="|") %>% unlist %>% paste0(collapse = ",") ) %>% c(LogOutput,.) -> LogOutput }
   list(
-    list( dopattern, "pattern done"),
     list( T , "anovastat done"),
     list( dovenn , "Venn done"),
     list( docluster , paste("Cluster analysis done with cut value = ",nc,sep="")),
+    list( dopattern, "pattern done"),
     list( doheatmap , "Heatmap done"),
     list( dovolcanoplot , "Volcanoplot done"),
-    list( dolineplot , "Lineplot done")) -> par0
+    list( dolineplot , "Lineplot done"),
+    list( dovolcanoplot , "Volcanoplot done")) -> par0
   par0 %>% sapply("[[", 1) %>% which %>% par0[.] %>% lapply("[[",2) %>% c(LogOutput,.) -> LogOutput
   Path %>% list.files(recursive=TRUE) %>% basename %>% grep("^List_.*.tsv$", .) %>% length -> NbList
   paste("Number of list diff created by all analysis : ",NbList,sep="") %>% c(LogOutput,.) -> LogOutput
@@ -1505,6 +1548,26 @@ omic <- function(
   Path %>% file.path("log.txt") %>% file("w") -> f
   foreach(i=1:length(LogOutput)) %do% { LogOutput[[i]] %>% paste(.,"\n",sep="") %>% writeLines(f) }
   close(f)
+  #
+  # save history
+  if(savehistory)
+  { 
+    utils::savehistory(file = file.path(Path,"Rscript.r"))
+    #
+    # remove old lines
+    Path %>% file.path("Rscript.r") %>% file("r") -> f
+    f %>% readLines -> rl0
+    close(f)
+    rl0 %>% grep("-----",.) -> selh
+    if(length(selh)>1)
+    {
+      rl0[(selh %>% length %>% "-"(1) %>% selh[.]):(rl0 %>% length)] -> rl1
+      Path %>% file.path("Rscript.r") %>% file("w") -> fo
+      rl1 %>% writeLines(fo) 
+      close(fo)
+    }
+  }
+  #
   # zip
   if(zip)
   {

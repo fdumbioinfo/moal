@@ -31,13 +31,14 @@ hcluster <- function( dat , factor = NULL , Symbol = NULL , nc = c(2,3,6,12),
   ### create heatmap with colored cluster
   i=j=1
   if( nc %>% "<"(.,2) %>% any ){ nc %>% "<="(.,2) %>% "!"(.) %>% which %>% nc[.] -> nc }
+  # i=2
   foreach(i=nc) %do%
   {
-    paste( "cl" , i , sep = ""  ) -> DirName
-    Path %>% file.path( DirName ) %>% dir.create
+    paste("cl",i,sep="") -> DirName
+    Path %>% file.path(DirName) %>% dir.create
     # heatmap cutree both
-    paste("Heatmap_cuttree_",i,"_",dim(Dat1)[2],"_",dim(Dat1)[1],".pdf",sep="") %>% 
-      file.path(Path,DirName,.) -> FileName
+    paste("Heatmap_cuttree_",i,"_",dim(Dat1)[2],"_",dim(Dat1)[1],".pdf",sep="") %>% file.path(Path,DirName,.) -> FileName
+    # factor=factor;labCol=colnames(Dat1);cexCol=0.45;labRow=Symbol;k=i
     pdf(FileName)
     Dat1 %>% heatmap(factor=factor,labCol=colnames(Dat1),cexCol=0.45,labRow=Symbol,k=i)
     graphics.off()

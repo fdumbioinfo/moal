@@ -20,7 +20,7 @@
 #' @import moalannotenst
 #' @import moalannotensp
 #' @export
-annot <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "ncbi", idtype = NULL )
+annotdb <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "ncbi", idtype = NULL )
 {
   symbollist %>% as.character -> symbollist0
   GeneDb0 <- NULL ; ens0 <- NULL
@@ -74,6 +74,10 @@ annot <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "
     symbollist0 %>% data.frame( "GeneID" =  . , "InputID" = paste("input",1:length(symbollist0),.,sep = "" ) ) -> symbollist1
     GeneDb2 %>% dplyr::inner_join(symbollist1)  -> GeneDb3
     symbollist0 %>% match(GeneDb3$GeneID) %>% GeneDb3[.,] -> Annot
+    Annot$Symbol %>% grep("^$",.) -> sell
+    if(length(sell)>0){ Annot$GeneID[sell] -> Annot$Symbol[sell] }
+    Annot$Symbol %>% is.na %>% which -> sell
+    if(length(sell)>0){ Annot$GeneID[sell] -> Annot$Symbol[sell] }
   }
   #
   # Ensembl gene
@@ -88,6 +92,8 @@ annot <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "
     symbollist0 %>% match(ens2$ENSGID) %>% ens2[.,] -> Annot
     Annot$Symbol %>% grep("^$",.) -> sell
     if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
+    Annot$Symbol %>% is.na %>% which -> sell
+    if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
   }
   #
   # Ensembl transcript
@@ -101,7 +107,9 @@ annot <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "
     ens1 %>% dplyr::inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSTID) %>% ens2[.,] -> Annot
     Annot$Symbol %>% grep("^$",.) -> sell
-    if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
+    if(length(sell)>0){ Annot$ENSTID[sell] -> Annot$Symbol[sell] }
+    Annot$Symbol %>% is.na %>% which -> sell
+    if(length(sell)>0){ Annot$ENSTID[sell] -> Annot$Symbol[sell] }
   }
   #
   # Ensembl Protein
@@ -115,7 +123,9 @@ annot <- function( symbollist = NULL, species = NULL, ortholog = F, dboutput = "
     ens1 %>% dplyr::inner_join(symbollist1)  -> ens2
     symbollist0 %>% match(ens2$ENSPID) %>% ens2[.,] -> Annot
     Annot$Symbol %>% grep("^$",.) -> sell
-    if(length(sell)>0){ Annot$ENSGID[sell] -> Annot$Symbol[sell] }
+    if(length(sell)>0){ Annot$ENSPID[sell] -> Annot$Symbol[sell] }
+    Annot$Symbol %>% is.na %>% which -> sell
+    if(length(sell)>0){ Annot$ENSPID[sell] -> Annot$Symbol[sell] }
   }
   #
   # SYMBOL ID

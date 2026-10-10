@@ -53,7 +53,7 @@ network <- function(
   # Nodes
   nodelist %>% as.character -> NodeList0
   nodelist %>% as.character -> NodeList1
-  NodeList0 %>% annot( species=Species0[1], dboutput="ebi", idtype = "SYMBOL" ) -> NodeList1
+  NodeList0 %>% annotdb( species=Species0[1], dboutput="ebi", idtype = "SYMBOL" ) -> NodeList1
   # check
   if( nrow(NodeList1) > 0 &
       (((((NodeList1$ENSGID %>% is.na)|(NodeList1$ENSGID %>% "=="(.,""))|(NodeList1$ENSGID %>% "=="(.,"NA"))) %>% all)|
@@ -67,7 +67,7 @@ network <- function(
     NodeList1$ENSPIDs %>% strsplit("\\|") %>% unlist %>% unique -> NodeList2
     NodeList2 %>% is.na %>% which -> sel ; if(length(sel) > 0){ NodeList2[-sel] -> NodeList2 }
     NodeList2 %>% "=="(.,"NA") %>% which -> sel ; if(length(sel) > 0){ NodeList2[-sel] -> NodeList2 }
-    NodeList2 %>% as.character %>% moal::annot(species=Species0[1], idtype="ENSP") %>%
+    NodeList2 %>% as.character %>% annotdb(species=Species0[1], idtype="ENSP") %>%
       dplyr::select(.data$ENSPID,.data$Symbol) %>% data.frame -> NodeList3
     # check
     if(nrow(NodeList3) > 0 & NodeList3$Symbol %>% is.na %>% all %>% "!"(.)){ NWNODE3 <- TRUE }else{ NWNODE3 <- FALSE }

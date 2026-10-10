@@ -17,9 +17,10 @@ omic(
   doqc = TRUE,
   threshold = c(1, 2, 3, 4, 9, 10, 11, 12),
   padj = "none",
+  anovafc = "anovafc",
   logratio = FALSE,
   dopattern = TRUE,
-  dovenn = FALSE,
+  dovenn = TRUE,
   docluster = TRUE,
   nc = c(2, 3, 6, 12),
   maxclusterheatmap = 5000,
@@ -37,6 +38,8 @@ omic(
   topdeg = 100,
   topena = 50,
   doenaora = FALSE,
+  maxenaoralist = 2000,
+  minenaoralist = 5,
   gmtfiles = NULL,
   filtergeneset = NULL,
   bg = 25000,
@@ -54,7 +57,11 @@ omic(
   crosscompint = FALSE,
   sample = NULL,
   seed = 123679,
-  dopar = NULL,
+  dopar = TRUE,
+  nbcore = NULL,
+  nrowsim = 2000,
+  liblocpath = NULL,
+  savehistory = TRUE,
   path = ".",
   dirname = NULL,
   zip = FALSE,
@@ -86,6 +93,8 @@ omic(
 
 \item{padj}{character fdr by defaut for Benjamini-Hochberg false discovery correction}
 
+\item{anovafc}{character fold-change calculate with anova model (by default) use meanfc or meanfcdelog}
+
 \item{logratio}{logical change fc (by default) in log2ratio}
 
 \item{dopattern}{logical search relevant pattern across levels factor}
@@ -116,15 +125,19 @@ omic(
 
 \item{doena}{logical msigdb enrichement analysis using gsea method without filtering}
 
-\item{gsearank}{character to choose gsea rank type among fc (by default) logration logfc sqrt}
+\item{gsearank}{character gsea rank type among logfc (by default) logration fc sqrt}
 
-\item{gseatail}{character to choose gsea twotail (by default) or onetail}
+\item{gseatail}{character gsea twotail test (by default) or onetail}
 
 \item{topdeg}{numeric top DEGs number to plot on network}
 
 \item{topena}{numeric top geneset for ena plot}
 
 \item{doenaora}{logical msigdb enrichement analysis using ora method for diff list}
+
+\item{maxenaoralist}{numeric max diff list size to do enrichment analysis with ora fir diff list}
+
+\item{minenaoralist}{numeric max diff list size to do enrichment analysis with ora fir diff list}
 
 \item{gmtfiles}{character gmt files list path}
 
@@ -160,7 +173,15 @@ omic(
 
 \item{seed}{numeric seed for random function}
 
-\item{dopar}{numeric core number}
+\item{dopar}{logical if TRUE do parallel computation}
+
+\item{nbcore}{numerical core number all available core if NULL}
+
+\item{nrowsim}{numeric row number for normal distribution simulate matrix analysis}
+
+\item{liblocpath}{character path to R local library if need}
+
+\item{savehistory}{logical save r session history}
 
 \item{path}{character results directory path}
 

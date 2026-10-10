@@ -30,7 +30,8 @@
 heatmap <- function(
   dat = NULL, factor = NULL , method = "complete" , dendrogram = "both", k = NULL,
   labCol = "" , cexCol = 0.5 , labRow = "" , cexRow = NULL,
-  cexlegend = 0.65 , keysize = 0.9, keycolor = c( "darkgreen", "orange" , "darkred") , parmar = c(5,4,5,6), scale = "row")
+  cexlegend = 0.65 , keysize = 0.9, keycolor = c( "darkgreen", "orange" , "darkred"),
+  parmar = c(5,4,5,6), scale = "row")
 {
   graphics::par(xpd=T, mar=parmar)
   if(dendrogram == "both")
@@ -89,13 +90,12 @@ heatmap <- function(
       {nrow(dat) %>% "<="(NRowheatmap0) %>% which %>% min %>% CexRow0[.] -> CexRow1}else{ CexRow0[11] -> CexRow1 }
   }else{ cexRow -> CexRow1}
   #
-  
   dat %>% as.matrix %>%
     gplots::heatmap.2(
       ColSideColors=factortocolor(factor), labCol=labCol, cexCol=cexCol, srtCol=90, labRow=labRow, cexRow=CexRow1, srtRow = 0,
       trace="none", key=T, keysize=keysize, density.info="none", key.xlab="", key.title=NA,
-      dendrogram=dendrogram, Colv=coldend, Rowv=rowdend,
-      col=colorpanel(50, low=keycolor[1], mid=keycolor[2], high=keycolor[3]), scale=scale, distfun=dist2 )
+      dendrogram=dendrogram, Colv=coldend, Rowv=rowdend,margins = c(6,10),
+      col=colorpanel(50,low=keycolor[1],mid=keycolor[2],high=keycolor[3]),scale=scale,distfun=dist2)
   if(FactorLevelsNumber > MatLevelsNumber)
   {
     graphics::legend("topright",inset=c(-0.22,-0.1),legend=LevelsLegend1,col=ColLegend1,lty=1,lwd=5,cex=cexlegend)

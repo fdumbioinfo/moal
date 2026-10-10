@@ -55,7 +55,7 @@
 #' 
 #' @examples
 #' # not run
-#' # gsenain( omicdata , species = "mm")
+#' # ena( omicdata , species = "mm")
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate arrange select desc last_col group_by
@@ -145,14 +145,15 @@ enanopar <- function(
         if(length(selNA)){ t %>% replace(selNA,1) -> omicdata[,sel] }
       }
   }
+  #
   ### Annotation
   omicdata -> OmicData0
-  OmicData0$Symbol %>% annot(dboutput="ebi",species=species,idtype = "SYMBOL") -> a0
+  OmicData0$Symbol %>% annotdb(dboutput="ebi",species=species,idtype = "SYMBOL") -> a0
   a0$Symbol -> OmicData0$Symbol
   # ebi annotation to add same ebi symbol exact match for network
   OmicData0 %>% data.frame(GeneID = a0$NCBIGeneID, check.names=F) -> OmicData1
   # ncbi geneid annotation to not loose GeneID not present in ebi
-  OmicData0$Symbol %>% annot(dboutput="ncbi",species=species,idtype = "SYMBOL") -> a0GeneID
+  OmicData0$Symbol %>% annotdb(dboutput="ncbi",species=species,idtype = "SYMBOL") -> a0GeneID
   OmicData1$GeneID <- a0GeneID$GeneID
   OmicData1$GeneID %>% is.na %>% "!"(.) %>% which -> sel
   if(length(sel) > 0){ OmicData1 %>% dplyr::slice(sel) -> OmicData2 }else{ OmicData1 -> OmicData2 } 
@@ -168,7 +169,7 @@ enanopar <- function(
     }
   # output
   t5 %>% lapply("[",1) %>% unlist %>% unique %>% data.frame(rowID=.) %>% inner_join(OmicData2) -> OutPut0
-  OutPut0$Symbol %>% annot(dboutput = "ebi",species=species) -> a0
+  OutPut0$Symbol %>% annotdb(dboutput = "ebi",species=species) -> a0
   a0 %>% dplyr::select(-.data$NCBIGeneID,-.data$Symbol) %>% data.frame(OutPut0,.,check.names=F) -> OutPut1
   paste("omicdata","_",species,"_",nrow(OutPut1),".tsv",sep="") -> FileName0
   OutPut1 %>% output(file.path(Path0,"data",FileName0))
@@ -190,7 +191,7 @@ enanopar <- function(
       {
         t5[[j]] %>% dplyr::arrange(.data[[colnames(t5[[j]])[2]]]) %>% dplyr::slice(1:topdeg) -> p
         # output
-        p$rowID %>% data.frame(rowID=.) %>% inner_join(OutPut1) -> Deg1
+        p$rowID %>% data.frame(rowID=.) %>% dplyr::inner_join(OutPut1) -> Deg1
         paste("DEGs_top",topdeg,"_",colnames(t5[[j]])[2] %>% gsub("p_","",.),"_",nrow(Deg1),".tsv",sep="") -> FileName0
         # network
         Deg1 %>% output(file.path(Path0,DirName1,FileName0))
@@ -235,7 +236,7 @@ enanopar <- function(
     foreach(j=1:length(t5)) %do%
       {
         t5[[j]] %>% dplyr::arrange(.data[[colnames(t5[[j]])[2]]]) %>% dplyr::slice(1:topdeg) -> p
-        p %>% dplyr::select(1,4) %>% inner_join(dat) -> t
+        p %>% dplyr::select(1,4) %>% dplyr::inner_join(dat) -> t
         t5[[j]] %>% colnames %>% "["(2) %>% sub("^p_(.*)vs(.*)","\\1",.) -> GrN
         t5[[j]] %>% colnames %>% "["(2) %>% sub("^p_(.*)vs(.*)","\\2",.) -> GrD
         c(GrD,GrN) %>% paste("^",.,"$",sep="") %>% paste0(collapse = "|") -> grep
@@ -249,12 +250,10 @@ enanopar <- function(
         5000 -> maxheatmap
         c(5,10,20,30,40,50,100,200,1000,maxheatmap) -> NRowheatmap0
         c(1,0.9,0.8,0.7,0.6,0.5,0.35,0.25,0.2,0.1) -> CexRow0
-        if(nrow(tt) < maxheatmap)
-        {nrow(tt) %>% "<="(NRowheatmap0) %>% which %>% min %>% CexRow0[.] -> CexRow1}else{ CexRow0[10] -> CexRow1 }
+        if(nrow(tt) < maxheatmap){nrow(tt) %>% "<="(NRowheatmap0) %>% which %>% min %>% CexRow0[.] -> CexRow1}else{ CexRow0[10] -> CexRow1 }
         #
         pdf(FileName1)
-        tt %>% heatmap(Factor0,labCol=colnames(tt),labRow=t$Symbol,
-                       dendrogram="row",cexRow=CexRow1,cexCol=0.5)
+        tt %>% heatmap(Factor0,labCol=colnames(tt),labRow=t$Symbol,dendrogram="row",cexRow=CexRow1,cexCol=0.5)
         title(main=Title0,cex.main=0.7)
         graphics.off()
       }
@@ -265,9 +264,10 @@ enanopar <- function(
   if(!(species == "hs"))
   {
     omicdata -> OmicData0
-    OmicData0$Symbol %>% annot(species=species,dboutput="ncbi") -> a0
+    # OmicData0$Symbol %>% annotdb(species=species,dboutput="ncbi") -> a0
+    OmicData0$Symbol %>% annotdb(species=species,dboutput="ncbi",idtype="SYMBOL") -> a0
     a0$Symbol -> OmicData0$Symbol
-    OmicData0 %>% data.frame(GeneID = a0$GeneID, check.names=F) -> OmicData1
+    OmicData0 %>% data.frame(GeneID=a0$GeneID,check.names=F) -> OmicData1
     OmicData1$GeneID %>% is.na %>% which -> sel
     if(length(sel) > 0){ OmicData1 %>% dplyr::slice(-sel) -> OmicData2 }else{ OmicData1 -> OmicData2 } 
     OmicData2 %>% colnames %>% grep("p_",.) -> sel1
@@ -280,7 +280,7 @@ enanopar <- function(
         t4 %>% dplyr::group_by(.data$Symbol) %>% dplyr::slice(1) %>% data.frame(check.names=F)
       }
     # ortho
-    t5[[1]] %>% dplyr::select(.data$Symbol) %>% unlist %>% annot(species=species,ortholog=T) -> a0
+    t5[[1]] %>% dplyr::select(.data$Symbol) %>% unlist %>% annotdb(species=species,ortholog=T) -> a0
     a0 %>% dplyr::select(.data$GeneID,.data$OtherGeneID,.data$Symbol) %>% setNames(c("HsGeneID","GeneID","Symbol")) -> a1
     t6 <- foreach(i=1:length(t5)) %do%
       {
@@ -293,7 +293,7 @@ enanopar <- function(
     OutPut0 <- foreach(i=1:length(t6),.combine = "rbind") %do% { t6[[i]][,c(1,6,5,4)] }
     OutPut0 %>% unique -> OutPut1
     OutPut1 %>% inner_join(OmicData0 %>% dplyr::select(-.data$Symbol),.) -> OutPut2
-    OutPut2$Symbol %>% annot(dboutput = "ebi") -> a0
+    OutPut2$Symbol %>% annotdb(dboutput = "ebi") -> a0
     a0 %>% dplyr::select(-.data$NCBIGeneID,-.data$Symbol) %>% data.frame(OutPut2,.,check.names=F) -> OutPut3
     paste("omicdata_ortholog_hs_",nrow(OutPut3),".tsv",sep="") -> FileName0
     OutPut3 %>% output(file.path(Path0,"data",FileName0))
@@ -311,7 +311,7 @@ enanopar <- function(
   # gsea enrichment
   #
   if(dotopgenesetnetwork | dotopgenesetheatmap){ doena <- T }
-  if(doena & nrow(OutPut1) > 4000)
+  if(doena & nrow(OutPut1) >= 4000)
   {
     file.path(Path0,"ena") %>% dir.create
     moalannotgene::genesetdb -> Genesetdb0
@@ -449,7 +449,7 @@ enanopar <- function(
                  GeneSetNameList0,Genesetdb1 %>% names %>% "["(i))
           }
       }
-    gseastats1 %>% unlist(recursive = F) -> gseastats2
+    gseastats1 %>% unlist(recursive=F) -> gseastats2
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %do%
       {
@@ -490,6 +490,10 @@ enanopar <- function(
           # plot
           # pval ranking
           fgseapval1 %>% dplyr::slice(1:topena) -> fgseapval1plot
+          # check NA when unbalanced up and down
+          fgseapval1plot$pval %>% is.na %>% which -> selNAgsea
+          if(length(selNAgsea)>0){ fgseapval1plot$pval[selNAgsea] <- 1 ; fgseapval1plot$NES[selNAgsea] <- 1 }
+          #
           if(fgseapval1plot %>% nrow %>% ">"(0))
           {
             # pval ranking
@@ -514,10 +518,14 @@ enanopar <- function(
               lapply(paste0,collapse="") %>% unlist -> Overlap
             fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
             fgseapval1plot3 -> datp
-            datp %>% dim
             # NES ranking
             fgseapval1 %>% dplyr::arrange( -abs(.data$NES) ) %>% dplyr::slice(1:topena) -> fgseapval1plot
             fgseapval1plot %>% dim
+            # check NA when unbalanced up and down
+            fgseapval1plot$pval %>% is.na %>% which -> selNAgsea
+            if(length(selNAgsea)>0){ fgseapval1plot$pval[selNAgsea] <- 1 ; fgseapval1plot$NES[selNAgsea] <- 1 }
+            #
+            
             # fgseapval1plot %>% rbind(fgseapval1plotnes) %>% unique -> fgseapval1plot
             fgseapval1plot$pval %>% log10 %>% "*"(-1) -> Log10Pval
             fgseapval1plot %>% data.frame(Log10Pval) -> fgseapval1plot2
@@ -744,7 +752,8 @@ enanopar <- function(
               Omicdataf1[sel,selCol] <- 25
             }
             #
-            1.1 -> enascoremin
+            # 1.1 -> enascoremin
+            1 -> enascoremin
             # Omicdataf1$GeneID -> GeneidList0
             # Omicdataf1$Symbol -> SymbolList0
             # NULL -> Ena0
@@ -1001,7 +1010,7 @@ enanopar <- function(
     }
   }
   # ----
-  # 6 - geneset networks from ena results
+  # 6 - top geneset network
   # ----
   if(dotopgenesetnetwork)
   {
@@ -1048,7 +1057,7 @@ enanopar <- function(
         {
           TopGeneset1[i] -> t
           t %>% names
-          t[[1]] %>% annot(.) -> tt
+          t[[1]] %>% annotdb(.) -> tt
           t[[1]] <- tt$Symbol
           t
         }
@@ -1065,7 +1074,7 @@ enanopar <- function(
         {
           TopGeneset1[i] -> t
           t %>% names
-          t[[1]] %>% annot(.) -> a0
+          t[[1]] %>% annotdb(.) -> a0
           a0$Symbol %>% data.frame(Symbol=.) %>% inner_join(data.frame(Symbol=Pvalnodelist1)) -> tt
           tt$Symbol
           t[[1]] <- tt$Symbol
@@ -1142,7 +1151,7 @@ enanopar <- function(
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(TopGeneset2),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %do%
       {
-        TopGeneset2[[i]] %>% annot(.) -> a0
+        TopGeneset2[[i]] %>% annotdb(.) -> a0
         a0$Symbol -> nodelist
         TopGeneset2[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
         TopGeneset2[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameTop
@@ -1239,7 +1248,7 @@ enanopar <- function(
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %do%
       {
         GenesetLists1[[i]] -> symbollist
-        GenesetLists1[[i]] %>% annot(.,idtype = "SYMBOL") -> a0
+        GenesetLists1[[i]] %>% annotdb(.,idtype = "SYMBOL") -> a0
         a0$Symbol -> nodelist
         GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
         GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> FileNameGeneset

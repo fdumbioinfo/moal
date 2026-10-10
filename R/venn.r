@@ -19,23 +19,19 @@
 #' @importFrom magrittr %>%
 #' @export
 venn <- function(
-  list = NULL , listnames = NULL , returnlist = F,
-  title = "Venn Diagram", plot = T,
-  export = F , path = "." , dirname = "venn" )
+  list = NULL, listnames = NULL, returnlist = F, title = "Venn Diagram",
+  plot = T, export = F, path = ".", dirname = "venn" )
 {
-  if( length( list ) == 2 )
+  if(length(list) == 2 | length(list) > 4)
   {
-    venn2( list = list , listnames = listnames , returnlist = returnlist , title = title,
-           plot = plot , export = export , path = path , dirname = dirname )
+    venn2(list=list,listnames=listnames,returnlist=returnlist,title=title,plot=plot,export=export,path=path,dirname=dirname)
   }
-  if( length( list ) == 3 )
+  if(length(list) == 3)
   {
-    venn3( list = list , listnames = listnames , title = title , plot = plot,
-           export = export , path = path , dirname = dirname )
+    venn3(list=list,listnames=listnames,title=title,plot=plot,export=export,path=path,dirname=dirname)
   }
-  if( length( list ) == 4 )
+  if(length(list) == 4)
   {
-    venn4( list = list , listnames = listnames , returnlist = returnlist , title = title,
-           plot = plot , export = export , path = path , dirname = dirname )
+    venn4(list=list,listnames=listnames,returnlist=returnlist,title=title,plot=plot,export=export,path=path,dirname=dirname)
   }
 }

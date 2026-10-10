@@ -4,12 +4,12 @@
 \alias{norm}
 \title{Normalization function}
 \usage{
-norm(dat, method = NULL, log = TRUE)
+norm(dat = NULL, method = "quantile", log = TRUE)
 }
 \arguments{
 \item{dat}{data.frame}
 
-\item{method}{character apply quantile normalization by default see details}
+\item{method}{character apply quantile normalization by default see details for all method}
 
 \item{log}{logical apply log base 2}
 }
@@ -20,7 +20,7 @@ data.frame
 normalization and log2
 }
 \details{
-for see limma normalizeBetweenArrays method
+Normalization method available: "TMM","TMMwsp","RLE","upperquartile" from EdgeR and "quantile","scale","cyclicloess"
 }
 \examples{
 # not run

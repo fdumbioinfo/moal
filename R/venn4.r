@@ -18,7 +18,7 @@
 #' #   c( letters[2:5] , letters[8:23] ) ) %>% venn4
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
-#' @import ggplot2
+#' @importFrom ggplot2 annotate labs ggtitle ggplot coord_fixed theme scale_fill_manual scale_colour_manual ggsave aes labs theme_void guides element_text
 #' @importFrom gplots venn
 #' @importFrom ggforce geom_ellipse
 #' @importFrom rlang .data
@@ -70,47 +70,40 @@ venn4 <- function(
     angle = c( -pi/4 , -pi/4 , pi/4 , pi/4 ),
     labels = labels ) -> df.venn
   # venn display
-  ggplot(df.venn) -> p
+  ggplot2::ggplot(df.venn) -> p
   p + ggforce::geom_ellipse(
-    aes(
-      x0 = .data$x, y0 = .data$y,
-      a = .data$a , b = .data$b , angle = .data$angle , fill = labels ),
-    alpha = .3, linewidth = 1, colour = 'black' ) -> p
-  p + coord_fixed() -> p
-  p + theme_void() -> p
-  p + theme(
-    legend.position = 'bottom',
-    legend.text = element_text( size = 7 ),
-    legend.key.size  = unit( 1.5 , "line") ) -> p
-  p + scale_fill_manual( values = palette0[1:4] ) -> p
-  p + scale_colour_manual( values = palette0[1:4] , guide = "none") -> p
-  p + labs(fill = NULL) -> p
-  p + guides( fill = guide_legend( nrow = 2 , byrow = TRUE ) ) -> p
-  p + annotate("text", x = v1$x, y = v1$y, label = v1$listSize, size = 8 ) -> p
-  p + ggtitle( title ) -> p
-  p + theme( plot.title = element_text(size=7) ) -> p
+    ggplot2::aes(x0=.data$x,y0=.data$y,a=.data$a,b=.data$b,angle=.data$angle,fill=labels),alpha=.3,linewidth=1,colour='black') -> p
+  p + ggplot2::coord_fixed() -> p
+  p + ggplot2::theme_void() -> p
+  p + ggplot2::theme(legend.position='bottom',legend.text=ggplot2::element_text(size=7),legend.key.size=unit(1.5,"line")) -> p
+  p + ggplot2::scale_fill_manual(values=palette0[1:4]) -> p
+  p + ggplot2::scale_colour_manual(values=palette0[1:4],guide="none") -> p
+  p + ggplot2::labs(fill=NULL) -> p
+  p + ggplot2::guides(fill=ggplot2::guide_legend(nrow=2,byrow=TRUE)) -> p
+  p + ggplot2::annotate("text",x=v1$x,y=v1$y,label=v1$listSize,size=8) -> p
+  p + ggplot2::ggtitle(title) -> p
+  p + ggplot2::theme(plot.title=ggplot2::element_text(size=7)) -> p
   # export
-  if( export )
+  if(export)
   {
-    if( is.null(dirname) ){ paste("venn4_",listSize[15], sep="") -> DirName }else{
-      paste( dirname,"_",listSize[15] , sep = "" ) -> DirName }
-    path %>% file.path( DirName ) %>% dir.create
+    if(is.null(dirname)){ paste("venn4_",listSize[15], sep="") -> DirName }else{ paste(dirname,"_",listSize[15],sep="") -> DirName }
+    path %>% file.path(DirName) %>% dir.create
     c( "SpeA","SpeB","SpeC","SpeD",
        "SpeIntAB","SpeIntAC","SpeIntAD","SpeIntBC","SpeIntBD","SpeIntCD",
        "IntABC","IntABD","IntACD","IntBCD","IntABCD") -> ListNamesOutput0
     listSize %>% ">"(.,0) %>% which -> sel
     ListNamesOutput0[sel]-> ListNamesOutput1
     list2[sel]-> list3
-    foreach( i=1:length(list3) ) %do%
+    foreach(i=1:length(list3)) %do%
       {
         paste("List_",ListNamesOutput1[i],"_",length(list1[[i]]),".tsv",sep="") -> FileName0
-        path %>% file.path( DirName , FileName0 ) -> FileName1
-        data.frame( "rowID" = list1[[i]] %>% as.character ) %>% output(FileName1)
+        path %>% file.path(DirName,FileName0) -> FileName1
+        data.frame("rowID"=list1[[i]] %>% as.character) %>% output(FileName1)
       }
     # plot
-    paste( "Venn4_",listSize[15],".pdf" , sep = "" ) -> FileName
-    path %>% file.path( DirName , FileName ) -> FileName
-    ggsave( FileName , plot = p )
+    paste("Venn4_",listSize[15],".pdf",sep="") -> FileName
+    path %>% file.path(DirName,FileName) -> FileName
+    ggsave(FileName,plot=p)
   }
-  if( plot ){ p %>% print }
+  if(plot){ p %>% print }
 }

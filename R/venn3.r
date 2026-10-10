@@ -17,7 +17,7 @@
 #' #  c( letters[2:5] , letters[8:23] ) ) %>% venn3
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
 #' @importFrom magrittr %>%
-#' @import ggplot2
+#' @importFrom ggplot2 annotate labs ggtitle ggplot coord_fixed theme scale_fill_manual scale_colour_manual ggsave aes labs theme_void
 #' @importFrom ggforce geom_circle
 #' @importFrom rlang .data
 #' @importFrom dplyr full_join inner_join
@@ -66,11 +66,7 @@ venn3 <- function(
     labels = Listnames ) -> df.venn
   # display
   ggplot(df.venn) -> p
-  p + ggforce::geom_circle(
-    aes(
-      x0 = .data$x, y0 = .data$y,
-      r = 1.5, fill = Listnames),
-    alpha = .3, linewidth = 1, colour = 'black' ) -> p
+  p + ggforce::geom_circle(aes(x0=.data$x,y0=.data$y,r=1.5,fill=Listnames),alpha=.3,linewidth=1,colour='black') -> p
   p + coord_fixed() -> p
   p + theme_void() -> p
   p + theme( legend.position = 'bottom' , legend.text = element_text(size = 6) ) -> p
