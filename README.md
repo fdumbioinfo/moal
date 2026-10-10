@@ -19,8 +19,8 @@ source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-mo
 ```r
 # -----
 # Paris-Saclay - GPL3 - https://github.com/fdumbioinfo/moal
-# title: title
-# date: 29-09-2026
+# title: moal omic() demo
+# date: 10-10-2026
 # -----
 #
 # libraries
