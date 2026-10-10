@@ -85,11 +85,6 @@ omic(
   dopar = T, nbcore = NULL, liblocpath = NULL, savehistory = T )
 #
 ```
-Same script in one command line:
-
-```r
-source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/1-moal-omic-demo.r")
-```
 
 
 <p><b>Test <a href="https://github.com/fdumbioinfo/rtools/tree/main/moal-demo">other examples </a> for functional analysis, volcanoplot, heatmap...</b></p>
