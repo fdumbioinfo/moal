@@ -7,12 +7,6 @@ Workflow summary:
  - Functional analysis: GSEA MSigDB enrichment analysis, StringDB interaction networks
 
 
-<b>Install:</b>
-
-```r
-source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-moal-install-r-universe.r")
-```
-
 
 <b>Install moal and test omic() function workflow:</b>
 
