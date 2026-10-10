@@ -44,7 +44,7 @@ sif %>% head
 sif$ANEUPLOIDY %>% ordered(c("Control","T13","T18","T21")) -> sif$ANEUPLOIDY
 sif$TISSUE %>% as.factor -> sif$TISSUE
 # create annotation
-dat$rowID %>% moal::annot(species ="hs", idtype = "GENE", dboutput = "ncbi") -> annot
+dat$rowID %>% annotdb(species ="hs", idtype = "GENE", dboutput = "ncbi") -> annot
 annot %>% head
 annot %>% str
 annot %>% dplyr::select(GeneID,Symbol) -> annot
