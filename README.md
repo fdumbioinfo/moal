@@ -104,7 +104,7 @@ Release updates:
 
 Add replacena function to replace NA or 0 value matrix by background noise distribution
 
-Add normalization metho to norm function
+Add normalization method to norm function : TMM, TMMwsp, RLE, upperquartile from EdgeR
 
 Test omic function witout data to simulate random analysis
 
