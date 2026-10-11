@@ -7,9 +7,9 @@
 norm(dat = NULL, method = "quantile", log = TRUE)
 }
 \arguments{
-\item{dat}{data.frame}
+\item{dat}{data.frame data.frame without row ID column}
 
-\item{method}{character apply quantile normalization by default see details for all method}
+\item{method}{character apply quantile normalization by default see details for all methods}
 
 \item{log}{logical apply log base 2}
 }
@@ -17,10 +17,12 @@ norm(dat = NULL, method = "quantile", log = TRUE)
 data.frame
 }
 \description{
-normalization and log2
+Apply normalization method and log2 on numerical table
 }
 \details{
-Normalization method available: "TMM","TMMwsp","RLE","upperquartile" from EdgeR and "quantile","scale","cyclicloess"
+Normalization method available:
+"TMM","TMMwsp","RLE","upperquartile" from EdgeR and "quantile","scale","cyclicloess" from limma
+"none" for no normalization
 }
 \examples{
 # not run
