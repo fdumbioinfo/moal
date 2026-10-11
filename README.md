@@ -13,7 +13,7 @@ Workflow summary:
 ```r
 # -----
 # Paris-Saclay - GPL3 - https://github.com/fdumbioinfo/moal
-# title: moal omic() demo
+# title: 1 - moal omic() demo
 # date: 10-10-2026
 # -----
 #
