@@ -76,7 +76,7 @@ omic(
   # output
   path = path, dirname = dirname, sample = sample,
   # parallelisation
-  dopar = T, nbcore = NULL, liblocpath = NULL, savehistory = T )
+  dopar = T, nbcore = NULL, libloc = NULL, savehistory = T )
 #
 ```
 
