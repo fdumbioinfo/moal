@@ -29,6 +29,7 @@ if(!file.exists("1-omic-outputdata")){"1-omic-outputdata" %>% dir.create}
 #
 # loading data
 # normalized expression data
+# use input() function to locally load your own data in tabluar format 
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_datanorm_22_23786.tsv" -> url
 data.table::fread(url) %>% data.frame -> dat
 dat %>% head
