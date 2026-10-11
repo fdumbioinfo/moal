@@ -69,7 +69,7 @@
 #' @param seed numeric seed for random function
 #' @param dopar logical if TRUE do parallel computation
 #' @param nbcore numerical core number all available core if NULL
-#' @param liblocpath character path to R local library if need
+#' @param libloc character path to R local library if need
 #' @param savehistory logical save r session history
 #' @param nrowsim numeric row number for normal distribution simulate matrix analysis 
 #' @param path character results directory path
@@ -162,7 +162,7 @@ omic <- function(
   dotopnetwork = TRUE, dotopheatmap = TRUE, layout = 2, mings = 5, maxgs = 700, overlapmin = 2, addenarankbarplot = TRUE,
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = TRUE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
-  crosscompint = FALSE, sample = NULL , seed = 123679, dopar = TRUE, nbcore = NULL, nrowsim = 2000, liblocpath = NULL, savehistory = TRUE,
+  crosscompint = FALSE, sample = NULL , seed = 123679, dopar = TRUE, nbcore = NULL, nrowsim = 2000, libloc = NULL, savehistory = TRUE,
   path = ".", dirname = NULL, zip = FALSE, remove = FALSE )
 {
   Sys.time() -> start
@@ -480,7 +480,7 @@ omic <- function(
       # parallel::detectCores() -> NbCore
       if(!is.null(nbcore)){nbcore -> NbCore}else{parallel::detectCores() -> NbCore}
       parallel::makeCluster(NbCore) -> cl
-      if(!is.null(liblocpath)){parallel::clusterCall(cl,function(libs){.libPaths(c(libs,.libPaths()))},liblocpath)}
+      if(!is.null(libloc)){parallel::clusterCall(cl,function(libs){.libPaths(c(libs,.libPaths()))},libloc)}
       doParallel::registerDoParallel(cl)
     }else{ foreach::registerDoSEQ() }
     ### anova

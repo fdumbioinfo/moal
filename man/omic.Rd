@@ -60,7 +60,7 @@ omic(
   dopar = TRUE,
   nbcore = NULL,
   nrowsim = 2000,
-  liblocpath = NULL,
+  libloc = NULL,
   savehistory = TRUE,
   path = ".",
   dirname = NULL,
@@ -179,7 +179,7 @@ omic(
 
 \item{nrowsim}{numeric row number for normal distribution simulate matrix analysis}
 
-\item{liblocpath}{character path to R local library if need}
+\item{libloc}{character path to R local library if need}
 
 \item{savehistory}{logical save r session history}
 
