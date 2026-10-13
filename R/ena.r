@@ -2,7 +2,7 @@
 #' @description Gene set enrichment analysis and interaction network
 #' @param omicdata character data.frame see details
 #' @param gmtfiles character gmt files list path
-#' @param species character hs mm rn dr ss
+#' @param species character available species: hs mm rn ss pt bt oa dr gg xt dm ce
 #' @param filtergeneset character list to filter MSigDB geneset collection
 #' @param threshold numeric pval 0.05 fc 1.5 by default see details
 #' @param dat data.frame file paths

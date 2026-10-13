@@ -1,7 +1,7 @@
 #' @title Annotation function for Symbol, NCBI or Ensembl IDs 
 #' @description Annotation function for Symbol, NCBI or Ensembl IDs 
 #' @param symbollist character list of IDs or Symbols
-#' @param species character species 'hs' 'mm' 'rn' 'dr' 'ss' (see details for complete list) 
+#' @param species character available species: hs mm rn ss pt bt oa dr gg xt dm ce
 #' @param ortholog logical if TRUE return homo sapiens ortholog for choosen species
 #' @param dboutput character database used for output 'ncbi'(default) or 'ebi'
 #' @param idtype character database ID accepted: 'SYMBOL'(default), 'GENE', 'ENST', 'ENSG', 'ENSP'

@@ -15,7 +15,7 @@ annotdb(
 \arguments{
 \item{symbollist}{character list of IDs or Symbols}
 
-\item{species}{character species 'hs' 'mm' 'rn' 'dr' 'ss' (see details for complete list)}
+\item{species}{character available species: hs mm rn ss pt bt oa dr gg xt dm ce}
 
 \item{ortholog}{logical if TRUE return homo sapiens ortholog for choosen species}
 

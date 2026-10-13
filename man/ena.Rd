@@ -44,7 +44,7 @@ ena(
 
 \item{gmtfiles}{character gmt files list path}
 
-\item{species}{character hs mm rn dr ss}
+\item{species}{character available species: hs mm rn ss pt bt oa dr gg xt dm ce}
 
 \item{dat}{data.frame file paths}
 
