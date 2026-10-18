@@ -101,7 +101,7 @@ Add replacena function to replace NA or 0 value matrix by background noise distr
 
 Add normalization method to norm function : TMM, TMMwsp, RLE, upperquartile from EdgeR
 
-Test omic function witout data to simulate random analysis
+Add omic function available without input data to simulate random H0 analysis using normal distribution accross factor levels
 
 Change annot function name to annotdb
 
