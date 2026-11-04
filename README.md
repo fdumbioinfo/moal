@@ -25,11 +25,10 @@ if(!require("curl",quietly=TRUE)){install.packages("curl")}
 library(moal)
 ??moal::omic
 # create output directory
-if(!file.exists("1-omic-outputdata")){"1-omic-outputdata" %>% dir.create}
+if(!dir.exists("1-omic-outputdata")){"1-omic-outputdata" %>% dir.create}
 #
-# loading data
-# normalized expression data
-# use input() function to locally load your own data in tabluar format 
+# data
+# normalized gene expression matrix
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_datanorm_22_23786.tsv" -> url
 url %>% curl::curl_download("GSE65055_datanorm_22_23786.tsv",handle=curl::new_handle())
 "GSE65055_datanorm_22_23786.tsv" %>% input -> dat
@@ -47,7 +46,7 @@ annot %>% head
 annot %>% dplyr::select(GeneID,Symbol) -> annot
 annot %>% head
 #
-# omic data biostatistical analysis and MSigDB GSEA functional analysis
+# omic workflow : anova and GSEA functional analysis
 "1-omic-outputdata" -> path
 "GSE65055" -> dirname
 NULL -> sample
