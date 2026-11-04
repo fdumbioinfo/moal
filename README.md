@@ -19,7 +19,7 @@ Workflow summary:
 #
 # Install moal
 if(!require("moal",quietly=TRUE)){source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-moal-install-r-universe.r")}
-if(!require("data.table",quietly=TRUE)){install.packages("data.table")}
+if(!require("curl",quietly=TRUE)){install.packages("curl")}
 #
 # Test omic() 
 library(moal)
@@ -31,7 +31,9 @@ if(!file.exists("1-omic-outputdata")){"1-omic-outputdata" %>% dir.create}
 # normalized expression data
 # use input() function to locally load your own data in tabluar format 
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_datanorm_22_23786.tsv" -> url
-data.table::fread(url) %>% data.frame -> dat
+# data.table::fread(url) %>% data.frame -> dat
+url %>% curl::curl_download("GSE65055_datanorm_22_23786.tsv",handle=curl::new_handle())
+"GSE65055_datanorm_22_23786.tsv" %>% input -> dat
 dat %>% head
 # sample information file
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_metadata_4_22.tsv" -> url
