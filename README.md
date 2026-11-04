@@ -31,18 +31,17 @@ if(!file.exists("1-omic-outputdata")){"1-omic-outputdata" %>% dir.create}
 # normalized expression data
 # use input() function to locally load your own data in tabluar format 
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_datanorm_22_23786.tsv" -> url
-# data.table::fread(url) %>% data.frame -> dat
 url %>% curl::curl_download("GSE65055_datanorm_22_23786.tsv",handle=curl::new_handle())
 "GSE65055_datanorm_22_23786.tsv" %>% input -> dat
 dat %>% head
 # sample information file
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_metadata_4_22.tsv" -> url
-data.table::fread(url) %>% data.frame -> sif
+url %>% curl::curl_download("GSE65055_metadata_4_22.tsv",handle=curl::new_handle())
 sif %>% head
 # Ordering factors levels for fold-changes
 sif$ANEUPLOIDY %>% ordered(c("Control","T13","T18","T21")) -> sif$ANEUPLOIDY
 sif$TISSUE %>% as.factor -> sif$TISSUE
-# create annotation
+# gene annotation
 dat$rowID %>% annotdb(species = "hs", idtype = "GENE", dboutput = "ncbi") -> annot
 annot %>% head
 annot %>% dplyr::select(GeneID,Symbol) -> annot
@@ -52,6 +51,8 @@ annot %>% head
 "1-omic-outputdata" -> path
 "GSE65055" -> dirname
 NULL -> sample
+T -> doena
+parallel::detectCores() %>% "/"(2) -> nbcore
 #
 omic(
   #
@@ -72,14 +73,14 @@ omic(
   doheatmap = T, dovolcanoplot = T, dolineplot = T, doboxplotrow = T,
   #
   # functional analysis doena for GSEA and doenaora for ORA significant feature lists
-  doena = T, doenaora = F, gmtfiles = NULL,
+  doena = doena, doenaora = F, gmtfiles = NULL,
   dotopheatmap = T, dotopgenesetheatmap = T, dogmtgenesetheatmap = F, 
   dotopnetwork = T, dotopgenesetnetwork = F, dogmtgenesetnetwork = F, 
   # 
   # output
   path = path, dirname = dirname, sample = sample,
   # parallelisation
-  dopar = T, nbcore = NULL, libloc = NULL, savehistory = T )
+  dopar = T, nbcore = nbcore, libloc = NULL, savehistory = T )
 #
 ```
 
