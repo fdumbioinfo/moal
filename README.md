@@ -36,7 +36,7 @@ dat %>% head
 # sample information file
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_metadata_4_22.tsv" -> url
 url %>% curl::curl_download("GSE65055_metadata_4_22.tsv",handle=curl::new_handle())
-"GSE65055_metadata_4_22.tsv" %>% input -> dat
+"GSE65055_metadata_4_22.tsv" %>% input -> sif
 sif %>% head
 # Ordering factors levels for fold-changes
 sif$ANEUPLOIDY %>% ordered(c("Control","T13","T18","T21")) -> sif$ANEUPLOIDY
