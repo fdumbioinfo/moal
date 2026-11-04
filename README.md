@@ -53,6 +53,7 @@ annot %>% head
 NULL -> sample
 T -> doena
 parallel::detectCores() %>% "/"(2) -> nbcore
+# NULL -> nbcore # use all core
 #
 omic(
   #
