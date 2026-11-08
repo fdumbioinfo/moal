@@ -48,40 +48,44 @@ annot %>% dplyr::select(GeneID,Symbol) -> annot
 annot %>% head
 #
 # omic workflow : anova and GSEA functional analysis
-"1-omic-outputdata" -> path
-"GSE65055" -> dirname
-NULL -> sample
+#
+# anova
+"ANEUPLOIDY" -> model
+NULL -> paired
+"BATCH" -> batch
+# functional analysis
+"hs" -> species
 T -> doena
+# output
+"GSE65055" -> dirname
+"1-omic-outputdata" -> path
+NULL -> sample
+# parallel
+T -> dopar
 parallel::detectCores() %>% "/"(2) -> nbcore
 # NULL -> nbcore # use all core
-#
+# omic
 omic(
-  #
   # input
   dat = dat , sif = sif,
-  annot = annot, species = "hs",
-  #
+  annot = annot, species = species,
   # anova model
-  model = "ANEUPLOIDY", padj = "none", anovafc = "anovafc",
-  batch = "TISSUE", 
+  model = model, padj = "none", anovafc = "anovafc",
   # paired = NULL,
-  #
-  # anova filters
+  batch = batch, 
+  # pval and fold-change thresholds: 3 for p0.05 fc > 1.5
   # threshold = c(1, 2, 3, 4, 9, 10, 11, 12),
   dovenn = T, docluster = T, dopattern = T,
-  #
   # plot
   doheatmap = T, dovolcanoplot = T, dolineplot = T, doboxplotrow = T,
-  #
   # functional analysis doena for GSEA and doenaora for ORA significant feature lists
   doena = doena, doenaora = F, gmtfiles = NULL,
   dotopheatmap = T, dotopgenesetheatmap = T, dogmtgenesetheatmap = F, 
   dotopnetwork = T, dotopgenesetnetwork = F, dogmtgenesetnetwork = F, 
-  # 
   # output
   path = path, dirname = dirname, sample = sample,
-  # parallelisation
-  dopar = T, nbcore = nbcore, libloc = NULL, savehistory = T )
+  # parallel
+  dopar = dopar, nbcore = nbcore, libloc = NULL)
 #
 ```
 
