@@ -15,7 +15,7 @@
 boxplot1 <- function( dat, ylab = "y", xlab = "TREATMENT", log=T )
 {
   if(log){ dat[,1] %>% as.numeric %>% "^"(2) -> dat[,1] }
-  par(xpd=T, mar=c(5,4,5,6))
+  # par(xpd=T, mar=c(5,4,5,6))
   p <- ggboxplot(dat, x = ".", y = "y",
                  color = ".", palette =palette0[1:length(dat[,2] %>% table)],
                  add = "jitter")

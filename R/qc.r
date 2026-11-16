@@ -133,8 +133,9 @@ qc <- function(
       Path %>% file.path(FileName0) -> FileName1
       paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
       # plot
-      t %>% pca(title=Title)
-      ggsave(FileName1)
+      # t %>% pca(title=Title)
+      t %>% pca(title=Title) -> ppca
+      ggsave(plot=ppca,filename=FileName1)
     }
   }
   # with factor
@@ -197,8 +198,8 @@ qc <- function(
           Path %>% file.path("pca",FileName0) -> FileName1
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% pca(factor=sif[,sel[i]], pc1=1, pc2=2, title=Title, legendtitle=colnames(sif)[sel[i]])
-          ggsave(FileName1)
+          t %>% pca(factor=sif[,sel[i]], pc1=1, pc2=2, title=Title, legendtitle=colnames(sif)[sel[i]]) -> ppca2
+          ggsave(plot=ppca2,filename=FileName1)
         }
       # pc 1 3
       foreach( i=1:length(sel) ) %do%
@@ -207,8 +208,8 @@ qc <- function(
           Path %>% file.path("pca",FileName0) -> FileName1
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% pca(factor=sif[,sel[i]], pc1=1, pc2=3, title=Title, legendtitle=colnames(sif)[sel[i]])
-          ggsave(FileName1)
+          t %>% pca(factor=sif[,sel[i]], pc1=1, pc2=3, title=Title, legendtitle=colnames(sif)[sel[i]]) -> ppca3
+          ggsave(plot=ppca3,filename=FileName1)
         }
       # pc 1 4
       foreach( i=1:length(sel) ) %do%
@@ -217,8 +218,8 @@ qc <- function(
           Path %>% file.path("pca",FileName0) -> FileName1
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t), sep = ""  ) -> Title
           #
-          t %>% pca(factor=sif[,sel[i] ],pc1=1,pc2=4,title=Title,legendtitle=colnames(sif)[sel[i]])
-          ggsave( FileName1 )
+          t %>% pca(factor=sif[,sel[i] ],pc1=1,pc2=4,title=Title,legendtitle=colnames(sif)[sel[i]]) -> ppca4
+          ggsave(plot=ppca4,filename=FileName1)
         }
     }
   }
@@ -241,8 +242,8 @@ qc <- function(
           Path %>% file.path( "pca", FileName ) -> FileName
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% pca(factor=sif[,sel[i]],pc1=1,pc2=2,title=Title,legendtitle=colnames(sif)[sel[i]])
-          ggsave(FileName)
+          t %>% pca(factor=sif[,sel[i]],pc1=1,pc2=2,title=Title,legendtitle=colnames(sif)[sel[i]]) -> ppca5
+          ggsave(plot=ppca5,filename=FileName)
         }
       # pc 1 3
       foreach(i=1:length(sel)) %do%
@@ -251,8 +252,8 @@ qc <- function(
           Path %>% file.path("pca",FileName) -> FileName
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% pca(factor=sif[,sel[i]],pc1=1,pc2=3,title=Title,legendtitle=colnames(sif)[sel[i]])
-          ggsave(FileName)
+          t %>% pca(factor=sif[,sel[i]],pc1=1,pc2=3,title=Title,legendtitle=colnames(sif)[sel[i]]) -> ppca6
+          ggsave(plot=ppca6,filename=FileName)
         }
       # pc 1 4
       foreach( i=1:length(sel) ) %do%
@@ -261,8 +262,8 @@ qc <- function(
           Path %>% file.path( "pca", FileName ) -> FileName
           paste("Principal Component Analysis data ",ncol(t)," x ",nrow(t),sep="") -> Title
           #
-          t %>% pca(factor=sif[,sel[i] ],pc1=1,pc2=4,title=Title,legendtitle=colnames(sif)[sel[i]])
-          ggsave( FileName )
+          t %>% pca(factor=sif[,sel[i] ],pc1=1,pc2=4,title=Title,legendtitle=colnames(sif)[sel[i]]) -> ppca7
+          ggsave(plot=ppca7,filename=FileName)
         }
     }
   }

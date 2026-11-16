@@ -66,6 +66,7 @@
 #' @importFrom forcats fct_reorder
 #' @importFrom parallel makeCluster stopCluster detectCores
 #' @importFrom doParallel registerDoParallel stopImplicitCluster
+#' @importFrom grDevices dev.off
 #' @noRd
 enanopar <- function(
     omicdata = NULL, gmtfiles = NULL, species = "hs", dat = NULL, factor = NULL,
@@ -328,7 +329,6 @@ enanopar <- function(
           close(f)
           #
           # if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
-          # gmtcol <- foreach(i=1:length(rl0),.packages = c("moal","magrittr")) %do%
           gmtcoll0 <- foreach(j=1:length(rl0),.packages = c("moal","magrittr")) %do%
             {
               rl0[j] %>% strsplit("\t") %>% unlist %>% "["(1) -> Name
@@ -346,25 +346,10 @@ enanopar <- function(
                     t[-sel] -> tt
                     list(Name,Name,length(tt),tt)
                   } }
-              # SymbolList %>% "match"(Omicdataf0$Symbol) %>% Omicdataf0$GeneID[.] -> t
-              # t %>% is.na %>% which -> sel
-              # SymbolList %>% moal::annot(.) -> t
-              # if((t %>% is.na %>% all %>% "!"(.)) | (SymbolList %>% grepl("^[0-9]+$",.) %>% all %>% "!"(.))) 
-              # { 
-              #   t %>% is.na %>% which -> sel
-              #   t[-sel] -> tt
-              #   list(Name,Name,length(tt),tt)
-              # } 
             }
-          # gmtcol0
-          # gmtcol0[1] %>% names
-          # names(gmtcol0) <- "zidane"
           if(gmtcoll0 %>% unlist %>% is.null %>% "!"(.)){ gmtcoll0 }
-          # gmtcol0 %>% "list"(gmtcol1,.) -> gmtcol1
-          # if(dopar){parallel::stopCluster(cl);doParallel::stopImplicitCluster()}
         }
-      # NULL -> gmtfiles2 
-      gmtcoll1
+      #
       if( gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% all %>% "!"(.) )
       {
         gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% which -> selcoll
@@ -383,13 +368,11 @@ enanopar <- function(
           {
             c(t[i],t[i],gmtcoll2[[i]] %>% length) %>% paste(collapse = "|")
           }
-        gmtcoll2 %>% names
         collNames %>% unique -> names(gmtcoll2)
         Genesetdb0 %>% "c"(gmtcoll2) -> Genesetdb0
       }
     }
     # remove min and max geneset
-    Genesetdb0 %>% names
     Genesetdb1 <- foreach(i=1:length(Genesetdb0)) %do%
       {
         Genesetdb0[[i]] %>% lapply("[",4) %>% unlist(recursive = F) %>% lapply(length) %>% unlist -> t
@@ -398,7 +381,6 @@ enanopar <- function(
       }
     Genesetdb0 %>% names -> names(Genesetdb1)
     Genesetdb1 %>% lapply(length)
-    Genesetdb1 %>% names
     # preprocessing
     gseastats0 <- foreach(j=1:length(t6)) %do%
       {
@@ -431,7 +413,6 @@ enanopar <- function(
         Omicdataf1 %>% data.frame(Signlog10pval0) %>% dplyr::arrange(Signlog10pval0) -> Omicdataf2
         Omicdataf2$Signlog10pval0 -> stats
         names(stats) <- Omicdataf2$GeneID
-        # c(stats,CompName0)
         list(colnames(Omicdataf0)[2] %>% sub("p_","",.),stats)
       }
     # fsgsea
@@ -454,7 +435,6 @@ enanopar <- function(
     foreach(i=1:length(gseastats2),.packages=c("magrittr","dplyr","moal","foreach","fgsea","stringr","ggplot2")) %do%
       {
         set.seed(123679)
-        # gseastats2[[i]][[2]] %>% data.frame -> test
         if(gseatail=="twotail")
         {
           fgsea0 <- fgsea::fgsea(pathways=gseastats2[[i]][[3]],stats=gseastats2[[i]][[2]],minSize=mings,maxSize=maxgs,scoreType="std",nproc=1)
@@ -520,13 +500,10 @@ enanopar <- function(
             fgseapval1plot3 -> datp
             # NES ranking
             fgseapval1 %>% dplyr::arrange( -abs(.data$NES) ) %>% dplyr::slice(1:topena) -> fgseapval1plot
-            fgseapval1plot %>% dim
             # check NA when unbalanced up and down
             fgseapval1plot$pval %>% is.na %>% which -> selNAgsea
             if(length(selNAgsea)>0){ fgseapval1plot$pval[selNAgsea] <- 1 ; fgseapval1plot$NES[selNAgsea] <- 1 }
             #
-            
-            # fgseapval1plot %>% rbind(fgseapval1plotnes) %>% unique -> fgseapval1plot
             fgseapval1plot$pval %>% log10 %>% "*"(-1) -> Log10Pval
             fgseapval1plot %>% data.frame(Log10Pval) -> fgseapval1plot2
             # reduce long geneset name
@@ -534,7 +511,6 @@ enanopar <- function(
               paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
             "PATHWAY$" -> Grepcol1
             fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-            
             fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
             Nchar0 %>% ">"(50) %>% which -> selNchar
             if(length(selNchar)>0)
@@ -544,21 +520,14 @@ enanopar <- function(
               fgseapval1plot2$Name %>% as.character -> NameNchar0
               fgseapval1plot2$Name[selNchar] <- paste(Head0,Tail0,sep="...")
             }
-            fgseapval1plot2 %>% dim
             fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,Log10Pval)) -> fgseapval1plot3
             fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
               lapply(paste0,collapse="") %>% unlist -> Overlap
-            fgseapval1plot3 %>% dim
             fgseapval1plot3 %>% data.frame(Overlap) -> datnes
             # barplot
-            fgseapval1plot3 %>% colnames
-            fgseapval1plot3 %>% colnames
-            datp %>% dim
             datp %>% enabarplot(datnes=datnes,title=DirName1,subtitle=gseastats2[[i]][[1]]) -> p
             # output plot
-            # paste(DirName1,"_ena_",gseastats2[[i]][[1]],"_",datp$Name %>% "c"(datnes$Name) %>% unique %>% length,".pdf",sep="") -> FileName0
             paste(DirName1,"_ena_",gseastats2[[i]][[1]],"_",topena,".pdf",sep="") -> FileName0
-            # ggsave(plot=p,filename=file.path(Path0,"ena",FileName0))
             ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width=40,height=30,scale=1,units="cm")
           }
         }
@@ -571,8 +540,6 @@ enanopar <- function(
     {
       Path0 %>% file.path("ena") %>% list.files(full.names = T) -> l0
       # PATHWAYS
-      # Genesetdb1 %>% names
-      # "^REACTOME|^KEGG|^WIKI|^HALLMAR|^KEGG|^CGP|^PID|^BIOCARTA"
       l0 %>% basename %>% grep("^REACTOME|^KEGG|^WIKI|^HALLMAR|^KEGG|^CGP|^PID|^BIOCARTA",.) -> selgs
       if(length(selgs)>0)
       {
@@ -652,7 +619,6 @@ enanopar <- function(
           close(f)
           #
           # if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
-          # gmtcol <- foreach(i=1:length(rl0),.packages = c("moal","magrittr")) %do%
           gmtcoll0 <- foreach(j=1:length(rl0),.packages = c("moal","magrittr")) %do%
             {
               rl0[j] %>% strsplit("\t") %>% unlist %>% "["(1) -> Name
@@ -670,24 +636,11 @@ enanopar <- function(
                   t[-sel] -> tt
                   list(Name,Name,length(tt),tt)
                 } }
-              # SymbolList %>% "match"(Omicdataf0$Symbol) %>% Omicdataf0$GeneID[.] -> t
-              # t %>% is.na %>% which -> sel
-              # SymbolList %>% moal::annot(.) -> t
-              # if((t %>% is.na %>% all %>% "!"(.)) | (SymbolList %>% grepl("^[0-9]+$",.) %>% all %>% "!"(.))) 
-              # { 
-              #   t %>% is.na %>% which -> sel
-              #   t[-sel] -> tt
-              #   list(Name,Name,length(tt),tt)
-              # } 
             }
-          # gmtcol0
-          # gmtcol0[1] %>% names
-          # names(gmtcol0) <- "zidane"
+          #
           if(gmtcoll0 %>% unlist %>% is.null %>% "!"(.)){ gmtcoll0 }
-          # gmtcol0 %>% "list"(gmtcol1,.) -> gmtcol1
-          # if(dopar){parallel::stopCluster(cl);doParallel::stopImplicitCluster()}
         }
-      # NULL -> gmtfiles2 
+      #
       if( gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% all %>% "!"(.) )
       {
         gmtcoll1 %>% lapply("[",1) %>% lapply(is.null) %>% unlist %>% which -> selcoll
@@ -711,16 +664,6 @@ enanopar <- function(
         Genesetdb0 %>% "c"(gmtcoll2) -> Genesetdb0
       }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     # remove min and max geneset
     Genesetdb1 <- foreach(i=1:length(Genesetdb0)) %do%
       {
@@ -752,23 +695,15 @@ enanopar <- function(
               Omicdataf1[sel,selCol] <- 25
             }
             #
-            # 1.1 -> enascoremin
             1 -> enascoremin
-            # Omicdataf1$GeneID -> GeneidList0
-            # Omicdataf1$Symbol -> SymbolList0
-            # NULL -> Ena0
             Ena0 <- foreach(k=1:length(Genesetdb1[[i]]),.combine="rbind") %do%
               {
                 Genesetdb1[[i]][[k]][[1]] -> GenesetName
-                # GeneidList0 %in% Genesetdb0[[i]][[k]][[4]] %>% which %>% GeneidList0[.] -> OverlapGeneIDList0
-                # GeneidList0 %in% Genesetdb0[[i]][[k]][[4]] %>% which %>% SymbolList0[.] -> OverlapSymbolList0
                 Omicdataf1$GeneID %in% Genesetdb1[[i]][[k]][[4]] %>% which -> selo
                 Omicdataf1[selo,]  -> Omicdataf2
                 Omicdataf2$GeneID -> OverlapGeneIDList0
                 Omicdataf2$Symbol -> OverlapSymbolList0
-                # Omicdataf1$Symbol %>% length -> ListSize0
                 Omicdataf1 %>% nrow -> ListSize0
-                # OverlapSymbolList0 %>% length -> OverlapSize0
                 Omicdataf2 %>% nrow -> OverlapSize0
                 Genesetdb1[[i]][[k]][[4]] %>% length -> GenesetSize0
                 ( OverlapSize0 / GenesetSize0 ) %>% round(2) -> OverlapRatio0
@@ -790,18 +725,9 @@ enanopar <- function(
                     mean %>% "*"(length(selfcd)) %>% log2 -> enafcd
                   if(is.na(enafcd) %>% all){ 1 -> enafcd }
                 }else{ 1 -> enafcd }
-                # if(enafcu %>% "-"(enafcd) %>% ">"(0)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
-                # if(enafcu %>% "/"(enafcd) %>% ">"(2)){ EnaScore0 %>% "*"(enafcu %>% "/"(enafcd) %>% "+"(1) %>% log2) -> EnaScore0 }
-                # if(enafcd %>% "/"(enafcu) %>% "<"(2)){ EnaScore0 %>% "*"(-(enafcd %>% "/"(enafcu) %>% "+"(1) %>% log2)) -> EnaScore0 }
-                # if(enafcd %>% "/"(enafcu) %>% ">"(2)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
+                #
                 if(enafcd %>% "/"(enafcu) %>% ">"(1)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
-                # if(length(selfcd) %>% ">"(0) & length(selfcd) %>% ">"(0))
-                # {
-                #   if(length(selfcd) %>% "*"() %>% "/"(length(selfcu)) %>% ">"(1.2)){ EnaScore0 %>% "*"(-1) -> EnaScore0 }
-                # }
                 # EnaScore0 
-                # if(  OverlapSize0 >= overlapmin & EnaScore0 > enascoremin )
-                # if(  OverlapSize0 >= overlapmin )
                 if(  OverlapSize0 >= overlapmin & (EnaScore0 > enascoremin | EnaScore0 < -enascoremin ) )
                 {
                   c(OverlapSize0,ListSize0,GenesetSize0,bg) %>% matrix(ncol=2) -> ContTable0
@@ -813,6 +739,7 @@ enanopar <- function(
                     OverlapSize0,GenesetSize0,OverlapRatio0,EnaScore0,Pval0)
                 }
               }
+            #
             # plot
             if(!is.null(Ena0))
             {
@@ -831,8 +758,7 @@ enanopar <- function(
                 setNames(c("Name","OverlapSize","GeneSetSize","OverlapSymbolList","pval","NES","OverlapGeneIDList")) %>% 
                 dplyr::arrange(.data$pval) -> Ena3
               Ena3 -> fgseapval1
-              fgseapval1 %>% colnames
-              # Ena1 %>% dplyr::select(.data$Name,.data$) -> fgseapval1
+              #
               Genesetdb1 %>% names %>% "["(i) %>% strsplit("\\|") %>% unlist %>% "["(2) %>% stringr::str_to_upper(.) -> DirName1
               paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",nrow(fgseapval1),".tsv",sep="") -> FileName0
               fgseapval1 %>% output(file.path(Path0,"ena",FileName0))
@@ -848,7 +774,6 @@ enanopar <- function(
                   paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
                 "PATHWAY$" -> Grepcol1
                 fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-                
                 fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
                 Nchar0 %>% ">"(50) %>% which -> selNchar
                 if(length(selNchar)>0)
@@ -863,10 +788,8 @@ enanopar <- function(
                   lapply(paste0,collapse="") %>% unlist -> Overlap
                 fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
                 fgseapval1plot3 -> datp
-                datp %>% dim
                 # NES ranking
                 fgseapval1 %>% dplyr::arrange( -abs(.data$NES) ) %>% dplyr::slice(1:topena) -> fgseapval1plot
-                fgseapval1plot %>% dim
                 # fgseapval1plot %>% rbind(fgseapval1plotnes) %>% unique -> fgseapval1plot
                 fgseapval1plot$pval %>% log10 %>% "*"(-1) -> Log10Pval
                 fgseapval1plot %>% data.frame(Log10Pval) -> fgseapval1plot2
@@ -875,7 +798,6 @@ enanopar <- function(
                   paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
                 "PATHWAY$" -> Grepcol1
                 fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-                
                 fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
                 Nchar0 %>% ">"(50) %>% which -> selNchar
                 if(length(selNchar)>0)
@@ -895,50 +817,13 @@ enanopar <- function(
                 fgseapval1plot3 %>% colnames
                 fgseapval1plot3 %>% colnames
                 datp %>% dim
+                pdf(NULL)
                 datp %>% enabarplot(datnes=datnes,title=DirName1,subtitle=Omicdataf1 %>% colnames %>% "["(2) %>% gsub("p_","",.)) -> p
-                
-                
-                
-                
-                
-                
-                
-                
-                
                 # NES ranking
-                # fgseapval1 %>% dplyr::arrange( -.data$NES ) %>% dplyr::slice(1:topena) -> fgseapval1plotnes
-                # fgseapval1plot %>% rbind(fgseapval1plotnes) %>% unique -> fgseapval1plot
-                # #
-                # fgseapval1plot$pval %>% log10 %>% "*"(-1) -> Log10Pval
-                # fgseapval1plot %>% data.frame(Log10Pval) -> fgseapval1plot2
-                # # reduce long geneset name
-                # Genesetdb0 %>% names %>% strsplit("\\|") %>% lapply("[",2) %>% unlist %>% stringr::str_to_upper(.) %>% 
-                #   paste("^",.,"_",sep="") %>% paste0(collapse="|") -> Grepcol0
-                # "PATHWAY$" -> Grepcol1
-                # fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub(Grepcol1,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-                # fgseapval1plot2$Name %>% gsub(Grepcol0,"",.) %>% gsub("_"," ",.) -> fgseapval1plot2$Name
-                # 
-                # fgseapval1plot2$Name %>% as.character %>% nchar -> Nchar0
-                # Nchar0 %>% ">"(50) %>% which -> selNchar
-                # if(length(selNchar)>0)
-                # {
-                #   fgseapval1plot2$Name[selNchar] %>% substr(1,45) -> Head0
-                #   fgseapval1plot2$Name[selNchar] %>% substr(Nchar0-10,Nchar0)-> Tail0
-                #   fgseapval1plot2$Name %>% as.character -> NameNchar0
-                #   fgseapval1plot2$Name[selNchar] <- paste(Head0,Tail0,sep="...")
-                # }
-                # # barplot log10Pval ranking
-                # fgseapval1plot2 %>% dplyr::mutate(Name=forcats::fct_reorder(.data$Name,.data$Log10Pval)) -> fgseapval1plot3
-                # fgseapval1plot3$OverlapSize %>% paste("/",fgseapval1plot3$GeneSetSize) %>% 
-                #   lapply(paste0,collapse="") %>% unlist -> Overlap
-                # fgseapval1plot3 %>% data.frame(Overlap) -> fgseapval1plot3
-                # fgseapval1plot3 %>% enabarplot(title=DirName1,subtitle=Omicdataf1 %>% colnames %>% "["(2) %>% gsub("p_","",.)) -> p
-                
-                
-                
                 # output
                 paste(DirName1,"_ena_",colnames(Omicdataf1)[3] %>% gsub("fc_","",.),"_",topena,".pdf",sep="") -> FileName0
                 ggsave(plot=p,filename=file.path(Path0,"ena",FileName0),width=40,height=30,scale=1,units="cm")
+                dev.off()
               }
             }
           }
@@ -1073,10 +958,8 @@ enanopar <- function(
       TopGeneset2 <- foreach(i=1:length(TopGeneset1),.combine = "c") %do%
         {
           TopGeneset1[i] -> t
-          t %>% names
           t[[1]] %>% annotdb(.) -> a0
           a0$Symbol %>% data.frame(Symbol=.) %>% inner_join(data.frame(Symbol=Pvalnodelist1)) -> tt
-          tt$Symbol
           t[[1]] <- tt$Symbol
           t
         }
@@ -1191,7 +1074,6 @@ enanopar <- function(
               c(GrD,GrN) %>% paste("^",.,"$",sep="") %>% paste0(collapse = "|") -> grep
               factor %>% grep(grep,.) -> sel
               tt %>% dplyr::select(c(sel+2)) -> ttt
-              # factor[sel] %>% as.character %>% ordered(c(GrD,GrN)) -> Factor0
               factor[sel] -> Factor0
               #
               if(THRESHOLD)
@@ -1303,16 +1185,11 @@ enanopar <- function(
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %do%
       {
-        # GenesetListsSymbol[[i]] -> symbollist
-        # symbollist %>% annot(.,idtype = "SYMBOL") -> a0
-        # a0$Symbol -> nodelist
         GenesetListsSymbol[[i]] -> nodelist
-        # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(1) -> title
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> title
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> FileNameGeneset
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(2) %>% gsub("/"," ",.) -> DirNameN0
         # reduce long geneset name
-        # FileNameGeneset %>% as.character %>% nchar -> Nchar0
         FileNameGeneset %>% as.character %>% nchar -> Nchar0
         Nchar0 %>% ">"(50) %>% which -> selNchar
         if(length(selNchar)>0)
@@ -1322,7 +1199,6 @@ enanopar <- function(
           FileNameGeneset %>% as.character -> NameNchar0
           FileNameGeneset <- paste(Head0,Tail0,sep="...")
         }
-        # GenesetLists1[i] %>% names %>% strsplit("\\|") %>% unlist %>% "["(2) -> DirNameN0
         #
         foreach(j=1:length(t6)) %do%
           {
@@ -1345,7 +1221,7 @@ enanopar <- function(
               c(GrD,GrN) %>% paste("^",.,"$",sep="") %>% paste0(collapse = "|") -> grep
               factor %>% grep(grep,.) -> sel
               tt %>% dplyr::select(c(sel+2)) -> ttt
-              # factor[sel] %>% as.character %>% ordered(c(GrD,GrN)) -> Factor0
+              #
               factor[sel] -> Factor0
               if(THRESHOLD)
               {
@@ -1425,9 +1301,6 @@ enanopar <- function(
     if(dopar){ parallel::detectCores() -> nb ; parallel::makeCluster(nb) -> cl; doParallel::registerDoParallel(cl)}
     foreach(i=1:length(GenesetLists1),.packages=c("magrittr","dplyr","moal","foreach","stringr","igraph","Rgraphviz","moalstringdbhs")) %do%
       {
-        # GenesetListsSymbol[[i]] -> symbollist
-        # symbollist %>% annot(.,idtype = "SYMBOL") -> a0
-        # a0$Symbol -> nodelist
         GenesetListsSymbol[[i]] -> nodelist
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> title
         GenesetLists1[i] %>% strsplit("\\|") %>% unlist %>% "["(1) %>% gsub("/"," ",.) -> FileNameGeneset

@@ -33,7 +33,7 @@ heatmap <- function(
   cexlegend = 0.65 , keysize = 0.9, keycolor = c( "darkgreen", "orange" , "darkred"),
   parmar = c(5,4,5,6), scale = "row")
 {
-  graphics::par(xpd=T, mar=parmar)
+  graphics::par(xpd=T,mar=parmar)
   if(dendrogram == "both")
   {
     dat %>% hc(factor=factor,doplot=F,method=method) -> coldend

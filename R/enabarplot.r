@@ -18,11 +18,6 @@
 enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRUE, addenarankbarplot = TRUE, title = "ena", subtitle = "")
 {
   # barplot
-  
-  
-  
-  
-  
   # fgseapval1plot3 %>% colnames
   dat %>% ggplot( aes(x=.data$Log10Pval,y=.data$Name,fill=.data$NES)) -> p
   p + geom_bar(stat="identity",width = 0.95) -> p
@@ -66,7 +61,7 @@ enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRU
               plot.subtitle=element_text(size=8,hjust=0.5),
               axis.title.x=element_text(size=6,face="bold"),
               axis.text.x=element_text(size=6,face="bold"),
-              axis.title.y=element_text(size=6,,face="bold"),
+              axis.title.y=element_text(size=6,face="bold"),
               axis.text.y=element_text(size=8,face="bold"),
               legend.position="bottom",
               legend.title=element_text(size = 5), 
@@ -83,10 +78,13 @@ enabarplot <- function( dat = NULL,datnes = NULL, labsize = 7, addratioena = TRU
     # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),nrow=2) -> p
     # gridExtra::grid.arrange(p1,p2,heights = c(10, 10),ncol=2) -> p
     # gridExtra::grid.arrange(p1,p2,heights = c(5,5),ncol=2) -> p
-    gridExtra::grid.arrange(p1,p2,ncol=2) -> p
+    # gridExtra::grid.arrange(p1,p2,ncol=2) -> p
+    gridExtra::arrangeGrob(p1,p2,ncol=2) -> p
     # gridExtra::grid.arrange(p1,p2,heights=c(10, 10)) -> p
     # ggpubr::ggarrange(p1, p2, widths = c(5,5)) -> p
     # plot_grid(p1, p2, labels = c('A', 'B'), label_size = 12)
   }
-  p %>% return()
+  # p %>% return()
+  # invisible(return(p))
+  invisible(p)
 }

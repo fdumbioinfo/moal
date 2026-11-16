@@ -74,6 +74,8 @@
 #' @param nrowsim numeric row number for normal distribution simulate matrix analysis 
 #' @param path character results directory path
 #' @param dirname character results directory name
+#' @param dohtmlreport logical create HTML report if TRUE (by default)
+#' @param dpihtml numerical plot resolution for html
 #' @param zip logical compress results directory if TRUE
 #' @param remove logical remove uncompress results directory if TRUE
 #' @return omic results directory
@@ -163,7 +165,7 @@ omic <- function(
   dotopgenesetnetwork = FALSE ,dotopgenesetheatmap = TRUE,
   dogmtgenesetnetwork = FALSE,dogmtgenesetheatmap = TRUE,
   crosscompint = FALSE, sample = NULL , seed = 123679, dopar = TRUE, nbcore = NULL, nrowsim = 2000, libloc = NULL, savehistory = TRUE,
-  path = ".", dirname = NULL, zip = FALSE, remove = FALSE )
+  path = ".", dirname = NULL, dohtmlreport = TRUE, dpihtml = 150, zip = FALSE, remove = FALSE )
 {
   Sys.time() -> start
   list() -> log
@@ -413,7 +415,7 @@ omic <- function(
       # QC RBE
       # paste("QC_all_RBE_",ncol(dat)-1,"_",nrow(dat),sep="") -> DirName
       "all_RBE" -> DirName
-      DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)
+      if(doqc){DatRbe %>% qc(sif=sif,path=Path,dirname=DirName)}
       # add factor for anova
       AnovaFactors %>% c(batch) -> AnovaFactors
       RBE <- T
@@ -477,11 +479,11 @@ omic <- function(
     #
     if(dopar)
     {
-      # parallel::detectCores() -> NbCore
       if(!is.null(nbcore)){nbcore -> NbCore}else{parallel::detectCores() -> NbCore}
       parallel::makeCluster(NbCore) -> cl
       if(!is.null(libloc)){parallel::clusterCall(cl,function(libs){.libPaths(c(libs,.libPaths()))},libloc)}
       doParallel::registerDoParallel(cl)
+      on.exit({parallel::stopCluster(cl);foreach::registerDoSEQ()},add=TRUE)
     }else{ foreach::registerDoSEQ() }
     ### anova
     All0 <- foreach(i=1:nrow(dat),.packages=c("moal","magrittr","dplyr","foreach","broom"),.combine=rbind) %dopar%
@@ -1309,6 +1311,49 @@ omic <- function(
   # ----
   # if(INTERACTON){ if() }
   if(UNBALANCED){ dolineplot <- FALSE }
+  # if(dolineplot)
+  # {
+  #   paste("Line plot processing...\n",sep="") %>% cat
+  #   Path %>% list.dirs(recursive=F) -> d0
+  #   d0 %>% basename %>% grep("^DiffLists_",.) %>% d0[.] -> d1
+  #   d1 %>% list.files(recursive=T,full.names=T) -> l0
+  #   l0 %>% basename %>% grep("^List_.*.tsv",.,value=F) %>% l0[.] -> l1
+  #   # l1 %>% basename %>% sub("List_.*_(.*).tsv","\\1",.) %>% as.numeric %>% ">"(.,0) %>% which %>% l1[.] -> l2
+  #   l1 %>% basename %>% sub("List_.*_(.*).tsv","\\1",.) %>% as.numeric %>% ">"(.,0) %>% which -> sellineplot 
+  #   # if( length(l2)==0 ){ dolineplot <- FALSE ; paste("No significant feature for lineplot done.\n",sep="") %>% cat }
+  #   if(length(sellineplot) < 1){ dolineplot <- FALSE ; paste("No significant feature for lineplot\n",sep="") %>% cat }else{ l1[sellineplot] -> l2 }
+  #   if(RBE){ datnoRBE -> datLineplot}else{ dat -> datLineplot }
+  #   if(dolineplot)
+  #   {
+  #     ll1 <- foreach(i=1:length(l2),.packages=c("magrittr","dplyr")) %dopar% { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
+  #     ll1 %>% unlist %>% as.character %>% unique -> ll2
+  #     # only for symbol in line plot
+  #     ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(r0,by="rowID") -> r1
+  #     # ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(dat,by="rowID") -> Dat2
+  #     ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(datLineplot,by="rowID") -> Dat2
+  #     paste("lineplot_",nrow(Dat2),sep="") -> DirName
+  #     Path %>% file.path(DirName) %>% dir.create
+  #     foreach(i=1:length(CompFactors)) %do%
+  #       {
+  #         Path %>% file.path( DirName , CompFactors[i] ) %>% dir.create
+  #         CompFactors[i] -> CompFactors0
+  #         if( CompFactors[i] %>% grepl("x",.) ){ IntFactor1 -> CompFactors0 }
+  #         foreach( j=1:nrow(Dat2), .packages = c("moal","magrittr","dplyr","broom","ggplot2") ) %dopar%
+  #           {
+  #             # r1$Symbol[j] %>% gsub("/"," ",.) %>% gsub("\'","",.) %>% gsub("-","",.) -> Symbol
+  #             r1$Symbol[j] %>% gsub("/","",.) %>% gsub("\'","",.) %>% gsub("-","",.) %>% gsub(":","",.) %>% gsub("\\*","",.) -> Symbol
+  #             paste("lineplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileName
+  #             Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
+  #             CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
+  #             sif %>% colnames %>% grep(grep, ., value=FALSE) %>% sif[,.] -> Sif0
+  #             Sif0 %>% data.frame(y=Dat2[j,-1] %>% as.numeric,.) -> Sif1
+  #             dplot(dat=Sif1,title=r1$Symbol[j],log=F) -> p0
+  #             ggsave(plot=p0,filename=FileName)
+  #           }
+  #       }
+  #     paste("Lineplot done.\n",sep="") %>% cat
+  #   }
+  # }
   if(dolineplot)
   {
     paste("Line plot processing...\n",sep="") %>% cat
@@ -1326,27 +1371,32 @@ omic <- function(
       ll1 <- foreach(i=1:length(l2),.packages=c("magrittr","dplyr")) %dopar% { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
       ll1 %>% unlist %>% as.character %>% unique -> ll2
       # only for symbol in line plot
-      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(r0,by="rowID") -> r1
+      ll2 %>% data.frame("rowID"=.,stringsAsFactors=FALSE) %>% inner_join(r0,by="rowID") -> r1
       # ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(dat,by="rowID") -> Dat2
-      ll2 %>% data.frame("rowID"=., stringsAsFactors=FALSE) %>% inner_join(datLineplot,by="rowID") -> Dat2
-      paste("lineplot_",nrow(Dat2),sep="") -> DirName
-      Path %>% file.path(DirName) %>% dir.create
+      ll2 %>% data.frame("rowID"=.,stringsAsFactors=FALSE) %>% inner_join(datLineplot,by="rowID") -> Dat2
+      # paste("lineplot_",nrow(Dat2),sep="") -> DirName
+      # paste("lineplot_",CompFactors,"_",nrow(Dat2),sep="") -> DirName
+      # Path %>% file.path(DirName) %>% dir.create
       foreach(i=1:length(CompFactors)) %do%
         {
-          Path %>% file.path( DirName , CompFactors[i] ) %>% dir.create
+          # Path %>% file.path(DirName,CompFactors[i]) %>% dir.create
+          paste("lineplot_",CompFactors[i],"_",nrow(Dat2),sep="") -> DirNameLP
+          # Path %>% file.path(DirName,CompFactors[i]) %>% dir.create
+          Path %>% file.path(DirNameLP) %>% dir.create
           CompFactors[i] -> CompFactors0
-          if( CompFactors[i] %>% grepl("x",.) ){ IntFactor1 -> CompFactors0 }
-          foreach( j=1:nrow(Dat2), .packages = c("moal","magrittr","dplyr","broom","ggplot2") ) %dopar%
+          if(CompFactors[i] %>% grepl("x",.)){ IntFactor1 -> CompFactors0 }
+          foreach(j=1:nrow(Dat2),.packages=c("moal","magrittr","dplyr","broom","ggplot2")) %dopar%
             {
               # r1$Symbol[j] %>% gsub("/"," ",.) %>% gsub("\'","",.) %>% gsub("-","",.) -> Symbol
               r1$Symbol[j] %>% gsub("/","",.) %>% gsub("\'","",.) %>% gsub("-","",.) %>% gsub(":","",.) %>% gsub("\\*","",.) -> Symbol
-              paste("lineplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileName
-              Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
+              paste("lineplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileNameLP
+              # Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
+              Path %>% file.path(DirNameLP,FileNameLP) -> FileNameLP1
               CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
               sif %>% colnames %>% grep(grep, ., value=FALSE) %>% sif[,.] -> Sif0
               Sif0 %>% data.frame(y=Dat2[j,-1] %>% as.numeric,.) -> Sif1
               dplot(dat=Sif1,title=r1$Symbol[j],log=F) -> p0
-              ggsave(plot=p0,filename=FileName)
+              ggsave(plot=p0,filename=FileNameLP1)
             }
         }
       paste("Lineplot done.\n",sep="") %>% cat
@@ -1355,9 +1405,51 @@ omic <- function(
   # ----
   # 11 - boxplot
   # ----
+  # if(doboxplotrow)
+  # {
+  #   paste("boxplot processing...\n" , sep = "" ) %>% cat
+  #   Path %>% list.dirs(recursive=F) -> d0
+  #   d0 %>% basename %>% grep("^DiffLists_",.) %>% d0[.] -> d1
+  #   d1 %>% list.files(recursive=T,full.names=T) -> l0
+  #   l0 %>% basename %>% grep("^List_.*.tsv",.,value=F) %>% l0[.] -> l1
+  #   # l1 %>% basename %>% sub( "List_.*_(.*).tsv","\\1",. ) %>% as.numeric %>% ">"(.,0) %>% which %>% l1[.] -> l2
+  #   l1 %>% basename %>% sub("List_.*_(.*).tsv","\\1",.) %>% as.numeric %>% ">"(.,0) %>% which -> selboxplot
+  #   # if( length(l2)==0 ){ doboxplotrow <- FALSE ; paste("No significant feature for boxplot done.\n",sep="") %>% cat }
+  #   if(length(selboxplot) < 1){ doboxplotrow <- F ; paste("No significant feature for boxplot \n",sep="") %>% cat }else{ l1[selboxplot] -> l2 }
+  #   if(RBE){ datnoRBE -> datboxplot}else{ dat -> datboxplot }
+  #   if(doboxplotrow)
+  #   {
+  #     ll1 <- foreach( i=1:length(l2), .packages=c("magrittr","dplyr") ) %dopar%
+  #       { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
+  #     ll1 %>% unlist %>% as.character %>% unique -> ll2
+  #     # only for symbol in line plot
+  #     ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(r0, by="rowID") -> r1
+  #     ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(datboxplot, by="rowID") -> Dat2
+  #     paste("boxplot_",nrow(Dat2),sep="") -> DirName
+  #     Path %>% file.path(DirName) %>% dir.create
+  #     foreach( i=1:length(CompFactors) ) %do%
+  #       {
+  #         Path %>% file.path( DirName , CompFactors[i] ) %>% dir.create
+  #         CompFactors[i] -> CompFactors0
+  #         # if( CompFactors[i] %>% grepl("x",.) ){ IntFactor1 -> CompFactors0 }
+  #         foreach( j=1:nrow(Dat2), .packages = c("moal","magrittr","dplyr","broom","ggplot2","ggpubr") ) %dopar%
+  #           {
+  #             r1$Symbol[j] %>% gsub("/"," ",.) %>% gsub("\'","",.) %>% gsub("-","",.) %>% gsub("\\*","",.) -> Symbol
+  #             paste("boxplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileName
+  #             Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
+  #             CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
+  #             sif %>% colnames %>% grep(grep, ., value=F) %>% sif[,.] -> Sif0
+  #             Sif0 %>% data.frame( y=Dat2[j,-1] %>% as.numeric, . ) -> Sif1
+  #             boxplot1( dat=Sif1 , xlab =CompFactors[i], ylab = r1$Symbol[j], log = F) -> p0
+  #             ggsave( plot=p0, filename=FileName )
+  #           }
+  #       }
+  #     paste("boxplot done.\n",sep="") %>% cat
+  #   }
+  # }
   if(doboxplotrow)
   {
-    paste( "boxplot processing...\n" , sep = "" ) %>% cat
+    paste("boxplot processing...\n",sep="") %>% cat
     Path %>% list.dirs(recursive=F) -> d0
     d0 %>% basename %>% grep("^DiffLists_",.) %>% d0[.] -> d1
     d1 %>% list.files(recursive=T,full.names=T) -> l0
@@ -1367,31 +1459,38 @@ omic <- function(
     # if( length(l2)==0 ){ doboxplotrow <- FALSE ; paste("No significant feature for boxplot done.\n",sep="") %>% cat }
     if(length(selboxplot) < 1){ doboxplotrow <- F ; paste("No significant feature for boxplot \n",sep="") %>% cat }else{ l1[selboxplot] -> l2 }
     if(RBE){ datnoRBE -> datboxplot}else{ dat -> datboxplot }
+    #
     if(doboxplotrow)
     {
-      ll1 <- foreach( i=1:length(l2), .packages=c("magrittr","dplyr") ) %dopar%
-        { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
+      ll1 <- foreach(i=1:length(l2),.packages=c("magrittr","dplyr")) %dopar% { l2[i] %>% input %>% dplyr::select(1) %>% unlist %>% unique }
       ll1 %>% unlist %>% as.character %>% unique -> ll2
       # only for symbol in line plot
-      ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(r0, by="rowID") -> r1
-      ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(datboxplot, by="rowID") -> Dat2
-      paste("boxplot_",nrow(Dat2),sep="") -> DirName
-      Path %>% file.path(DirName) %>% dir.create
-      foreach( i=1:length(CompFactors) ) %do%
+      ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(r0,by="rowID") -> r1
+      ll2 %>% data.frame("rowID"=.,stringsAsFactors=F) %>% dplyr::inner_join(datboxplot,by="rowID") -> Dat2
+      # paste("boxplot_",nrow(Dat2),sep="") -> DirName
+      # Path %>% file.path(DirName) %>% dir.create
+      # paste("boxplot_",CompFactors[i],"_",nrow(Dat2),sep="") -> DirNameLP
+      # Path %>% file.path(DirName,CompFactors[i]) %>% dir.create
+      # Path %>% file.path(DirNameLP) %>% dir.create
+      foreach(i=1:length(CompFactors)) %do%
         {
-          Path %>% file.path( DirName , CompFactors[i] ) %>% dir.create
+          # Path %>% file.path( DirName , CompFactors[i] ) %>% dir.create
           CompFactors[i] -> CompFactors0
-          # if( CompFactors[i] %>% grepl("x",.) ){ IntFactor1 -> CompFactors0 }
-          foreach( j=1:nrow(Dat2), .packages = c("moal","magrittr","dplyr","broom","ggplot2","ggpubr") ) %dopar%
+          paste("boxplot_",CompFactors[i],"_",nrow(Dat2),sep="") -> DirNameBB
+          # Path %>% file.path(DirName,CompFactors[i]) %>% dir.create
+          Path %>% file.path(DirNameBB) %>% dir.create
+          # if(CompFactors[i] %>% grepl("x",.)){IntFactor1 -> CompFactors0}
+          foreach(j=1:nrow(Dat2),.packages = c("moal","magrittr","dplyr","broom","ggplot2","ggpubr")) %dopar%
             {
               r1$Symbol[j] %>% gsub("/"," ",.) %>% gsub("\'","",.) %>% gsub("-","",.) %>% gsub("\\*","",.) -> Symbol
-              paste("boxplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileName
-              Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
+              paste("boxplot_",CompFactors[i],"_",Symbol,".pdf",sep="") -> FileNameBB0
+              # Path %>% file.path(DirName, CompFactors[i], FileName) -> FileName
+              Path %>% file.path(DirNameBB,FileNameBB0) -> FileNameBB1
               CompFactors0 %>% paste("^",.,"$",sep="") %>% paste0(collapse="|") -> grep
-              sif %>% colnames %>% grep(grep, ., value=F) %>% sif[,.] -> Sif0
-              Sif0 %>% data.frame( y=Dat2[j,-1] %>% as.numeric, . ) -> Sif1
-              boxplot1( dat=Sif1 , xlab =CompFactors[i], ylab = r1$Symbol[j], log = F) -> p0
-              ggsave( plot=p0, filename=FileName )
+              sif %>% colnames %>% grep(grep,.,value=F) %>% sif[,.] -> Sif0
+              Sif0 %>% data.frame(y=Dat2[j,-1] %>% as.numeric,.) -> Sif1
+              boxplot1(dat=Sif1,xlab=CompFactors[i],ylab=r1$Symbol[j],log=F) -> p0
+              ggsave(plot=p0,filename=FileNameBB1)
             }
         }
       paste("boxplot done.\n",sep="") %>% cat
@@ -1500,11 +1599,11 @@ omic <- function(
   }
   #
   # parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()
-  if(dopar){parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()}
+  # if(dopar){parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()}
   #
-  # ----
-  # log
-  # ----
+  # -----
+  # 13 - log
+  # -----
   LogOutput <- list()
   paste("###################################\n",sep="") %>%
   paste("####### moal omic analysis  #######\n",sep="") %>%
@@ -1549,8 +1648,11 @@ omic <- function(
   foreach(i=1:length(LogOutput)) %do% { LogOutput[[i]] %>% paste(.,"\n",sep="") %>% writeLines(f) }
   close(f)
   #
+  paste("log done.\n") %>% cat
+  #
   # save history
-  if(savehistory)
+  # if(savehistory)
+  if(savehistory & dir.exists(file.path(Path)) & interactive())
   { 
     utils::savehistory(file = file.path(Path,"Rscript.r"))
     #
@@ -1566,17 +1668,33 @@ omic <- function(
       rl1 %>% writeLines(fo) 
       close(fo)
     }
+    paste("save R script done.\n") %>% cat
   }
-  #
-  # zip
+  # -----
+  # 14 - html report
+  # -----
+  if(dohtmlreport)
+  {
+    paste("Create htmlreport...\n") %>% cat
+    htmlreport(omicfolder=Path,name="Report",dpihtml=dpihtml)
+    paste("html report done.\n") %>% cat
+  }
+  # parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()
+  # if(dopar){parallel::stopCluster(cl) ; doParallel::stopImplicitCluster()}
+  # -----
+  # 15 - zip and done
+  # -----
   if(zip)
   {
     utils::zip(zipfile=Path %>% basename, files=Path %>% basename)
     paste("zip done.\n") %>% cat
   }
   if(zip & remove){ base::unlink( Path, recursive=T ) ; paste( "remove done.\n" ) %>% cat }
-  paste( "##################\nOmic analysis done \n##################\n",sep="") %>% cat
+  #
   # Rplots.pdf
-  if(file.exists(file.path(path,"Rplots.pdf"))){ file.remove(file.path(path,"Rplots.pdf")) }
-  # ----
+  # if(file.exists(file.path(path,"Rplots.pdf"))){ graphics.off() ; file.remove(file.path(path,"Rplots.pdf")) }
+  #
+  # done
+  paste( "##################\nOmic analysis done \n##################\n",sep="") %>% cat
+  # -----
 }

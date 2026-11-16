@@ -64,7 +64,7 @@ anovastats <- function( dat , path = "." , filename = "anovastatplot" )
     scale_fill_manual(values=palette0) +
     theme_bw() +
     ggtitle(paste("Average F ratio ",sep="")) +
-    theme(axis.text.x=element_text(face="plain",color="black",size=7,angle=90))
+    theme(axis.text.x=element_text(face="plain",color="black",size=7,angle=90)) -> p
   paste("Average_Fratio_",filename,"_",nrow(dat),".pdf",sep="") -> FileName0
-  ggsave(file.path(path,FileName0))
+  ggsave(plot=p,filename=file.path(path,FileName0))
 }

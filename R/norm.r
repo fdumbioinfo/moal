@@ -3,6 +3,7 @@
 #' @param dat data.frame data.frame without row ID column
 #' @param method character apply quantile normalization by default see details for all methods
 #' @param log logical apply log base 2
+#' @param rnaseq logical if TRUE (by default) apply normalization for integer matrix (as rnaseq rawcount)
 #' @return data.frame
 #' @details
 #' Normalization method available: 
@@ -17,31 +18,40 @@
 #' @importFrom limma normalizeBetweenArrays voom
 #' @importFrom edgeR DGEList normLibSizes
 #' @export
-norm <- function( dat = NULL, method = "quantile", log = TRUE )
+norm <- function( dat = NULL, method = "quantile", rnaseq = TRUE ,log = TRUE )
 {
   dat -> dato
   #
-  if(method == "none"){ dat -> dat1 }else{ dat -> dat1 }
-  # limma method
-  if(method %>% "=="(c("quantile","scale","cyclicloess")) %>% any)
-  {
-    dat %>% limma::normalizeBetweenArrays(method=method) %>% as.data.frame -> dat1
-  }
-  # EdgeR method
-  if(method %>% "=="(c("TMM","TMMwsp","RLE","upperquartile")) %>% any)
-  {
-    dat %>% edgeR::DGEList() %>% edgeR::normLibSizes(method=method) -> dg0
-    dat %>% sweep(2,dg0$samples$norm.factors,"*") -> dat1
+  if(method == "none")
+  { 
+    dat -> dat1
+  }else
+  { 
+    #
+    # limma method
+    if(method %>% "=="(c("quantile","scale","cyclicloess")) %>% any)
+    {
+      dat %>% limma::normalizeBetweenArrays(method=method) %>% as.data.frame -> dat1
+    }
+    #
+    # EdgeR method
+    if(method %>% "=="(c("TMM","TMMwsp","RLE","upperquartile")) %>% any)
+    {
+      dat %>% edgeR::DGEList() %>% edgeR::normLibSizes(method=method) -> dg0
+      dat %>% sweep(2,dg0$samples$norm.factors,"*") -> dat1
+    }
   }
   # log
   # if(log){ dat1 %>% "+"(.,1.01) %>% log2 -> dato }else{ dat1 -> dato }
   if(log)
   { 
     dat1 %>% unlist -> t 
+    t %>% min -> Min0
+    if(Min0<0){ t %>% "+"(Min0) -> t}
     t %>% "<="(1) %>% which -> sel
     if(length(sel)>0){ t[sel] <- 1.01 ; t %>% matrix(nrow=nrow(dat1),byrow=F) -> dat1 }
     dat1 %>% log2 -> dato
-  }
+  }else{ dat1 -> dato }
   #
-  dato %>% return()
+  dato %>% data.frame(check.names=F) %>% return()
 }
