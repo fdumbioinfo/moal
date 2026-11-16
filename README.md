@@ -69,7 +69,7 @@ omic(
   # data
   dat = dat , sif = sif,
   annot = annot, species = species,
-  # anova model
+  # anova
   model = model, padj = "none", anovafc = "anovafc",
   # paired = NULL,
   batch = batch, 
