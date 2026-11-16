@@ -66,7 +66,7 @@ parallel::detectCores() %>% "/"(2) -> nbcore
 # NULL -> nbcore # use all core
 # omic
 omic(
-  # input
+  # data
   dat = dat , sif = sif,
   annot = annot, species = species,
   # anova model
