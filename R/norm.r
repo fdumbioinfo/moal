@@ -3,7 +3,6 @@
 #' @param dat data.frame data.frame without row ID column
 #' @param method character apply quantile normalization by default see details for all methods
 #' @param log logical apply log base 2
-#' @param rnaseq logical if TRUE (by default) apply normalization for integer matrix (as rnaseq rawcount)
 #' @return data.frame
 #' @details
 #' Normalization method available: 
@@ -18,7 +17,7 @@
 #' @importFrom limma normalizeBetweenArrays voom
 #' @importFrom edgeR DGEList normLibSizes
 #' @export
-norm <- function( dat = NULL, method = "quantile", rnaseq = TRUE ,log = TRUE )
+norm <- function( dat = NULL, method = "quantile", log = TRUE )
 {
   dat -> dato
   #
