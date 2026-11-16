@@ -64,6 +64,8 @@ omic(
   savehistory = TRUE,
   path = ".",
   dirname = NULL,
+  dohtmlreport = TRUE,
+  dpihtml = 150,
   zip = FALSE,
   remove = FALSE
 )
@@ -186,6 +188,10 @@ omic(
 \item{path}{character results directory path}
 
 \item{dirname}{character results directory name}
+
+\item{dohtmlreport}{logical create HTML report if TRUE (by default)}
+
+\item{dpihtml}{numerical plot resolution for html}
 
 \item{zip}{logical compress results directory if TRUE}
 
