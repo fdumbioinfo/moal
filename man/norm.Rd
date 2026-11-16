@@ -4,14 +4,12 @@
 \alias{norm}
 \title{Normalization function}
 \usage{
-norm(dat = NULL, method = "quantile", rnaseq = TRUE, log = TRUE)
+norm(dat = NULL, method = "quantile", log = TRUE)
 }
 \arguments{
 \item{dat}{data.frame data.frame without row ID column}
 
 \item{method}{character apply quantile normalization by default see details for all methods}
-
-\item{rnaseq}{logical if TRUE (by default) apply normalization for integer matrix (as rnaseq rawcount)}
 
 \item{log}{logical apply log base 2}
 }
