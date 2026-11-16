@@ -52,7 +52,7 @@ annot %>% head
 # anova
 "ANEUPLOIDY" -> model
 NULL -> paired
-"BATCH" -> batch
+"TISSUE" -> batch
 # functional analysis
 "hs" -> species
 T -> doena
