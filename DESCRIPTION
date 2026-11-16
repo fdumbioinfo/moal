@@ -1,6 +1,6 @@
 Package: moal
 Title: Multi Omic Analysis at Lab
-Version: 1.2.3
+Version: 1.2.4
 Authors@R: 
     person("Florent", "Dumont", , "florent.dumont@universite-paris-saclay.fr", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4439-5070"))
@@ -28,6 +28,7 @@ Imports:
     graphics,
     grDevices,
     gridExtra,
+    htmltools,
     limma,
     moalannotensg,
     moalannotensp,
@@ -40,7 +41,9 @@ Imports:
     moalstringdbrn,
     moalstringdbss,
     parallel,
+    pdftools,
     plyr,
+    quarto,
     Rgraphviz,
     rlang,
     scales,
