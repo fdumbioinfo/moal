@@ -101,6 +101,8 @@ bioRxiv preprint: https://doi.org/10.1101/2023.10.17.562686
 
 Zenodo repository: https://zenodo.org/records/15309968
 
+--
+
 Release updates:
 
 1.2.4
@@ -147,4 +149,6 @@ Enrichment function gsneain():
 - Create heatmaps and interaction networks for significative gene sets
 - Heatmap created with gene set GMT files provided
 - Biological databases updates: NCBI gene, NCBI orthologs, Ensemble gene, Ensemble transcript, Ensemble proteins, MSigDB gene set collections and StringDB interactions.
+
+--
 
