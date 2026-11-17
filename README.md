@@ -60,10 +60,12 @@ T -> doena
 "GSE65055" -> dirname
 "1-omic-outputdata" -> path
 NULL -> sample
+T -> dohtmlreport
+150 -> dpihtml
 # parallel
 T -> dopar
 parallel::detectCores() %>% "/"(2) -> nbcore
-# NULL -> nbcore # use all core
+# NULL -> nbcore # for use all core
 # omic
 omic(
   # data
@@ -85,7 +87,7 @@ omic(
   # output
   path = path, dirname = dirname, sample = sample,
   # parallel
-  dopar = dopar, nbcore = nbcore, libloc = NULL)
+  dopar = dopar, nbcore = nbcore, libloc = NULL, dohtmlreport = dohtmlreport, dpihtml = dpihtml  )
 #
 ```
 
