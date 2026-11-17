@@ -11,6 +11,7 @@
 #' @importFrom htmltools htmlEscape
 #' @importFrom pdftools pdf_convert
 #' @importFrom foreach foreach
+#' @noRd
 htmlreport <- function( omicfolder = NULL, name = NULL , dpihtml = 150 )
 {
   i=1
