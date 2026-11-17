@@ -59,7 +59,7 @@ T -> doena
 # output
 "GSE65055" -> dirname
 "1-omic-outputdata" -> path
-NULL -> sample # NULL to use all matrix rows
+NULL -> sample # NULL to use all data rows
 T -> dohtmlreport
 150 -> dpihtml
 # parallel
