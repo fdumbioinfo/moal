@@ -21,12 +21,11 @@ Workflow summary:
 if(!require("moal",quietly=TRUE)){source("https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/0-moal-install-r-universe.r")}
 if(!require("curl",quietly=TRUE)){install.packages("curl")}
 #
-# Test omic() 
+# Test omic() workflow : anova and GSEA functional analysis 
 library(moal)
 ??moal::omic
 # create output directory
 if(!dir.exists("1-omic-outputdata")){"1-omic-outputdata" %>% dir.create}
-#
 # data
 # normalized gene expression matrix
 "https://raw.githubusercontent.com/fdumbioinfo/rtools/main/moal-demo/inputdata/GSE65055_datanorm_22_23786.tsv" -> url
@@ -46,9 +45,6 @@ dat$rowID %>% annotdb(species = "hs", idtype = "GENE", dboutput = "ncbi") -> ann
 annot %>% head
 annot %>% dplyr::select(GeneID,Symbol) -> annot
 annot %>% head
-#
-# omic workflow : anova and GSEA functional analysis
-#
 # anova
 "ANEUPLOIDY" -> model
 NULL -> paired
