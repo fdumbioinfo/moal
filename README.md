@@ -103,9 +103,14 @@ Zenodo repository: https://zenodo.org/records/15309968
 
 Release updates:
 
+1.2.4
+
+Add html report using quarto markdown to improve navigation through the tree structure, search and plot visualization on a larger scale  
+
+
 1.2.3
 
-Add replacena function to replace NA or 0 value matrix by background noise distribution
+Add replacena function to remove rows with low background or with numerous NA or 0 values, keep rows with hétérogenous distribution accros experimental design and replace value with background noise distribution
 
 Add normalization method to norm function : TMM, TMMwsp, RLE, upperquartile from EdgeR
 
