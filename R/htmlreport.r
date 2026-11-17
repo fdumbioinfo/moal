@@ -5,6 +5,7 @@
 #' @param dpihtml numerical plot resolution for html
 #' @return report folder
 #' @author Florent Dumont <florent.dumont@universite-paris-saclay.fr>
+#' @import magick
 #' @importFrom magrittr %>%
 #' @importFrom quarto quarto_render
 #' @importFrom htmltools htmlEscape
