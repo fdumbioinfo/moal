@@ -30,6 +30,7 @@ Imports:
     gridExtra,
     htmltools,
     limma,
+    magick,
     moalannotensg,
     moalannotensp,
     moalannotenst,
